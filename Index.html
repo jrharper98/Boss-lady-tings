@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Boss Lady Tings">
+<meta name="theme-color" content="#f5f4f0">
+<title>Boss Lady Tings</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #f5f4f0; --bg2: #eceae4; --card: #ffffff;
+  --text: #1a1a18; --text2: #6b6b67; --text3: #9b9b97;
+  --border: rgba(0,0,0,0.10); --border2: rgba(0,0,0,0.18);
+  --accent: #2d5a27; --accent-light: #e8f0e7;
+  --red: #b03a2e; --red-light: #fdf0ee;
+  --r: 14px; --r-sm: 10px;
+  --safe-top: env(safe-area-inset-top, 44px);
+  --safe-bottom: env(safe-area-inset-bottom, 20px);
+}
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 16px; }
+body { display: flex; flex-direction: column; overflow: hidden; }
+#app { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.safe-top { height: var(--safe-top); background: var(--bg); flex-shrink: 0; }
+.header { padding: 8px 16px 10px; background: var(--bg); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.header-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+.header-title em { font-style: italic; color: var(--accent); font-weight: 400; }
+.biz-tabs { display: flex; overflow-x: auto; padding: 0 12px; background: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.biz-tabs::-webkit-scrollbar { display: none; }
+.biz-tab { padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text3); white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; user-select: none; transition: color 0.15s; }
+.biz-tab.active { color: var(--accent); border-color: var(--accent); }
+.content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 14px 14px calc(80px + var(--safe-bottom)); }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding-bottom: var(--safe-bottom); z-index: 50; }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0 6px; cursor: pointer; user-select: none; gap: 3px; border: none; background: none; -webkit-appearance: none; }
+.nav-icon { font-size: 22px; line-height: 1; }
+.nav-lbl { font-size: 10px; font-weight: 600; color: var(--text3); }
+.nav-btn.active .nav-lbl { color: var(--accent); }
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.metric { background: var(--card); border-radius: var(--r); padding: 14px 12px; border: 1px solid var(--border); }
+.metric-lbl { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+.metric-val { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.metric-val.green { color: var(--accent); }
+.metric-val.red { color: var(--red); }
+.card { background: var(--card); border-radius: var(--r); border: 1px solid var(--border); margin-bottom: 12px; overflow: hidden; }
+.card-head { padding: 13px 14px 0; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.card-body { padding: 0 14px 14px; }
+.sec-label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin: 14px 0 8px; }
+.form-row { display: flex; gap: 10px; margin-bottom: 12px; }
+.fg { flex: 1; min-width: 0; }
+.fg label { font-size: 11px; font-weight: 700; color: var(--text3); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.03em; }
+.fg input, .fg select { 
+  width: 100%; padding: 12px 12px; border: 1.5px solid var(--border2); border-radius: var(--r-sm);
+  font-size: 16px; background: #fff; color: var(--text); 
+  -webkit-appearance: none; appearance: none;
+  font-family: -apple-system, 'Helvetica Neue', sans-serif;
+  display: block; min-height: 46px;
+}
+.fg select { 
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b67' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; background-color: #fff; padding-right: 34px;
+}
+.btn-full { width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: var(--r-sm); font-size: 16px; font-weight: 700; cursor: pointer; -webkit-appearance: none; margin-top: 4px; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
+.btn-full:active { opacity: 0.8; }
+.btn-sm { padding: 8px 14px; background: var(--bg2); color: var(--text2); border: 1px solid var(--border2); border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; -webkit-appearance: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
+.btn-sm:active { opacity: 0.7; }
+.btn-del { padding: 6px 12px; background: var(--red-light); color: var(--red); border: 1px solid var(--red); border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; -webkit-appearance: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
+.exp-row { display: flex; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.exp-row:last-child { border-bottom: none; }
+.exp-main { flex: 1; min-width: 0; }
+.exp-vendor { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.exp-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.exp-note { font-size: 12px; color: var(--text2); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.exp-right { text-align: right; flex-shrink: 0; }
+.exp-amt { font-size: 16px; font-weight: 700; }
+.badge { display: inline-block; padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; margin-top: 4px; }
+.b-decor { background:#eeedfe;color:#3c3489; } .b-food { background:#faeeda;color:#633806; }
+.b-marketing { background:#e1f5ee;color:#085041; } .b-utilities { background:#e6f1fb;color:#0c447c; }
+.b-venue { background:#fbeaf0;color:#72243e; } .b-supplies { background:#eaf3de;color:#27500a; }
+.b-platform { background:#f1efe8;color:#444441; } .b-travel { background:#fcebeb;color:#791f1f; }
+.b-transport { background:#dbeafe;color:#1e3a8a; } .b-software { background:#faece7;color:#712b13; }
+.b-other { background:#f1efe8;color:#444441; }
+.cat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.cat-row:last-child { border-bottom: none; }
+.cat-amt { font-size: 15px; font-weight: 700; }
+.ev-item { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.ev-item:last-child { border-bottom: none; }
+.ev-name { font-size: 14px; font-weight: 600; }
+.ev-date { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.ev-stats { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+.ev-stat { font-size: 12px; color: var(--text3); }
+.ev-stat strong { color: var(--text); }
+.preview { background: var(--bg2); border-radius: var(--r-sm); padding: 12px; margin: 8px 0; }
+.preview-row { display: flex; justify-content: space-between; font-size: 14px; padding: 3px 0; }
+.total-row { display: flex; justify-content: space-between; padding: 12px 14px; border-top: 1px solid var(--border); font-weight: 700; font-size: 14px; background: var(--bg2); }
+.empty { text-align: center; padding: 28px 0; color: var(--text3); font-size: 14px; }
+.upload-zone { border: 2px dashed var(--border2); border-radius: var(--r-sm); padding: 16px; text-align: center; font-size: 14px; color: var(--text3); cursor: pointer; margin-bottom: 6px; }
+.file-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: var(--bg2); border-radius: 99px; font-size: 12px; border: 1px solid var(--border); margin: 3px; }
+.schc-row { display: flex; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.schc-row:last-child { border-bottom: none; font-weight: 700; }
+.export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+#toast { position: fixed; bottom: calc(80px + var(--safe-bottom) + 12px); left: 50%; transform: translateX(-50%); background: #1a1a18; color: #fff; padding: 10px 20px; border-radius: 99px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 0.25s; z-index: 200; pointer-events: none; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="safe-top"></div>
+  <div class="header">
+    <div class="header-title">Boss <em>Lady</em> Tings</div>
+    <button class="btn-sm" onclick="exportCSV('all')">↗ Export all</button>
+  </div>
+  <div class="biz-tabs" id="biz-tabs">
+    <div class="biz-tab active" onclick="switchBiz('rover')">🐾 Rover</div>
+    <div class="biz-tab" onclick="switchBiz('wyzant')">📚 Wyzant</div>
+    <div class="biz-tab" onclick="switchBiz('itt')">💃 It Takes Two</div>
+    <div class="biz-tab" onclick="switchBiz('eve')">🌿 EVE</div>
+  </div>
+  <div class="content" id="content"></div>
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="nav-overview" onclick="switchView('overview')">
+      <span class="nav-icon">📊</span><span class="nav-lbl">Overview</span>
+    </button>
+    <button class="nav-btn" id="nav-add" onclick="switchView('add')">
+      <span class="nav-icon" style="font-size:28px;line-height:0.85">+</span><span class="nav-lbl">Add</span>
+    </button>
+    <button class="nav-btn" id="nav-export" onclick="switchView('export')">
+      <span class="nav-icon">↗</span><span class="nav-lbl">Export</span>
+    </button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+var CATS = {
+  rover:  ['Supplies','Food & Bev','Transportation','Travel','Platform Fees','Marketing','Software','Other'],
+  wyzant: ['Supplies','Transportation','Travel','Platform Fees','Marketing','Software','Other'],
+  itt:    ['Decor','Food & Bev','Marketing','Utilities','Venue','Supplies','Transportation','Other'],
+  eve:    ['Decor','Food & Bev','Marketing','Utilities','Venue','Supplies','Transportation','Software','Other']
+};
+var PAY = ['BoA CC','Apple Card','Venmo','PayPal','Personal Debit','Personal Checking','EventBrite Portal','Cash','Other'];
+var SC_MAP = {
+  'Supplies':'Supplies (ln 22)','Food & Bev':'Meals (ln 24b)','Travel':'Travel (ln 24a)',
+  'Transportation':'Car & truck (ln 9)','Platform Fees':'Commissions (ln 10)',
+  'Marketing':'Advertising (ln 8)','Software':'Office expense (ln 18)',
+  'Utilities':'Utilities (ln 25)','Venue':'Rent/lease (ln 20b)',
+  'Decor':'Supplies (ln 22)','Other':'Other expenses (ln 48)'
+};
+var BIZ = {rover:'Rover',wyzant:'Wyzant',itt:'It Takes Two',eve:'EVE'};
+var TICKET_BIZ = ['itt','eve'];
+var CAT_CLS = {
+  'Decor':'b-decor','Food & Bev':'b-food','Marketing':'b-marketing','Utilities':'b-utilities',
+  'Venue':'b-venue','Supplies':'b-supplies','Platform Fees':'b-platform','Travel':'b-travel',
+  'Transportation':'b-transport','Software':'b-software','Other':'b-other'
+};
+
+var state = {
+  rover:{expenses:[]}, wyzant:{expenses:[]},
+  itt:{expenses:[],events:[],ticketPrices:{single:65,couple:115}},
+  eve:{expenses:[],events:[],ticketPrices:{single:65,couple:115}}
+};
+var biz = 'rover', curView = 'overview';
+var pendingFiles = [];
+
+try {
+  var s = localStorage.getItem('bossLadyTings');
+  if (s) {
+    state = JSON.parse(s);
+    ['itt','eve'].forEach(function(b) {
+      if (!state[b].events) state[b].events = [];
+      if (!state[b].ticketPrices) state[b].ticketPrices = {single:65,couple:115};
+    });
+  }
+} catch(e) {}
+
+function save() { try { localStorage.setItem('bossLadyTings', JSON.stringify(state)); } catch(e) {} }
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(function() { t.style.opacity = '0'; }, 2000);
+}
+
+function fmt(n) { return '$' + parseFloat(n||0).toFixed(2); }
+function fmtDate(d) { if (!d) return ''; var p = d.split('-'); return p[1]+'/'+p[2]+'/'+p[0].slice(2); }
+function catCls(c) { return CAT_CLS[c] || 'b-other'; }
+function totalExp(b) { return (state[b].expenses||[]).reduce(function(s,e){ return s+(parseFloat(e.amount)||0); },0); }
+function totalRev(b) {
+  if (TICKET_BIZ.indexOf(b) < 0) return 0;
+  var p = state[b].ticketPrices;
+  return (state[b].events||[]).reduce(function(s,ev){ return s+(parseInt(ev.singleSold)||0)*parseFloat(p.single)+(parseInt(ev.coupleSold)||0)*parseFloat(p.couple); },0);
+}
+function totalAtt(b) { return (state[b].events||[]).reduce(function(s,ev){ return s+(parseInt(ev.singleSold)||0)+(parseInt(ev.coupleSold)||0)*2; },0); }
+
+function switchBiz(b2) {
+  biz = b2;
+  var tabs = document.querySelectorAll('.biz-tab');
+  var keys = ['rover','wyzant','itt','eve'];
+  for (var i=0; i<tabs.length; i++) tabs[i].classList.toggle('active', keys[i]===b2);
+  render();
+}
+
+function switchView(v) {
+  curView = v;
+  ['overview','add','export'].forEach(function(x) {
+    var el = document.getElementById('nav-'+x);
+    if (el) el.classList.toggle('active', x===v);
+  });
+  render();
+}
+
+function render() {
+  var el = document.getElementById('content');
+  if (curView === 'overview') el.innerHTML = buildOverview();
+  else if (curView === 'add') el.innerHTML = buildAdd();
+  else el.innerHTML = buildExport();
+  if (curView === 'add') initAddDefaults();
+  if (curView === 'export') renderSchedC();
+  el.scrollTop = 0;
+}
+
+function buildOverview() {
+  var exps = state[biz].expenses || [];
+  var isT = TICKET_BIZ.indexOf(biz) >= 0;
+  var te = totalExp(biz), tr = totalRev(biz), profit = tr - te;
+  var cats = CATS[biz];
+  var ct = {}; cats.forEach(function(c){ ct[c]=0; });
+  exps.forEach(function(e){ ct[e.category] !== undefined ? ct[e.category]+=parseFloat(e.amount)||0 : ct['Other']=(ct['Other']||0)+(parseFloat(e.amount)||0); });
+
+  var h = '<div class="metrics">';
+  h += '<div class="metric"><div class="metric-lbl">Expenses</div><div class="metric-val red">'+fmt(te)+'</div></div>';
+  if (isT) {
+    h += '<div class="metric"><div class="metric-lbl">Revenue</div><div class="metric-val green">'+fmt(tr)+'</div></div>';
+    h += '<div class="metric"><div class="metric-lbl">Net profit</div><div class="metric-val '+(profit>=0?'green':'red')+'">'+fmt(profit)+'</div></div>';
+    h += '<div class="metric"><div class="metric-lbl">Attendance</div><div class="metric-val">'+totalAtt(biz)+'</div></div>';
+  } else {
+    h += '<div class="metric"><div class="metric-lbl">Logged</div><div class="metric-val">'+exps.length+'</div></div>';
+  }
+  h += '</div>';
+
+  var hasCats = cats.some(function(c){ return ct[c]>0; });
+  if (hasCats) {
+    h += '<div class="sec-label">By category</div><div class="card">';
+    cats.filter(function(c){ return ct[c]>0; }).sort(function(a,b){ return ct[b]-ct[a]; }).forEach(function(c){
+      h += '<div class="cat-row"><span class="badge '+catCls(c)+'">'+c+'</span><span class="cat-amt">'+fmt(ct[c])+'</span></div>';
+    });
+    h += '</div>';
+  }
+
+  if (isT) {
+    var evs = (state[biz].events||[]).slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+    var tp = state[biz].ticketPrices;
+    h += '<div class="sec-label">Events</div><div class="card">';
+    if (!evs.length) h += '<div class="empty">No events yet. Tap Add to log one.</div>';
+    else {
+      evs.forEach(function(ev) {
+        var rev = (parseInt(ev.singleSold)||0)*parseFloat(tp.single)+(parseInt(ev.coupleSold)||0)*parseFloat(tp.couple);
+        var att = (parseInt(ev.singleSold)||0)+(parseInt(ev.coupleSold)||0)*2;
+        var net = rev-(parseFloat(ev.opCost)||0);
+        h += '<div class="ev-item"><div style="display:flex;justify-content:space-between;align-items:flex-start">';
+        h += '<div><div class="ev-name">'+(ev.name||'Unnamed')+'</div><div class="ev-date">'+fmtDate(ev.date)+'</div></div>';
+        h += '<span style="font-size:16px;font-weight:700;color:'+(net>=0?'var(--accent)':'var(--red)')+'">'+fmt(net)+'</span></div>';
+        h += '<div class="ev-stats"><div class="ev-stat">🎟 <strong>'+att+'</strong> attended</div><div class="ev-stat">💰 <strong>'+fmt(rev)+'</strong></div>';
+        h += '<div class="ev-stat">Singles: <strong>'+(ev.singleSold||0)+'</strong></div><div class="ev-stat">Couples: <strong>'+(ev.coupleSold||0)+'</strong></div></div>';
+        h += '<div style="margin-top:8px"><button class="btn-del" onclick="deleteEvent(\''+ev.id+'\')">Delete</button></div></div>';
+      });
+      h += '<div class="total-row"><span>All-time revenue</span><span style="color:var(--accent)">'+fmt(tr)+'</span></div>';
+    }
+    h += '</div>';
+  }
+
+  var sorted = exps.slice().sort(function(a,b){ return new Date(b.date+' '+(b.time||'00:00'))-new Date(a.date+' '+(a.time||'00:00')); });
+  h += '<div class="sec-label">Expense log ('+exps.length+')</div><div class="card">';
+  if (!sorted.length) h += '<div class="empty">No expenses yet. Tap Add below.</div>';
+  else sorted.forEach(function(e) {
+    h += '<div class="exp-row"><div class="exp-main"><div class="exp-vendor">'+(e.vendor||'—')+'</div>';
+    h += '<div class="exp-meta">'+fmtDate(e.date)+(e.time?' · '+e.time:'')+(e.payMethod?' · '+e.payMethod:'')+'</div>';
+    if (e.note) h += '<div class="exp-note">'+e.note+'</div>';
+    if (e.files&&e.files.length) h += '<div style="font-size:11px;color:var(--text3);margin-top:3px">📎 '+e.files.join(', ')+'</div>';
+    h += '<span class="badge '+catCls(e.category)+'">'+e.category+'</span></div>';
+    h += '<div class="exp-right"><div class="exp-amt">'+fmt(e.amount)+'</div>';
+    h += '<button class="btn-del" style="margin-top:6px" onclick="deleteExp(\''+e.id+'\')">Del</button></div></div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+function buildAdd() {
+  var cats = CATS[biz];
+  var isT = TICKET_BIZ.indexOf(biz) >= 0;
+  var tp = isT ? state[biz].ticketPrices : null;
+
+  var h = '<div class="sec-label">Add expense — '+BIZ[biz]+'</div><div class="card"><div class="card-body">';
+  h += '<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="a-date"></div><div class="fg"><label>Time</label><input type="time" id="a-time"></div></div>';
+  h += '<div class="form-row"><div class="fg" style="flex:2"><label>Vendor</label><input type="text" id="a-vendor" placeholder="e.g. Amazon" autocomplete="off" autocorrect="off"></div><div class="fg"><label>Amount ($)</label><input type="number" id="a-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div></div>';
+  h += '<div class="form-row"><div class="fg"><label>Category</label><select id="a-cat">'+cats.map(function(c){ return '<option>'+c+'</option>'; }).join('')+'</select></div><div class="fg"><label>Payment</label><select id="a-pay">'+PAY.map(function(p){ return '<option>'+p+'</option>'; }).join('')+'</select></div></div>';
+  h += '<div class="fg" style="margin-bottom:12px"><label>Note (optional)</label><input type="text" id="a-note" placeholder="Brief description" autocorrect="off"></div>';
+  h += '<div class="fg" style="margin-bottom:12px"><label>Receipt</label><div class="upload-zone" onclick="document.getElementById(\'a-file\').click()">📎 Tap to attach photo or file<input type="file" id="a-file" style="display:none" accept="image/*,.pdf" multiple onchange="handleFiles(this)"></div><div id="file-chips"></div></div>';
+  h += '<button class="btn-full" onclick="addExp()">Add Expense</button></div></div>';
+
+  if (isT) {
+    h += '<div class="sec-label">Log event — '+BIZ[biz]+'</div><div class="card"><div class="card-body">';
+    h += '<div class="form-row"><div class="fg" style="flex:2"><label>Event name</label><input type="text" id="ev-name" placeholder="e.g. Nov Tango Night" autocorrect="off"></div><div class="fg"><label>Date</label><input type="date" id="ev-date"></div></div>';
+    h += '<div class="form-row"><div class="fg"><label>Single price ($)</label><input type="number" id="ev-sp" value="'+tp.single+'" step="0.01" inputmode="decimal"></div><div class="fg"><label>Couple price ($)</label><input type="number" id="ev-cp" value="'+tp.couple+'" step="0.01" inputmode="decimal"></div></div>';
+    h += '<div class="form-row"><div class="fg"><label>Singles sold</label><input type="number" id="ev-ss" placeholder="0" min="0" inputmode="numeric"></div><div class="fg"><label>Couples sold</label><input type="number" id="ev-cs" placeholder="0" min="0" inputmode="numeric"></div><div class="fg"><label>Op costs ($)</label><input type="number" id="ev-oc" placeholder="0.00" step="0.01" inputmode="decimal"></div></div>';
+    h += '<div id="ev-preview"></div>';
+    h += '<button class="btn-full" style="background:#2d5a27" onclick="addEvent()">Log Event</button></div></div>';
+  }
+  return h;
+}
+
+function buildExport() {
+  var h = '<div class="sec-label">Download CSV for Google Sheets</div><div class="card"><div class="card-body">';
+  h += '<p style="font-size:13px;color:var(--text2);margin-bottom:12px">In Google Sheets: File → Import → Upload CSV</p>';
+  h += '<div class="export-grid">';
+  ['rover','wyzant','itt','eve'].forEach(function(b){ h+='<button class="btn-sm" onclick="exportCSV(\''+b+'\')">'+BIZ[b]+'</button>'; });
+  h += '</div><button class="btn-full" style="margin-top:10px" onclick="exportCSV(\'all\')">↗ Export All Businesses</button></div></div>';
+  h += '<div class="sec-label">Schedule C (Tax)</div><div class="card"><div class="card-body">';
+  h += '<p style="font-size:13px;color:var(--text2);margin-bottom:10px">IRS Schedule C line items</p>';
+  h += '<select id="sc-biz" onchange="renderSchedC()" style="width:100%;padding:12px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:16px;background:#fff;-webkit-appearance:none;margin-bottom:12px">';
+  h += '<option value="rover">Rover</option><option value="wyzant">Wyzant</option><option value="itt">It Takes Two</option><option value="eve">EVE</option></select>';
+  h += '<div id="sc-out"></div>';
+  h += '<button class="btn-full" style="margin-top:10px" onclick="exportSchC()">↗ Download Schedule C CSV</button></div></div>';
+  return h;
+}
+
+function initAddDefaults() {
+  var today = new Date().toISOString().split('T')[0];
+  var now = new Date();
+  var t = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  var dateEl = document.getElementById('a-date'); if (dateEl) dateEl.value = today;
+  var timeEl = document.getElementById('a-time'); if (timeEl) timeEl.value = t;
+  var evDate = document.getElementById('ev-date'); if (evDate) evDate.value = today;
+  pendingFiles = [];
+  var chips = document.getElementById('file-chips'); if (chips) chips.innerHTML = '';
+
+  var ssEl = document.getElementById('ev-ss');
+  var csEl = document.getElementById('ev-cs');
+  var ocEl = document.getElementById('ev-oc');
+  if (ssEl) ssEl.addEventListener('input', updatePreview);
+  if (csEl) csEl.addEventListener('input', updatePreview);
+  if (ocEl) ocEl.addEventListener('input', updatePreview);
+}
+
+function updatePreview() {
+  var sp = parseFloat(document.getElementById('ev-sp')?document.getElementById('ev-sp').value:0)||0;
+  var cp = parseFloat(document.getElementById('ev-cp')?document.getElementById('ev-cp').value:0)||0;
+  var ss = parseInt(document.getElementById('ev-ss')?document.getElementById('ev-ss').value:0)||0;
+  var cs = parseInt(document.getElementById('ev-cs')?document.getElementById('ev-cs').value:0)||0;
+  var oc = parseFloat(document.getElementById('ev-oc')?document.getElementById('ev-oc').value:0)||0;
+  var rev = ss*sp + cs*cp, att = ss + cs*2;
+  var prev = document.getElementById('ev-preview'); if (!prev) return;
+  if (!ss && !cs) { prev.innerHTML=''; return; }
+  prev.innerHTML = '<div class="preview"><div class="preview-row"><span style="color:var(--text3)">Attendance</span><strong>'+att+' people</strong></div>'
+    +'<div class="preview-row"><span style="color:var(--text3)">Revenue</span><strong style="color:var(--accent)">'+fmt(rev)+'</strong></div>'
+    +'<div class="preview-row"><span style="color:var(--text3)">Net after op costs</span><strong style="color:'+(rev-oc>=0?'var(--accent)':'var(--red)')+'">'+fmt(rev-oc)+'</strong></div></div>';
+}
+
+function handleFiles(input) {
+  var names = Array.prototype.map.call(input.files, function(f){ return f.name; });
+  pendingFiles = pendingFiles.concat(names).filter(function(v,i,a){ return a.indexOf(v)===i; });
+  var chips = document.getElementById('file-chips');
+  if (chips) chips.innerHTML = pendingFiles.map(function(f){ return '<span class="file-chip">📎 '+f+' <span onclick="removeFile(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>'; }).join('');
+}
+function removeFile(n) {
+  pendingFiles = pendingFiles.filter(function(f){ return f!==n; });
+  var chips = document.getElementById('file-chips');
+  if (chips) chips.innerHTML = pendingFiles.map(function(f){ return '<span class="file-chip">📎 '+f+' <span onclick="removeFile(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>'; }).join('');
+}
+
+function addExp() {
+  var vendor = (document.getElementById('a-vendor').value||'').trim();
+  var amount = parseFloat(document.getElementById('a-amount').value);
+  var date = document.getElementById('a-date').value;
+  var time = document.getElementById('a-time').value;
+  var cat = document.getElementById('a-cat').value;
+  var pay = document.getElementById('a-pay').value;
+  var note = (document.getElementById('a-note').value||'').trim();
+  if (!vendor || isNaN(amount) || amount <= 0) { toast('Enter vendor and amount'); return; }
+  if (!date) { toast('Select a date'); return; }
+  state[biz].expenses.push({id:Date.now()+'',date:date,time:time,vendor:vendor,amount:amount,category:cat,payMethod:pay,note:note,files:pendingFiles.slice()});
+  save(); toast('✓ Expense added'); pendingFiles = [];
+  document.getElementById('a-vendor').value = '';
+  document.getElementById('a-amount').value = '';
+  document.getElementById('a-note').value = '';
+  var chips = document.getElementById('file-chips'); if (chips) chips.innerHTML = '';
+}
+
+function addEvent() {
+  var name = (document.getElementById('ev-name').value||'').trim();
+  var date = document.getElementById('ev-date').value;
+  var sp = parseFloat(document.getElementById('ev-sp').value)||0;
+  var cp = parseFloat(document.getElementById('ev-cp').value)||0;
+  var ss = parseInt(document.getElementById('ev-ss').value)||0;
+  var cs = parseInt(document.getElementById('ev-cs').value)||0;
+  var oc = parseFloat(document.getElementById('ev-oc').value)||0;
+  if (!date) { toast('Enter event date'); return; }
+  if (!ss && !cs) { toast('Enter tickets sold'); return; }
+  state[biz].ticketPrices = {single:sp, couple:cp};
+  state[biz].events.push({id:Date.now()+'',name:name,date:date,singleSold:ss,coupleSold:cs,opCost:oc});
+  save(); toast('✓ Event logged');
+  document.getElementById('ev-name').value = '';
+  document.getElementById('ev-ss').value = '';
+  document.getElementById('ev-cs').value = '';
+  document.getElementById('ev-oc').value = '';
+  var prev = document.getElementById('ev-preview'); if (prev) prev.innerHTML = '';
+}
+
+function deleteExp(id) {
+  if (!confirm('Delete this expense?')) return;
+  state[biz].expenses = state[biz].expenses.filter(function(e){ return e.id!==id; });
+  save(); toast('Deleted'); render();
+}
+function deleteEvent(id) {
+  if (!confirm('Delete this event?')) return;
+  state[biz].events = state[biz].events.filter(function(e){ return e.id!==id; });
+  save(); toast('Deleted'); render();
+}
+
+function renderSchedC() {
+  var b = (document.getElementById('sc-biz')||{}).value || 'rover';
+  var exps = state[b].expenses || [];
+  var map = {};
+  exps.forEach(function(e){ var l=SC_MAP[e.category]||'Other expenses (ln 48)'; map[l]=(map[l]||0)+(parseFloat(e.amount)||0); });
+  var out = document.getElementById('sc-out'); if (!out) return;
+  if (!Object.keys(map).length) { out.innerHTML='<p style="font-size:13px;color:var(--text3);padding:8px 0">No expenses yet.</p>'; return; }
+  var total=0, h='<div class="card" style="margin:0">';
+  Object.entries(map).sort(function(a,b){ return b[1]-a[1]; }).forEach(function(kv){ total+=kv[1]; h+='<div class="schc-row"><span style="color:var(--text2)">'+kv[0]+'</span><strong>'+fmt(kv[1])+'</strong></div>'; });
+  h+='<div class="schc-row" style="background:var(--bg2)"><span>Total deductible</span><strong style="color:var(--red)">'+fmt(total)+'</strong></div></div>';
+  out.innerHTML = h;
+}
+
+function exportCSV(b) {
+  var rows = [['Business','Date','Time','Vendor','Amount','Category','Payment Method','Note','Receipts']];
+  var keys = b==='all' ? ['rover','wyzant','itt','eve'] : [b];
+  keys.forEach(function(k) {
+    (state[k].expenses||[]).forEach(function(e){ rows.push([BIZ[k],e.date,e.time,e.vendor,e.amount,e.category,e.payMethod,e.note,(e.files||[]).join('; ')]); });
+    if (TICKET_BIZ.indexOf(k)>=0 && (state[k].events||[]).length) {
+      rows.push([]);
+      rows.push([BIZ[k]+' Events','Date','Name','Singles','Couples','Attendance','Op Costs','Revenue']);
+      var tp = state[k].ticketPrices;
+      state[k].events.slice().sort(function(a,c){ return new Date(a.date)-new Date(c.date); }).forEach(function(ev){
+        var rev=(parseInt(ev.singleSold)||0)*parseFloat(tp.single)+(parseInt(ev.coupleSold)||0)*parseFloat(tp.couple);
+        rows.push([BIZ[k],ev.date,ev.name,ev.singleSold,ev.coupleSold,(parseInt(ev.singleSold)||0)+(parseInt(ev.coupleSold)||0)*2,ev.opCost,rev.toFixed(2)]);
+      });
+    }
+  });
+  dl(rows, (b==='all'?'all_businesses':BIZ[b])+'_expenses.csv');
+}
+
+function exportSchC() {
+  var b = (document.getElementById('sc-biz')||{}).value||'rover';
+  var exps = state[b].expenses||[];
+  var map={};
+  exps.forEach(function(e){ var l=SC_MAP[e.category]||'Other expenses (ln 48)'; map[l]=(map[l]||0)+(parseFloat(e.amount)||0); });
+  var rows=[['IRS Schedule C — '+BIZ[b]],['Line item','Amount']];
+  var total=0;
+  Object.entries(map).sort(function(a,b){ return b[1]-a[1]; }).forEach(function(kv){ total+=kv[1]; rows.push([kv[0],kv[1].toFixed(2)]); });
+  rows.push(['Total deductible',total.toFixed(2)]);
+  dl(rows, BIZ[b]+'_schedule_c.csv');
+}
+
+function dl(rows, name) {
+  var csv = rows.map(function(r){ return r.map(function(c){ return '"'+String(c||'').replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  toast('↗ Downloaded');
+}
+
+render();
+</script>
+</body>
+</html>
