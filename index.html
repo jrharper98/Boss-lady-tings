@@ -515,12 +515,12 @@ function buildOverview() {
         var net=rev-(parseFloat(ev.opCost)||0);
         h+='<div class="ev-item"><div style="display:flex;justify-content:space-between;align-items:flex-start">';
         h+='<div><div class="ev-name">'+(ev.name||'Unnamed')+'</div><div class="ev-date">'+fmtDate(ev.date)+'</div></div>';
-        h+='<span style="font-size:16px;font-weight:700;color:'+(net>=0?'var(--accent)':'var(--red)')+'">'+fmt(net)+'</span></div>';
+        h+='<span style="font-size:16px;font-weight:700;color:'+(net>=0?'var(--profit)':'var(--red)')+'">'+fmt(net)+'</span></div>';
         h+='<div class="ev-stats"><div class="ev-stat">🎟 <strong>'+att+'</strong> attended</div><div class="ev-stat">💰 <strong>'+fmt(rev)+'</strong></div>';
         h+='<div class="ev-stat">Singles: <strong>'+(ev.singleSold||0)+'</strong></div><div class="ev-stat">Couples: <strong>'+(ev.coupleSold||0)+'</strong></div></div>';
         h+='<div style="margin-top:8px"><button class="btn-del" onclick="deleteEvent(\''+ev.id+'\')">Delete</button></div></div>';
       });
-      h+='<div class="total-row"><span>Period revenue</span><span style="color:var(--accent)">'+fmt(tr)+'</span></div>';
+      h+='<div class="total-row"><span>Period revenue</span><span style="color:var(--income)">'+fmt(tr)+'</span></div>';
     }
     h += '</div>';
   }
@@ -624,9 +624,9 @@ function buildEarnings() {
     h += '<div class="card" style="margin-bottom:10px">';
     h += '<div style="padding:12px 14px 0;font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">'+emoji+' '+BIZ[k]+'</div>';
     h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--border)">';
-    h += '<div style="padding:12px 10px;border-right:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Income</div><div style="font-size:16px;font-weight:700;color:var(--accent)">'+fmt(inc)+'</div>'+((!isT&&(state[k].income||{}).asOf)?'<div style="font-size:10px;color:var(--text3);margin-top:2px">As of '+fmtDate(state[k].income.asOf)+'</div>':'')+'</div>';
+    h += '<div style="padding:12px 10px;border-right:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Income</div><div style="font-size:16px;font-weight:700;color:var(--income)">'+fmt(inc)+'</div>'+((!isT&&(state[k].income||{}).asOf)?'<div style="font-size:10px;color:var(--text3);margin-top:2px">As of '+fmtDate(state[k].income.asOf)+'</div>':'')+'</div>';
     h += '<div style="padding:12px 10px;border-right:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Expenses</div><div style="font-size:16px;font-weight:700;color:var(--red)">'+fmt(exp)+'</div></div>';
-    h += '<div style="padding:12px 10px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Net profit</div><div style="font-size:16px;font-weight:700;color:'+(profit>=0?'var(--accent)':'var(--red)')+'">'+fmt(profit)+'</div></div>';
+    h += '<div style="padding:12px 10px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Net profit</div><div style="font-size:16px;font-weight:700;color:'+(profit>=0?'var(--profit)':'var(--red)')+'">'+fmt(profit)+'</div></div>';
     h += '</div></div>';
   });
 
@@ -639,7 +639,7 @@ function buildEarnings() {
   h += '</div>';
   h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)">';
   h += '<div style="padding:14px;border-right:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Total expenses</div><div style="font-size:22px;font-weight:700;color:var(--red)">'+fmt(totalExpAll)+'</div></div>';
-  h += '<div style="padding:14px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Total net profit</div><div style="font-size:22px;font-weight:700;color:'+(totalProfitAll>=0?'var(--accent)':'var(--red)')+'">'+fmt(totalProfitAll)+'</div></div>';
+  h += '<div style="padding:14px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Total net profit</div><div style="font-size:22px;font-weight:700;color:'+(totalProfitAll>=0?'var(--profit)':'var(--red)')+'">'+fmt(totalProfitAll)+'</div></div>';
   h += '</div>';
   h += '<div style="padding:12px 16px;background:var(--bg2);border-top:1px solid var(--border)">';
   h += '<p style="font-size:12px;color:var(--text2)">⚠️ This is an estimate of taxable income. Net profit is your approximate gross income for Schedule C. Consult a tax professional for your actual tax liability.</p>';
