@@ -15,10 +15,11 @@
   --bg: #f5f4f0; --bg2: #eceae4; --card: #ffffff;
   --text: #1a1a18; --text2: #6b6b67; --text3: #9b9b97;
   --border: rgba(0,0,0,0.10); --border2: rgba(0,0,0,0.18);
-  --accent: #2d5a27; --accent-light: #e8f0e7;
+  --accent: #1a7a12; --accent-light: #e8f0e7;
   --red: #b03a2e; --red-light: #fdf0ee;
   --gold: #8a6d1e; --gold-light: #fdf6e3;
   --blue: #185FA5; --blue-light: #e6f1fb;
+  --income: #0070e0; --profit: #1a7a12;
   --r: 14px; --r-sm: 10px;
   --safe-top: env(safe-area-inset-top, 44px);
   --safe-bottom: env(safe-area-inset-bottom, 20px);
@@ -475,7 +476,7 @@ function buildOverview() {
     var inc = state[biz].income || {amount:0,date:'',asOf:''};
     var incProfit = (parseFloat(inc.amount)||0) - te;
     h += '<div class="metric"><div class="metric-lbl">Logged</div><div class="metric-val">'+exps.length+'</div></div>';
-    h += '<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Income YTD</div><div class="metric-val green">'+fmt(inc.amount)+'</div>'+(inc.asOf?'<div style="font-size:10px;color:var(--text3);margin-top:3px">As of '+fmtDate(inc.asOf)+'</div>':'')+'</div>';
+    h += '<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Income YTD</div><div class="metric-val" style="color:var(--income)">'+fmt(inc.amount)+'</div>'+(inc.asOf?'<div style="font-size:10px;color:var(--text3);margin-top:3px">As of '+fmtDate(inc.asOf)+'</div>':'')+'</div>';
     h += '<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Net profit YTD</div><div class="metric-val '+(incProfit>=0?'green':'red')+'">'+fmt(incProfit)+'</div></div>';
   }
   h += '</div>';
@@ -632,7 +633,7 @@ function buildEarnings() {
   // Grand total card
   h += '<div class="sec-label">Combined total</div>';
   h += '<div class="card" style="overflow:hidden">';
-  h += '<div style="background:var(--accent);padding:14px 16px">';
+  h += '<div style="background:var(--income);padding:14px 16px">';
   h += '<div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Total income across all businesses</div>';
   h += '<div style="font-size:32px;font-weight:700;color:#fff">'+fmt(totalIncome)+'</div>';
   h += '</div>';
