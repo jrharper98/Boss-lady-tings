@@ -30,6 +30,10 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .header { padding: 8px 16px 10px; background: var(--bg); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
 .header-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
 .header-title em { font-style: italic; color: var(--accent); font-weight: 400; }
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); display: inline-block; margin-left: 6px; vertical-align: middle; transition: background 0.3s; }
+.sync-dot.synced { background: #4caf50; }
+.sync-dot.syncing { background: #ff9800; }
+.sync-dot.error { background: var(--red); }
 .biz-tabs { display: flex; overflow-x: auto; padding: 0 12px; background: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .biz-tabs::-webkit-scrollbar { display: none; }
 .biz-tab { padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text3); white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; user-select: none; transition: color 0.15s; }
@@ -47,7 +51,6 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .metric-val.green { color: var(--accent); }
 .metric-val.red { color: var(--red); }
 .card { background: var(--card); border-radius: var(--r); border: 1px solid var(--border); margin-bottom: 12px; overflow: hidden; }
-.card-head { padding: 13px 14px 0; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
 .card-body { padding: 0 14px 14px; }
 .sec-label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin: 14px 0 8px; }
 .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
@@ -106,34 +109,44 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .schc-row { display: flex; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
 .schc-row:last-child { border-bottom: none; font-weight: 700; }
 .export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-/* Period filter pills */
 .period-bar { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
 .period-pill { padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 600; border: 1.5px solid var(--border2); background: var(--bg2); color: var(--text2); cursor: pointer; -webkit-appearance: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
 .period-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .period-select { padding: 8px 12px; border-radius: var(--r-sm); font-size: 14px; border: 1.5px solid var(--border2); background: #fff; color: var(--text); -webkit-appearance: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; min-height: 40px; }
-/* Modal overlay */
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 300; display: flex; align-items: flex-end; }
 .modal { background: var(--bg); border-radius: 20px 20px 0 0; padding: 20px 16px calc(20px + var(--safe-bottom)); width: 100%; max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.modal-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
-.modal-close { float: right; font-size: 22px; cursor: pointer; color: var(--text3); line-height: 1; margin-top: -2px; }
-/* 1099 doc list */
+.modal-title { font-size: 17px; font-weight: 700; color: var(--text); }
 .doc-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
 .doc-row:last-child { border-bottom: none; }
 .doc-icon { font-size: 24px; flex-shrink: 0; }
 .doc-info { flex: 1; min-width: 0; }
 .doc-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .doc-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+/* Loading screen */
+#loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+#loading .load-title { font-size: 24px; font-weight: 700; color: var(--accent); }
+#loading .load-title em { font-style: italic; font-weight: 400; color: var(--text2); }
+#loading .load-sub { font-size: 13px; color: var(--text3); }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 #toast { position: fixed; bottom: calc(80px + var(--safe-bottom) + 12px); left: 50%; transform: translateX(-50%); background: #1a1a18; color: #fff; padding: 10px 20px; border-radius: 99px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 0.25s; z-index: 400; pointer-events: none; white-space: nowrap; }
 </style>
 </head>
 <body>
-<div id="app">
+
+<div id="loading">
+  <div class="load-title">Boss <em>Lady</em> Tings</div>
+  <div class="spinner"></div>
+  <div class="load-sub">Syncing your data...</div>
+</div>
+
+<div id="app" style="display:none">
   <div class="safe-top"></div>
   <div class="header">
-    <div class="header-title">Boss <em>Lady</em> Tings</div>
-    <button class="btn-sm" onclick="exportCSV('all')">↗ Export all</button>
+    <div class="header-title">Boss <em>Lady</em> Tings <span class="sync-dot" id="sync-dot"></span></div>
+    <button class="btn-sm" onclick="exportCSV('all')">↗ Export</button>
   </div>
-  <div class="biz-tabs" id="biz-tabs">
+  <div class="biz-tabs">
     <div class="biz-tab active" onclick="switchBiz('rover')">🐾 Rover</div>
     <div class="biz-tab" onclick="switchBiz('wyzant')">📚 Wyzant</div>
     <div class="biz-tab" onclick="switchBiz('itt')">💃 It Takes Two</div>
@@ -159,6 +172,9 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 <div id="toast"></div>
 
 <script>
+var SB_URL = 'https://ckamlcpgucshevharpxg.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrYW1sY3BndWNzaGV2aGFycHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4ODE0OTcsImV4cCI6MjA5MjQ1NzQ5N30.WTGAY6BURpfyBioyRlNFTIe_BiTAKa65k4IhWnM4Oi4';
+
 var CATS = {
   rover:  ['Supplies','Food & Bev','Transportation','Travel','Platform Fees','Marketing','Software','Other'],
   wyzant: ['Supplies','Transportation','Travel','Platform Fees','Marketing','Software','Other'],
@@ -182,49 +198,148 @@ var CAT_CLS = {
 };
 var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+// In-memory state loaded from Supabase
 var state = {
   rover:{expenses:[]}, wyzant:{expenses:[]},
   itt:{expenses:[],events:[],ticketPrices:{single:65,couple:115}},
   eve:{expenses:[],events:[],ticketPrices:{single:65,couple:115}},
-  docs: []
+  docs:[]
 };
 var biz = 'rover', curView = 'overview';
 var pendingFiles = [];
-var periodMode = 'all'; // 'all', 'month', 'year'
-var periodMonth = ''; // 'YYYY-MM'
-var periodYear = '';  // 'YYYY'
+var periodMode = 'all', periodMonth = '', periodYear = '';
 var editingId = null;
 
-try {
-  var s = localStorage.getItem('bossLadyTings');
-  if (s) {
-    var loaded = JSON.parse(s);
-    // merge so new keys don't get lost
-    state.rover = loaded.rover || state.rover;
-    state.wyzant = loaded.wyzant || state.wyzant;
-    state.itt = loaded.itt || state.itt;
-    state.eve = loaded.eve || state.eve;
-    state.docs = loaded.docs || [];
-    ['itt','eve'].forEach(function(b) {
-      if (!state[b].events) state[b].events = [];
-      if (!state[b].ticketPrices) state[b].ticketPrices = {single:65,couple:115};
+// ── SUPABASE HELPERS ──
+function sbHeaders() {
+  return {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + SB_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal'
+  };
+}
+
+function sbGet(table, params) {
+  var url = SB_URL + '/rest/v1/' + table + '?';
+  if (params) url += params;
+  return fetch(url, { method: 'GET', headers: sbHeaders() }).then(function(r) { return r.json(); });
+}
+
+function sbInsert(table, data) {
+  return fetch(SB_URL + '/rest/v1/' + table, {
+    method: 'POST',
+    headers: sbHeaders(),
+    body: JSON.stringify(data)
+  });
+}
+
+function sbUpdate(table, id, data) {
+  return fetch(SB_URL + '/rest/v1/' + table + '?id=eq.' + encodeURIComponent(id), {
+    method: 'PATCH',
+    headers: sbHeaders(),
+    body: JSON.stringify(data)
+  });
+}
+
+function sbDelete(table, id) {
+  return fetch(SB_URL + '/rest/v1/' + table + '?id=eq.' + encodeURIComponent(id), {
+    method: 'DELETE',
+    headers: sbHeaders()
+  });
+}
+
+function sbUpsert(table, data) {
+  return fetch(SB_URL + '/rest/v1/' + table, {
+    method: 'POST',
+    headers: Object.assign({}, sbHeaders(), {'Prefer': 'resolution=merge-duplicates,return=minimal'}),
+    body: JSON.stringify(data)
+  });
+}
+
+function setSyncDot(status) {
+  var dot = document.getElementById('sync-dot');
+  if (!dot) return;
+  dot.className = 'sync-dot ' + status;
+}
+
+// ── LOAD ALL DATA FROM SUPABASE ──
+function loadAll() {
+  setSyncDot('syncing');
+  var promises = [
+    sbGet('expenses', 'order=date.desc'),
+    sbGet('events', 'order=date.desc'),
+    sbGet('ticket_prices', ''),
+    sbGet('docs', 'order=uploaded.desc')
+  ];
+  return Promise.all(promises).then(function(results) {
+    var expenses = results[0] || [];
+    var events   = results[1] || [];
+    var prices   = results[2] || [];
+    var docs     = results[3] || [];
+
+    // Reset state
+    var keys = ['rover','wyzant','itt','eve'];
+    keys.forEach(function(k) {
+      state[k].expenses = [];
+      state[k].events = [];
     });
-  }
-} catch(e) {}
+    state.docs = [];
 
-function save() { try { localStorage.setItem('bossLadyTings', JSON.stringify(state)); } catch(e) {} }
+    // Map expenses to businesses
+    expenses.forEach(function(e) {
+      if (state[e.biz]) {
+        state[e.biz].expenses.push({
+          id: e.id, date: e.date, time: e.time, vendor: e.vendor,
+          amount: e.amount, category: e.category, payMethod: e.pay_method,
+          note: e.note, files: e.files ? e.files.split('|').filter(Boolean) : []
+        });
+      }
+    });
 
+    // Map events
+    events.forEach(function(e) {
+      if (state[e.biz]) {
+        state[e.biz].events.push({
+          id: e.id, name: e.name, date: e.date,
+          singleSold: e.single_sold, coupleSold: e.couple_sold, opCost: e.op_cost
+        });
+      }
+    });
+
+    // Map ticket prices
+    prices.forEach(function(p) {
+      if (state[p.biz]) {
+        state[p.biz].ticketPrices = { single: p.single_price, couple: p.couple_price };
+      }
+    });
+
+    // Map docs
+    docs.forEach(function(d) {
+      state.docs.push({ id: d.id, name: d.name, biz: d.biz, uploaded: d.uploaded });
+    });
+
+    setSyncDot('synced');
+    return true;
+  }).catch(function(err) {
+    setSyncDot('error');
+    console.error('Sync error:', err);
+    return false;
+  });
+}
+
+// ── UI HELPERS ──
 function toast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg; t.style.opacity = '1';
   setTimeout(function() { t.style.opacity = '0'; }, 2200);
 }
-
 function fmt(n) { return '$' + parseFloat(n||0).toFixed(2); }
 function fmtDate(d) { if (!d) return ''; var p = d.split('-'); return p[1]+'/'+p[2]+'/'+p[0].slice(2); }
 function catCls(c) { return CAT_CLS[c] || 'b-other'; }
+function genId() { return Date.now() + '-' + Math.random().toString(36).slice(2,7); }
+function fmtMonthLabel(ym) { var p = ym.split('-'); return MONTHS[parseInt(p[1])-1] + ' ' + p[0]; }
 
-// Filter expenses by current period
 function filteredExps(b) {
   var all = state[b].expenses || [];
   if (periodMode === 'all') return all;
@@ -235,78 +350,69 @@ function filteredExps(b) {
     return true;
   });
 }
-
 function totalExp(b) { return filteredExps(b).reduce(function(s,e){ return s+(parseFloat(e.amount)||0); },0); }
 function totalRev(b) {
-  if (TICKET_BIZ.indexOf(b) < 0) return 0;
+  if (TICKET_BIZ.indexOf(b)<0) return 0;
   var p = state[b].ticketPrices;
-  var evs = state[b].events || [];
-  if (periodMode !== 'all') {
-    evs = evs.filter(function(ev) {
-      if (!ev.date) return false;
-      if (periodMode === 'year') return ev.date.slice(0,4) === periodYear;
-      if (periodMode === 'month') return ev.date.slice(0,7) === periodMonth;
-      return true;
-    });
-  }
+  var evs = filteredEvs(b);
   return evs.reduce(function(s,ev){ return s+(parseInt(ev.singleSold)||0)*parseFloat(p.single)+(parseInt(ev.coupleSold)||0)*parseFloat(p.couple); },0);
 }
-function totalAtt(b) {
+function filteredEvs(b) {
   var evs = state[b].events || [];
-  if (periodMode !== 'all') {
-    evs = evs.filter(function(ev) {
-      if (!ev.date) return false;
-      if (periodMode === 'year') return ev.date.slice(0,4) === periodYear;
-      if (periodMode === 'month') return ev.date.slice(0,7) === periodMonth;
-      return true;
-    });
-  }
-  return evs.reduce(function(s,ev){ return s+(parseInt(ev.singleSold)||0)+(parseInt(ev.coupleSold)||0)*2; },0);
+  if (periodMode === 'all') return evs;
+  return evs.filter(function(ev) {
+    if (!ev.date) return false;
+    if (periodMode === 'year') return ev.date.slice(0,4) === periodYear;
+    if (periodMode === 'month') return ev.date.slice(0,7) === periodMonth;
+    return true;
+  });
 }
+function totalAtt(b) { return filteredEvs(b).reduce(function(s,ev){ return s+(parseInt(ev.singleSold)||0)+(parseInt(ev.coupleSold)||0)*2; },0); }
 
-// Get available months/years from expense data
 function getAvailableYears(b) {
   var years = {};
-  (state[b].expenses||[]).forEach(function(e){ if(e.date) years[e.date.slice(0,4)] = 1; });
-  (state[b].events||[]).forEach(function(e){ if(e.date) years[e.date.slice(0,4)] = 1; });
+  (state[b].expenses||[]).forEach(function(e){ if(e.date) years[e.date.slice(0,4)]=1; });
+  (state[b].events||[]).forEach(function(e){ if(e.date) years[e.date.slice(0,4)]=1; });
   return Object.keys(years).sort().reverse();
 }
 function getAvailableMonths(b) {
   var months = {};
-  (state[b].expenses||[]).forEach(function(e){ if(e.date) months[e.date.slice(0,7)] = 1; });
-  (state[b].events||[]).forEach(function(e){ if(e.date) months[e.date.slice(0,7)] = 1; });
+  (state[b].expenses||[]).forEach(function(e){ if(e.date) months[e.date.slice(0,7)]=1; });
+  (state[b].events||[]).forEach(function(e){ if(e.date) months[e.date.slice(0,7)]=1; });
   return Object.keys(months).sort().reverse();
-}
-function fmtMonthLabel(ym) {
-  var p = ym.split('-');
-  return MONTHS[parseInt(p[1])-1] + ' ' + p[0];
 }
 
 function switchBiz(b2) {
-  biz = b2;
-  periodMode = 'all'; periodMonth = ''; periodYear = '';
+  biz = b2; periodMode='all'; periodMonth=''; periodYear='';
   var tabs = document.querySelectorAll('.biz-tab');
   var keys = ['rover','wyzant','itt','eve'];
-  for (var i=0; i<tabs.length; i++) tabs[i].classList.toggle('active', keys[i]===b2);
+  for (var i=0;i<tabs.length;i++) tabs[i].classList.toggle('active',keys[i]===b2);
   render();
 }
 function switchView(v) {
   curView = v;
-  ['overview','add','docs','export'].forEach(function(x) {
+  ['overview','add','docs','export'].forEach(function(x){
     var el = document.getElementById('nav-'+x);
-    if (el) el.classList.toggle('active', x===v);
+    if(el) el.classList.toggle('active',x===v);
   });
-  render();
+  // Refresh data when switching to overview
+  if (v === 'overview') {
+    setSyncDot('syncing');
+    loadAll().then(function(){ render(); });
+  } else {
+    render();
+  }
 }
 
 function render() {
   var el = document.getElementById('content');
-  if (curView === 'overview') el.innerHTML = buildOverview();
-  else if (curView === 'add') el.innerHTML = buildAdd();
-  else if (curView === 'docs') el.innerHTML = buildDocs();
+  if (!el) return;
+  if (curView==='overview') el.innerHTML = buildOverview();
+  else if (curView==='add') el.innerHTML = buildAdd();
+  else if (curView==='docs') el.innerHTML = buildDocs();
   else el.innerHTML = buildExport();
-  if (curView === 'add') initAddDefaults();
-  if (curView === 'export') renderSchedC();
+  if (curView==='add') initAddDefaults();
+  if (curView==='export') renderSchedC();
   el.scrollTop = 0;
 }
 
@@ -314,59 +420,37 @@ function buildPeriodBar() {
   var years = getAvailableYears(biz);
   var months = getAvailableMonths(biz);
   var h = '<div class="period-bar">';
-  h += '<button class="period-pill'+(periodMode==='all'?' active':'')+'" onclick="setPeriod(\'all\',\'\')">All time</button>';
-
+  h += '<button class="period-pill'+(periodMode==='all'?' active':'')+'" onclick="setPeriod(\'all\')">All time</button>';
   if (years.length) {
-    h += '<select class="period-select" onchange="setPeriodYear(this.value)" style="max-width:100px">';
-    h += '<option value="">Year...</option>';
-    years.forEach(function(y) {
-      h += '<option value="'+y+'"'+(periodMode==='year'&&periodYear===y?' selected':'')+'>'+y+'</option>';
-    });
+    h += '<select class="period-select" onchange="setPeriodYear(this.value)" style="max-width:100px"><option value="">Year...</option>';
+    years.forEach(function(y){ h+='<option value="'+y+'"'+(periodMode==='year'&&periodYear===y?' selected':'')+'>'+y+'</option>'; });
     h += '</select>';
   }
   if (months.length) {
-    h += '<select class="period-select" onchange="setPeriodMonth(this.value)" style="max-width:120px">';
-    h += '<option value="">Month...</option>';
-    months.forEach(function(m) {
-      h += '<option value="'+m+'"'+(periodMode==='month'&&periodMonth===m?' selected':'')+'>'+fmtMonthLabel(m)+'</option>';
-    });
+    h += '<select class="period-select" onchange="setPeriodMonth(this.value)" style="max-width:120px"><option value="">Month...</option>';
+    months.forEach(function(m){ h+='<option value="'+m+'"'+(periodMode==='month'&&periodMonth===m?' selected':'')+'>'+fmtMonthLabel(m)+'</option>'; });
     h += '</select>';
   }
   h += '</div>';
-
-  // Show active filter label
-  if (periodMode !== 'all') {
-    var label = periodMode === 'year' ? periodYear : fmtMonthLabel(periodMonth);
+  if (periodMode!=='all') {
+    var label = periodMode==='year'?periodYear:fmtMonthLabel(periodMonth);
     h += '<div style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:10px">Showing: '+label+'</div>';
   }
   return h;
 }
-
-function setPeriod(mode, val) {
-  periodMode = mode; periodMonth = ''; periodYear = '';
-  render();
-}
-function setPeriodYear(val) {
-  if (!val) { periodMode='all'; periodYear=''; render(); return; }
-  periodMode = 'year'; periodYear = val; periodMonth = '';
-  render();
-}
-function setPeriodMonth(val) {
-  if (!val) { periodMode='all'; periodMonth=''; render(); return; }
-  periodMode = 'month'; periodMonth = val; periodYear = '';
-  render();
-}
+function setPeriod(m){ periodMode=m; periodMonth=''; periodYear=''; render(); }
+function setPeriodYear(v){ if(!v){periodMode='all';periodYear='';render();return;} periodMode='year';periodYear=v;periodMonth='';render(); }
+function setPeriodMonth(v){ if(!v){periodMode='all';periodMonth='';render();return;} periodMode='month';periodMonth=v;periodYear='';render(); }
 
 function buildOverview() {
   var exps = filteredExps(biz);
-  var isT = TICKET_BIZ.indexOf(biz) >= 0;
-  var te = totalExp(biz), tr = totalRev(biz), profit = tr - te;
-  var cats = CATS[biz];
-  var ct = {}; cats.forEach(function(c){ ct[c]=0; });
-  exps.forEach(function(e){ ct[e.category]!==undefined ? ct[e.category]+=parseFloat(e.amount)||0 : ct['Other']=(ct['Other']||0)+(parseFloat(e.amount)||0); });
+  var isT = TICKET_BIZ.indexOf(biz)>=0;
+  var te=totalExp(biz), tr=totalRev(biz), profit=tr-te;
+  var cats=CATS[biz], ct={};
+  cats.forEach(function(c){ct[c]=0;});
+  exps.forEach(function(e){ ct[e.category]!==undefined?ct[e.category]+=parseFloat(e.amount)||0:ct['Other']=(ct['Other']||0)+(parseFloat(e.amount)||0); });
 
   var h = buildPeriodBar();
-
   h += '<div class="metrics">';
   h += '<div class="metric"><div class="metric-lbl">Expenses</div><div class="metric-val red">'+fmt(te)+'</div></div>';
   if (isT) {
@@ -378,379 +462,342 @@ function buildOverview() {
   }
   h += '</div>';
 
-  var hasCats = cats.some(function(c){ return ct[c]>0; });
+  var hasCats = cats.some(function(c){return ct[c]>0;});
   if (hasCats) {
     h += '<div class="sec-label">By category</div><div class="card">';
-    cats.filter(function(c){ return ct[c]>0; }).sort(function(a,b){ return ct[b]-ct[a]; }).forEach(function(c){
+    cats.filter(function(c){return ct[c]>0;}).sort(function(a,b){return ct[b]-ct[a];}).forEach(function(c){
       h += '<div class="cat-row"><span class="badge '+catCls(c)+'">'+c+'</span><span class="cat-amt">'+fmt(ct[c])+'</span></div>';
     });
     h += '</div>';
   }
 
   if (isT) {
-    var allEvs = state[biz].events || [];
-    var evs = allEvs;
-    if (periodMode !== 'all') {
-      evs = allEvs.filter(function(ev) {
-        if (!ev.date) return false;
-        if (periodMode === 'year') return ev.date.slice(0,4) === periodYear;
-        if (periodMode === 'month') return ev.date.slice(0,7) === periodMonth;
-        return true;
-      });
-    }
-    evs = evs.slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+    var evs = filteredEvs(biz).slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
     var tp = state[biz].ticketPrices;
     h += '<div class="sec-label">Events</div><div class="card">';
     if (!evs.length) h += '<div class="empty">No events for this period.</div>';
     else {
-      evs.forEach(function(ev) {
-        var rev = (parseInt(ev.singleSold)||0)*parseFloat(tp.single)+(parseInt(ev.coupleSold)||0)*parseFloat(tp.couple);
-        var att = (parseInt(ev.singleSold)||0)+(parseInt(ev.coupleSold)||0)*2;
-        var net = rev-(parseFloat(ev.opCost)||0);
-        h += '<div class="ev-item"><div style="display:flex;justify-content:space-between;align-items:flex-start">';
-        h += '<div><div class="ev-name">'+(ev.name||'Unnamed')+'</div><div class="ev-date">'+fmtDate(ev.date)+'</div></div>';
-        h += '<span style="font-size:16px;font-weight:700;color:'+(net>=0?'var(--accent)':'var(--red)')+'">'+fmt(net)+'</span></div>';
-        h += '<div class="ev-stats"><div class="ev-stat">🎟 <strong>'+att+'</strong> attended</div><div class="ev-stat">💰 <strong>'+fmt(rev)+'</strong></div>';
-        h += '<div class="ev-stat">Singles: <strong>'+(ev.singleSold||0)+'</strong></div><div class="ev-stat">Couples: <strong>'+(ev.coupleSold||0)+'</strong></div></div>';
-        h += '<div style="margin-top:8px"><button class="btn-del" onclick="deleteEvent(\''+ev.id+'\')">Delete</button></div></div>';
+      evs.forEach(function(ev){
+        var rev=(parseInt(ev.singleSold)||0)*parseFloat(tp.single)+(parseInt(ev.coupleSold)||0)*parseFloat(tp.couple);
+        var att=(parseInt(ev.singleSold)||0)+(parseInt(ev.coupleSold)||0)*2;
+        var net=rev-(parseFloat(ev.opCost)||0);
+        h+='<div class="ev-item"><div style="display:flex;justify-content:space-between;align-items:flex-start">';
+        h+='<div><div class="ev-name">'+(ev.name||'Unnamed')+'</div><div class="ev-date">'+fmtDate(ev.date)+'</div></div>';
+        h+='<span style="font-size:16px;font-weight:700;color:'+(net>=0?'var(--accent)':'var(--red)')+'">'+fmt(net)+'</span></div>';
+        h+='<div class="ev-stats"><div class="ev-stat">🎟 <strong>'+att+'</strong> attended</div><div class="ev-stat">💰 <strong>'+fmt(rev)+'</strong></div>';
+        h+='<div class="ev-stat">Singles: <strong>'+(ev.singleSold||0)+'</strong></div><div class="ev-stat">Couples: <strong>'+(ev.coupleSold||0)+'</strong></div></div>';
+        h+='<div style="margin-top:8px"><button class="btn-del" onclick="deleteEvent(\''+ev.id+'\')">Delete</button></div></div>';
       });
-      h += '<div class="total-row"><span>Period revenue</span><span style="color:var(--accent)">'+fmt(tr)+'</span></div>';
+      h+='<div class="total-row"><span>Period revenue</span><span style="color:var(--accent)">'+fmt(tr)+'</span></div>';
     }
     h += '</div>';
   }
 
-  var sorted = exps.slice().sort(function(a,b){ return new Date(b.date+' '+(b.time||'00:00'))-new Date(a.date+' '+(a.time||'00:00')); });
+  var sorted = exps.slice().sort(function(a,b){return new Date(b.date+' '+(b.time||'00:00'))-new Date(a.date+' '+(a.time||'00:00'));});
   h += '<div class="sec-label">Expense log ('+sorted.length+')</div><div class="card">';
   if (!sorted.length) h += '<div class="empty">No expenses for this period.</div>';
-  else sorted.forEach(function(e) {
-    h += '<div class="exp-row"><div class="exp-main"><div class="exp-vendor">'+(e.vendor||'—')+'</div>';
-    h += '<div class="exp-meta">'+fmtDate(e.date)+(e.time?' · '+e.time:'')+(e.payMethod?' · '+e.payMethod:'')+'</div>';
-    if (e.note) h += '<div class="exp-note">'+e.note+'</div>';
-    if (e.files&&e.files.length) h += '<div style="font-size:11px;color:var(--text3);margin-top:3px">📎 '+e.files.join(', ')+'</div>';
-    h += '<span class="badge '+catCls(e.category)+'">'+e.category+'</span></div>';
-    h += '<div class="exp-right"><div class="exp-amt">'+fmt(e.amount)+'</div>';
-    h += '<div class="exp-actions">';
-    h += '<button class="btn-edit" onclick="openEdit(\''+e.id+'\')">Edit</button>';
-    h += '<button class="btn-dupe" onclick="dupeExp(\''+e.id+'\')">Dupe</button>';
-    h += '<button class="btn-del" onclick="deleteExp(\''+e.id+'\')">Del</button>';
-    h += '</div></div></div>';
+  else sorted.forEach(function(e){
+    h+='<div class="exp-row"><div class="exp-main"><div class="exp-vendor">'+(e.vendor||'—')+'</div>';
+    h+='<div class="exp-meta">'+fmtDate(e.date)+(e.time?' · '+e.time:'')+(e.payMethod?' · '+e.payMethod:'')+'</div>';
+    if(e.note) h+='<div class="exp-note">'+e.note+'</div>';
+    if(e.files&&e.files.length) h+='<div style="font-size:11px;color:var(--text3);margin-top:3px">📎 '+e.files.join(', ')+'</div>';
+    h+='<span class="badge '+catCls(e.category)+'">'+e.category+'</span></div>';
+    h+='<div class="exp-right"><div class="exp-amt">'+fmt(e.amount)+'</div>';
+    h+='<div class="exp-actions">';
+    h+='<button class="btn-edit" onclick="openEdit(\''+e.id+'\')">Edit</button>';
+    h+='<button class="btn-dupe" onclick="dupeExp(\''+e.id+'\')">Dupe</button>';
+    h+='<button class="btn-del" onclick="deleteExp(\''+e.id+'\')">Del</button>';
+    h+='</div></div></div>';
   });
   h += '</div>';
   return h;
 }
 
 function buildAdd() {
-  var cats = CATS[biz];
-  var isT = TICKET_BIZ.indexOf(biz) >= 0;
-  var tp = isT ? state[biz].ticketPrices : null;
-
-  var h = '<div class="sec-label">Add expense — '+BIZ[biz]+'</div><div class="card"><div class="card-body">';
-  h += '<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="a-date"></div><div class="fg"><label>Time</label><input type="time" id="a-time"></div></div>';
-  h += '<div class="form-row"><div class="fg" style="flex:2"><label>Vendor</label><input type="text" id="a-vendor" placeholder="e.g. Amazon" autocomplete="off" autocorrect="off"></div><div class="fg"><label>Amount ($)</label><input type="number" id="a-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div></div>';
-  h += '<div class="form-row"><div class="fg"><label>Category</label><select id="a-cat">'+cats.map(function(c){ return '<option>'+c+'</option>'; }).join('')+'</select></div><div class="fg"><label>Payment</label><select id="a-pay">'+PAY.map(function(p){ return '<option>'+p+'</option>'; }).join('')+'</select></div></div>';
-  h += '<div class="fg" style="margin-bottom:12px"><label>Note (optional)</label><input type="text" id="a-note" placeholder="Brief description" autocorrect="off"></div>';
-  h += '<div class="fg" style="margin-bottom:12px"><label>Receipt</label><div class="upload-zone" onclick="document.getElementById(\'a-file\').click()">📎 Tap to attach photo or file<input type="file" id="a-file" style="display:none" accept="image/*,.pdf" multiple onchange="handleFiles(this)"></div><div id="file-chips"></div></div>';
-  h += '<button class="btn-full" onclick="addExp()">Add Expense</button></div></div>';
-
+  var cats=CATS[biz], isT=TICKET_BIZ.indexOf(biz)>=0, tp=isT?state[biz].ticketPrices:null;
+  var h='<div class="sec-label">Add expense — '+BIZ[biz]+'</div><div class="card"><div class="card-body">';
+  h+='<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="a-date"></div><div class="fg"><label>Time</label><input type="time" id="a-time"></div></div>';
+  h+='<div class="form-row"><div class="fg" style="flex:2"><label>Vendor</label><input type="text" id="a-vendor" placeholder="e.g. Amazon" autocomplete="off" autocorrect="off"></div><div class="fg"><label>Amount ($)</label><input type="number" id="a-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div></div>';
+  h+='<div class="form-row"><div class="fg"><label>Category</label><select id="a-cat">'+cats.map(function(c){return'<option>'+c+'</option>';}).join('')+'</select></div><div class="fg"><label>Payment</label><select id="a-pay">'+PAY.map(function(p){return'<option>'+p+'</option>';}).join('')+'</select></div></div>';
+  h+='<div class="fg" style="margin-bottom:12px"><label>Note (optional)</label><input type="text" id="a-note" placeholder="Brief description" autocorrect="off"></div>';
+  h+='<div class="fg" style="margin-bottom:12px"><label>Receipt</label><div class="upload-zone" onclick="document.getElementById(\'a-file\').click()">📎 Tap to attach photo or file<input type="file" id="a-file" style="display:none" accept="image/*,.pdf" multiple onchange="handleFiles(this)"></div><div id="file-chips"></div></div>';
+  h+='<button class="btn-full" onclick="addExp()">Add Expense</button></div></div>';
   if (isT) {
-    h += '<div class="sec-label">Log event — '+BIZ[biz]+'</div><div class="card"><div class="card-body">';
-    h += '<div class="form-row"><div class="fg" style="flex:2"><label>Event name</label><input type="text" id="ev-name" placeholder="e.g. Nov Tango Night" autocorrect="off"></div><div class="fg"><label>Date</label><input type="date" id="ev-date"></div></div>';
-    h += '<div class="form-row"><div class="fg"><label>Single price ($)</label><input type="number" id="ev-sp" value="'+tp.single+'" step="0.01" inputmode="decimal"></div><div class="fg"><label>Couple price ($)</label><input type="number" id="ev-cp" value="'+tp.couple+'" step="0.01" inputmode="decimal"></div></div>';
-    h += '<div class="form-row"><div class="fg"><label>Singles sold</label><input type="number" id="ev-ss" placeholder="0" min="0" inputmode="numeric"></div><div class="fg"><label>Couples sold</label><input type="number" id="ev-cs" placeholder="0" min="0" inputmode="numeric"></div><div class="fg"><label>Op costs ($)</label><input type="number" id="ev-oc" placeholder="0.00" step="0.01" inputmode="decimal"></div></div>';
-    h += '<div id="ev-preview"></div>';
-    h += '<button class="btn-full" style="background:#2d5a27" onclick="addEvent()">Log Event</button></div></div>';
+    h+='<div class="sec-label">Log event — '+BIZ[biz]+'</div><div class="card"><div class="card-body">';
+    h+='<div class="form-row"><div class="fg" style="flex:2"><label>Event name</label><input type="text" id="ev-name" placeholder="e.g. Nov Tango Night" autocorrect="off"></div><div class="fg"><label>Date</label><input type="date" id="ev-date"></div></div>';
+    h+='<div class="form-row"><div class="fg"><label>Single ($)</label><input type="number" id="ev-sp" value="'+tp.single+'" step="0.01" inputmode="decimal"></div><div class="fg"><label>Couple ($)</label><input type="number" id="ev-cp" value="'+tp.couple+'" step="0.01" inputmode="decimal"></div></div>';
+    h+='<div class="form-row"><div class="fg"><label>Singles sold</label><input type="number" id="ev-ss" placeholder="0" min="0" inputmode="numeric"></div><div class="fg"><label>Couples sold</label><input type="number" id="ev-cs" placeholder="0" min="0" inputmode="numeric"></div><div class="fg"><label>Op costs ($)</label><input type="number" id="ev-oc" placeholder="0.00" step="0.01" inputmode="decimal"></div></div>';
+    h+='<div id="ev-preview"></div>';
+    h+='<button class="btn-full" style="background:#2d5a27" onclick="addEvent()">Log Event</button></div></div>';
   }
   return h;
 }
 
 function buildDocs() {
-  var docs = state.docs || [];
-  var h = '<div class="sec-label">1099 Tax Forms</div>';
-  h += '<div class="card"><div class="card-body" style="padding-top:14px">';
-  h += '<p style="font-size:13px;color:var(--text2);margin-bottom:12px">Store your 1099-NEC, 1099-K, and other tax forms here for easy reference at tax time.</p>';
-  h += '<div class="upload-zone" onclick="document.getElementById(\'doc-file\').click()">📋 Tap to upload a 1099 or tax form<input type="file" id="doc-file" style="display:none" accept=".pdf,image/*" multiple onchange="uploadDocs(this)"></div>';
-  h += '</div></div>';
-
+  var docs=state.docs||[];
+  var h='<div class="sec-label">1099 Tax Forms</div><div class="card"><div class="card-body" style="padding-top:14px">';
+  h+='<p style="font-size:13px;color:var(--text2);margin-bottom:12px">Store your 1099-NEC, 1099-K, and other tax forms here.</p>';
+  h+='<div class="upload-zone" onclick="document.getElementById(\'doc-file\').click()">📋 Tap to upload a 1099 or tax form<input type="file" id="doc-file" style="display:none" accept=".pdf,image/*" multiple onchange="uploadDocs(this)"></div></div></div>';
   if (docs.length) {
-    h += '<div class="sec-label">Uploaded forms ('+docs.length+')</div><div class="card">';
-    docs.forEach(function(d) {
-      var icon = d.name.toLowerCase().indexOf('.pdf') >= 0 ? '📄' : '🖼️';
-      h += '<div class="doc-row">';
-      h += '<span class="doc-icon">'+icon+'</span>';
-      h += '<div class="doc-info"><div class="doc-name">'+d.name+'</div>';
-      h += '<div class="doc-meta">'+d.biz+' · Uploaded '+d.uploaded+'</div></div>';
-      h += '<button class="btn-del" onclick="deleteDoc(\''+d.id+'\')">Del</button>';
-      h += '</div>';
+    h+='<div class="sec-label">Uploaded forms ('+docs.length+')</div><div class="card">';
+    docs.forEach(function(d){
+      var icon=d.name.toLowerCase().indexOf('.pdf')>=0?'📄':'🖼️';
+      h+='<div class="doc-row"><span class="doc-icon">'+icon+'</span><div class="doc-info"><div class="doc-name">'+d.name+'</div><div class="doc-meta">'+d.biz+' · '+d.uploaded+'</div></div>';
+      h+='<button class="btn-del" onclick="deleteDoc(\''+d.id+'\')">Del</button></div>';
     });
-    h += '</div>';
-  } else {
-    h += '<div class="card"><div class="empty">No forms uploaded yet.</div></div>';
-  }
-
-  // Also show a note per business about expected 1099s
-  h += '<div class="sec-label">What to expect</div><div class="card"><div class="card-body" style="padding-top:12px">';
-  var notes = [
-    ['🐾 Rover', '1099-NEC if you earned $600+ in the year'],
-    ['📚 Wyzant', '1099-NEC if you earned $600+ in the year'],
-    ['💃 It Takes Two', 'Keep records of ticket revenue; may receive 1099-K if using payment processors'],
-    ['🌿 EVE', 'Keep records of ticket revenue; may receive 1099-K if using payment processors'],
-  ];
-  notes.forEach(function(n) {
-    h += '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">';
-    h += '<span style="font-weight:600;min-width:110px;color:var(--text)">'+n[0]+'</span>';
-    h += '<span style="color:var(--text2)">'+n[1]+'</span></div>';
+    h+='</div>';
+  } else { h+='<div class="card"><div class="empty">No forms uploaded yet.</div></div>'; }
+  h+='<div class="sec-label">What to expect</div><div class="card"><div class="card-body" style="padding-top:12px">';
+  [['🐾 Rover','1099-NEC if you earned $600+ in the year'],['📚 Wyzant','1099-NEC if you earned $600+ in the year'],
+   ['💃 It Takes Two','May receive 1099-K if using payment processors over threshold'],
+   ['🌿 EVE','May receive 1099-K if using payment processors over threshold']].forEach(function(n){
+    h+='<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:600;min-width:110px;color:var(--text)">'+n[0]+'</span><span style="color:var(--text2)">'+n[1]+'</span></div>';
   });
-  h += '</div></div>';
+  h+='</div></div>';
   return h;
 }
 
 function buildExport() {
-  var h = '<div class="sec-label">Download CSV for Google Sheets</div><div class="card"><div class="card-body">';
-  h += '<p style="font-size:13px;color:var(--text2);margin-bottom:12px">In Google Sheets: File → Import → Upload CSV</p>';
-  h += '<div class="export-grid">';
-  ['rover','wyzant','itt','eve'].forEach(function(b){ h+='<button class="btn-sm" onclick="exportCSV(\''+b+'\')">'+BIZ[b]+'</button>'; });
-  h += '</div><button class="btn-full" style="margin-top:10px" onclick="exportCSV(\'all\')">↗ Export All Businesses</button></div></div>';
-  h += '<div class="sec-label">Schedule C (Tax)</div><div class="card"><div class="card-body">';
-  h += '<p style="font-size:13px;color:var(--text2);margin-bottom:10px">IRS Schedule C line items</p>';
-  h += '<select id="sc-biz" onchange="renderSchedC()" style="width:100%;padding:12px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:16px;background:#fff;-webkit-appearance:none;margin-bottom:12px">';
-  h += '<option value="rover">Rover</option><option value="wyzant">Wyzant</option><option value="itt">It Takes Two</option><option value="eve">EVE</option></select>';
-  h += '<div id="sc-out"></div>';
-  h += '<button class="btn-full" style="margin-top:10px" onclick="exportSchC()">↗ Download Schedule C CSV</button></div></div>';
+  var h='<div class="sec-label">Download CSV for Google Sheets</div><div class="card"><div class="card-body">';
+  h+='<p style="font-size:13px;color:var(--text2);margin-bottom:12px">File → Import → Upload CSV in Google Sheets</p>';
+  h+='<div class="export-grid">';
+  ['rover','wyzant','itt','eve'].forEach(function(b){h+='<button class="btn-sm" onclick="exportCSV(\''+b+'\')">'+BIZ[b]+'</button>';});
+  h+='</div><button class="btn-full" style="margin-top:10px" onclick="exportCSV(\'all\')">↗ Export All Businesses</button></div></div>';
+  h+='<div class="sec-label">Schedule C (Tax)</div><div class="card"><div class="card-body">';
+  h+='<select id="sc-biz" onchange="renderSchedC()" style="width:100%;padding:12px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:16px;background:#fff;-webkit-appearance:none;margin-bottom:12px">';
+  h+='<option value="rover">Rover</option><option value="wyzant">Wyzant</option><option value="itt">It Takes Two</option><option value="eve">EVE</option></select>';
+  h+='<div id="sc-out"></div><button class="btn-full" style="margin-top:10px" onclick="exportSchC()">↗ Download Schedule C CSV</button></div></div>';
   return h;
 }
 
 // ── EDIT MODAL ──
 function openEdit(id) {
-  var e = null;
-  var exps = state[biz].expenses || [];
-  for (var i=0; i<exps.length; i++) { if (exps[i].id === id) { e = exps[i]; break; } }
-  if (!e) return;
-  editingId = id;
-  var cats = CATS[biz];
-  var h = '<div class="modal-overlay" onclick="closeModal(event)">';
-  h += '<div class="modal"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
-  h += '<span class="modal-title">Edit Expense</span>';
-  h += '<span class="modal-close" onclick="closeModalDirect()">✕</span></div>';
-  h += '<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+(e.date||'')+'"></div><div class="fg"><label>Time</label><input type="time" id="ed-time" value="'+(e.time||'')+'"></div></div>';
-  h += '<div class="form-row"><div class="fg" style="flex:2"><label>Vendor</label><input type="text" id="ed-vendor" value="'+(e.vendor||'')+'" autocorrect="off"></div><div class="fg"><label>Amount ($)</label><input type="number" id="ed-amount" value="'+(e.amount||'')+'" step="0.01" min="0" inputmode="decimal"></div></div>';
-  h += '<div class="form-row"><div class="fg"><label>Category</label><select id="ed-cat">'+cats.map(function(c){ return '<option'+(c===e.category?' selected':'')+'>'+c+'</option>'; }).join('')+'</select></div><div class="fg"><label>Payment</label><select id="ed-pay">'+PAY.map(function(p){ return '<option'+(p===e.payMethod?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div></div>';
-  h += '<div class="fg" style="margin-bottom:16px"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'" autocorrect="off"></div>';
-  h += '<button class="btn-full" onclick="saveEdit()">Save Changes</button>';
-  h += '<button class="btn-full" style="background:var(--bg2);color:var(--text2);margin-top:8px" onclick="closeModalDirect()">Cancel</button>';
-  h += '</div></div>';
-  document.getElementById('modal-root').innerHTML = h;
+  var e=null, exps=state[biz].expenses||[];
+  for(var i=0;i<exps.length;i++){if(exps[i].id===id){e=exps[i];break;}}
+  if(!e) return;
+  editingId=id;
+  var cats=CATS[biz];
+  var h='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span class="modal-title">Edit Expense</span><span onclick="closeModalDirect()" style="font-size:22px;cursor:pointer;color:var(--text3)">✕</span></div>';
+  h+='<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+(e.date||'')+'"></div><div class="fg"><label>Time</label><input type="time" id="ed-time" value="'+(e.time||'')+'"></div></div>';
+  h+='<div class="form-row"><div class="fg" style="flex:2"><label>Vendor</label><input type="text" id="ed-vendor" value="'+(e.vendor||'')+'" autocorrect="off"></div><div class="fg"><label>Amount ($)</label><input type="number" id="ed-amount" value="'+(e.amount||'')+'" step="0.01" inputmode="decimal"></div></div>';
+  h+='<div class="form-row"><div class="fg"><label>Category</label><select id="ed-cat">'+cats.map(function(c){return'<option'+(c===e.category?' selected':'')+'>'+c+'</option>';}).join('')+'</select></div><div class="fg"><label>Payment</label><select id="ed-pay">'+PAY.map(function(p){return'<option'+(p===e.payMethod?' selected':'')+'>'+p+'</option>';}).join('')+'</select></div></div>';
+  h+='<div class="fg" style="margin-bottom:16px"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'" autocorrect="off"></div>';
+  h+='<button class="btn-full" onclick="saveEdit()">Save Changes</button>';
+  h+='<button class="btn-full" style="background:var(--bg2);color:var(--text2);margin-top:8px" onclick="closeModalDirect()">Cancel</button>';
+  h+='</div></div>';
+  document.getElementById('modal-root').innerHTML=h;
 }
-
-function closeModal(evt) {
-  if (evt.target.classList.contains('modal-overlay')) closeModalDirect();
-}
-function closeModalDirect() {
-  document.getElementById('modal-root').innerHTML = '';
-  editingId = null;
-}
+function closeModal(evt){if(evt.target.classList.contains('modal-overlay'))closeModalDirect();}
+function closeModalDirect(){document.getElementById('modal-root').innerHTML='';editingId=null;}
 
 function saveEdit() {
-  var exps = state[biz].expenses;
-  for (var i=0; i<exps.length; i++) {
-    if (exps[i].id === editingId) {
-      exps[i].date = document.getElementById('ed-date').value;
-      exps[i].time = document.getElementById('ed-time').value;
-      exps[i].vendor = (document.getElementById('ed-vendor').value||'').trim();
-      exps[i].amount = parseFloat(document.getElementById('ed-amount').value)||0;
-      exps[i].category = document.getElementById('ed-cat').value;
-      exps[i].payMethod = document.getElementById('ed-pay').value;
-      exps[i].note = (document.getElementById('ed-note').value||'').trim();
-      break;
-    }
-  }
-  save(); closeModalDirect(); toast('✓ Expense updated'); render();
+  var data = {
+    date: document.getElementById('ed-date').value,
+    time: document.getElementById('ed-time').value,
+    vendor: (document.getElementById('ed-vendor').value||'').trim(),
+    amount: parseFloat(document.getElementById('ed-amount').value)||0,
+    category: document.getElementById('ed-cat').value,
+    pay_method: document.getElementById('ed-pay').value,
+    note: (document.getElementById('ed-note').value||'').trim()
+  };
+  setSyncDot('syncing');
+  sbUpdate('expenses', editingId, data).then(function(){
+    return loadAll();
+  }).then(function(){
+    closeModalDirect(); toast('✓ Expense updated'); render();
+  }).catch(function(){ setSyncDot('error'); toast('Save failed — check connection'); });
 }
 
 // ── DUPLICATE ──
 function dupeExp(id) {
-  var exps = state[biz].expenses;
-  var orig = null;
-  for (var i=0; i<exps.length; i++) { if (exps[i].id===id) { orig = exps[i]; break; } }
-  if (!orig) return;
-  var copy = {
-    id: Date.now()+'',
-    date: new Date().toISOString().split('T')[0], // today's date
-    time: orig.time,
-    vendor: orig.vendor,
-    amount: orig.amount,
-    category: orig.category,
-    payMethod: orig.payMethod,
-    note: orig.note ? orig.note+' (copy)' : '(copy)',
-    files: (orig.files||[]).slice()
-  };
-  state[biz].expenses.push(copy);
-  save(); toast('✓ Duplicated — update the date'); render();
-}
-
-// ── 1099 DOCS ──
-function uploadDocs(input) {
-  var files = Array.prototype.slice.call(input.files);
-  files.forEach(function(f) {
-    state.docs.push({
-      id: Date.now()+Math.random()+'',
-      name: f.name,
-      biz: BIZ[biz],
-      uploaded: new Date().toLocaleDateString()
-    });
-  });
-  save(); toast('✓ '+files.length+' form(s) uploaded'); render();
-}
-function deleteDoc(id) {
-  if (!confirm('Remove this document?')) return;
-  state.docs = state.docs.filter(function(d){ return d.id!==id; });
-  save(); toast('Removed'); render();
-}
-
-// ── ADD / EVENT ──
-function initAddDefaults() {
+  var exps=state[biz].expenses, orig=null;
+  for(var i=0;i<exps.length;i++){if(exps[i].id===id){orig=exps[i];break;}}
+  if(!orig) return;
   var today = new Date().toISOString().split('T')[0];
-  var now = new Date();
-  var t = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  var dateEl = document.getElementById('a-date'); if (dateEl) dateEl.value = today;
-  var timeEl = document.getElementById('a-time'); if (timeEl) timeEl.value = t;
-  var evDate = document.getElementById('ev-date'); if (evDate) evDate.value = today;
-  pendingFiles = [];
-  var chips = document.getElementById('file-chips'); if (chips) chips.innerHTML = '';
-  var ssEl = document.getElementById('ev-ss');
-  var csEl = document.getElementById('ev-cs');
-  var ocEl = document.getElementById('ev-oc');
-  if (ssEl) ssEl.addEventListener('input', updatePreview);
-  if (csEl) csEl.addEventListener('input', updatePreview);
-  if (ocEl) ocEl.addEventListener('input', updatePreview);
+  var row = {
+    id: genId(), biz: biz,
+    date: today, time: orig.time,
+    vendor: orig.vendor, amount: orig.amount,
+    category: orig.category, pay_method: orig.payMethod,
+    note: (orig.note?orig.note+' (copy)':'(copy)'),
+    files: (orig.files||[]).join('|')
+  };
+  setSyncDot('syncing');
+  sbInsert('expenses', row).then(function(){ return loadAll(); }).then(function(){
+    toast('✓ Duplicated — update the date if needed'); render();
+  }).catch(function(){ setSyncDot('error'); toast('Duplicate failed'); });
+}
+
+// ── ADD EXPENSE ──
+function initAddDefaults() {
+  var today=new Date().toISOString().split('T')[0];
+  var now=new Date();
+  var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  var d=document.getElementById('a-date'); if(d) d.value=today;
+  var ti=document.getElementById('a-time'); if(ti) ti.value=t;
+  var ed=document.getElementById('ev-date'); if(ed) ed.value=today;
+  pendingFiles=[];
+  var chips=document.getElementById('file-chips'); if(chips) chips.innerHTML='';
+  var ss=document.getElementById('ev-ss'); if(ss) ss.addEventListener('input',updatePreview);
+  var cs=document.getElementById('ev-cs'); if(cs) cs.addEventListener('input',updatePreview);
+  var oc=document.getElementById('ev-oc'); if(oc) oc.addEventListener('input',updatePreview);
 }
 
 function updatePreview() {
-  var sp = parseFloat(document.getElementById('ev-sp')?document.getElementById('ev-sp').value:0)||0;
-  var cp = parseFloat(document.getElementById('ev-cp')?document.getElementById('ev-cp').value:0)||0;
-  var ss = parseInt(document.getElementById('ev-ss')?document.getElementById('ev-ss').value:0)||0;
-  var cs = parseInt(document.getElementById('ev-cs')?document.getElementById('ev-cs').value:0)||0;
-  var oc = parseFloat(document.getElementById('ev-oc')?document.getElementById('ev-oc').value:0)||0;
-  var rev = ss*sp + cs*cp, att = ss + cs*2;
-  var prev = document.getElementById('ev-preview'); if (!prev) return;
-  if (!ss && !cs) { prev.innerHTML=''; return; }
-  prev.innerHTML = '<div class="preview"><div class="preview-row"><span style="color:var(--text3)">Attendance</span><strong>'+att+' people</strong></div>'
+  var sp=parseFloat((document.getElementById('ev-sp')||{}).value)||0;
+  var cp=parseFloat((document.getElementById('ev-cp')||{}).value)||0;
+  var ss=parseInt((document.getElementById('ev-ss')||{}).value)||0;
+  var cs=parseInt((document.getElementById('ev-cs')||{}).value)||0;
+  var oc=parseFloat((document.getElementById('ev-oc')||{}).value)||0;
+  var rev=ss*sp+cs*cp, att=ss+cs*2;
+  var prev=document.getElementById('ev-preview'); if(!prev) return;
+  if(!ss&&!cs){prev.innerHTML='';return;}
+  prev.innerHTML='<div class="preview"><div class="preview-row"><span style="color:var(--text3)">Attendance</span><strong>'+att+' people</strong></div>'
     +'<div class="preview-row"><span style="color:var(--text3)">Revenue</span><strong style="color:var(--accent)">'+fmt(rev)+'</strong></div>'
     +'<div class="preview-row"><span style="color:var(--text3)">Net after op costs</span><strong style="color:'+(rev-oc>=0?'var(--accent)':'var(--red)')+'">'+fmt(rev-oc)+'</strong></div></div>';
 }
 
 function handleFiles(input) {
-  var names = Array.prototype.map.call(input.files, function(f){ return f.name; });
-  pendingFiles = pendingFiles.concat(names).filter(function(v,i,a){ return a.indexOf(v)===i; });
-  var chips = document.getElementById('file-chips');
-  if (chips) chips.innerHTML = pendingFiles.map(function(f){ return '<span class="file-chip">📎 '+f+' <span onclick="removeFile(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>'; }).join('');
+  var names=Array.prototype.map.call(input.files,function(f){return f.name;});
+  pendingFiles=pendingFiles.concat(names).filter(function(v,i,a){return a.indexOf(v)===i;});
+  var chips=document.getElementById('file-chips');
+  if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removeFile(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
 }
-function removeFile(n) {
-  pendingFiles = pendingFiles.filter(function(f){ return f!==n; });
-  var chips = document.getElementById('file-chips');
-  if (chips) chips.innerHTML = pendingFiles.map(function(f){ return '<span class="file-chip">📎 '+f+' <span onclick="removeFile(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>'; }).join('');
+function removeFile(n){
+  pendingFiles=pendingFiles.filter(function(f){return f!==n;});
+  var chips=document.getElementById('file-chips');
+  if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removeFile(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
 }
 
 function addExp() {
-  var vendor = (document.getElementById('a-vendor').value||'').trim();
-  var amount = parseFloat(document.getElementById('a-amount').value);
-  var date = document.getElementById('a-date').value;
-  var time = document.getElementById('a-time').value;
-  var cat = document.getElementById('a-cat').value;
-  var pay = document.getElementById('a-pay').value;
-  var note = (document.getElementById('a-note').value||'').trim();
-  if (!vendor || isNaN(amount) || amount <= 0) { toast('Enter vendor and amount'); return; }
-  if (!date) { toast('Select a date'); return; }
-  state[biz].expenses.push({id:Date.now()+'',date:date,time:time,vendor:vendor,amount:amount,category:cat,payMethod:pay,note:note,files:pendingFiles.slice()});
-  save(); toast('✓ Expense added'); pendingFiles = [];
-  document.getElementById('a-vendor').value = '';
-  document.getElementById('a-amount').value = '';
-  document.getElementById('a-note').value = '';
-  var chips = document.getElementById('file-chips'); if (chips) chips.innerHTML = '';
+  var vendor=(document.getElementById('a-vendor').value||'').trim();
+  var amount=parseFloat(document.getElementById('a-amount').value);
+  var date=document.getElementById('a-date').value;
+  var time=document.getElementById('a-time').value;
+  var cat=document.getElementById('a-cat').value;
+  var pay=document.getElementById('a-pay').value;
+  var note=(document.getElementById('a-note').value||'').trim();
+  if(!vendor||isNaN(amount)||amount<=0){toast('Enter vendor and amount');return;}
+  if(!date){toast('Select a date');return;}
+  var row={id:genId(),biz:biz,date:date,time:time,vendor:vendor,amount:amount,category:cat,pay_method:pay,note:note,files:pendingFiles.join('|')};
+  setSyncDot('syncing');
+  sbInsert('expenses',row).then(function(){return loadAll();}).then(function(){
+    toast('✓ Expense added'); pendingFiles=[];
+    document.getElementById('a-vendor').value='';
+    document.getElementById('a-amount').value='';
+    document.getElementById('a-note').value='';
+    var chips=document.getElementById('file-chips'); if(chips) chips.innerHTML='';
+  }).catch(function(){setSyncDot('error');toast('Save failed — check connection');});
 }
 
 function addEvent() {
-  var name = (document.getElementById('ev-name').value||'').trim();
-  var date = document.getElementById('ev-date').value;
-  var sp = parseFloat(document.getElementById('ev-sp').value)||0;
-  var cp = parseFloat(document.getElementById('ev-cp').value)||0;
-  var ss = parseInt(document.getElementById('ev-ss').value)||0;
-  var cs = parseInt(document.getElementById('ev-cs').value)||0;
-  var oc = parseFloat(document.getElementById('ev-oc').value)||0;
-  if (!date) { toast('Enter event date'); return; }
-  if (!ss && !cs) { toast('Enter tickets sold'); return; }
-  state[biz].ticketPrices = {single:sp, couple:cp};
-  state[biz].events.push({id:Date.now()+'',name:name,date:date,singleSold:ss,coupleSold:cs,opCost:oc});
-  save(); toast('✓ Event logged');
-  document.getElementById('ev-name').value = '';
-  document.getElementById('ev-ss').value = '';
-  document.getElementById('ev-cs').value = '';
-  document.getElementById('ev-oc').value = '';
-  var prev = document.getElementById('ev-preview'); if (prev) prev.innerHTML = '';
+  var name=(document.getElementById('ev-name').value||'').trim();
+  var date=document.getElementById('ev-date').value;
+  var sp=parseFloat(document.getElementById('ev-sp').value)||0;
+  var cp=parseFloat(document.getElementById('ev-cp').value)||0;
+  var ss=parseInt(document.getElementById('ev-ss').value)||0;
+  var cs=parseInt(document.getElementById('ev-cs').value)||0;
+  var oc=parseFloat(document.getElementById('ev-oc').value)||0;
+  if(!date){toast('Enter event date');return;}
+  if(!ss&&!cs){toast('Enter tickets sold');return;}
+  setSyncDot('syncing');
+  var priceRow={biz:biz,single_price:sp,couple_price:cp};
+  var evRow={id:genId(),biz:biz,name:name,date:date,single_sold:ss,couple_sold:cs,op_cost:oc};
+  Promise.all([sbUpsert('ticket_prices',priceRow), sbInsert('events',evRow)]).then(function(){return loadAll();}).then(function(){
+    toast('✓ Event logged');
+    document.getElementById('ev-name').value='';
+    document.getElementById('ev-ss').value='';
+    document.getElementById('ev-cs').value='';
+    document.getElementById('ev-oc').value='';
+    var prev=document.getElementById('ev-preview'); if(prev) prev.innerHTML='';
+  }).catch(function(){setSyncDot('error');toast('Save failed — check connection');});
 }
 
 function deleteExp(id) {
-  if (!confirm('Delete this expense?')) return;
-  state[biz].expenses = state[biz].expenses.filter(function(e){ return e.id!==id; });
-  save(); toast('Deleted'); render();
+  if(!confirm('Delete this expense?')) return;
+  setSyncDot('syncing');
+  sbDelete('expenses',id).then(function(){return loadAll();}).then(function(){toast('Deleted');render();}).catch(function(){setSyncDot('error');});
 }
 function deleteEvent(id) {
-  if (!confirm('Delete this event?')) return;
-  state[biz].events = state[biz].events.filter(function(e){ return e.id!==id; });
-  save(); toast('Deleted'); render();
+  if(!confirm('Delete this event?')) return;
+  setSyncDot('syncing');
+  sbDelete('events',id).then(function(){return loadAll();}).then(function(){toast('Deleted');render();}).catch(function(){setSyncDot('error');});
 }
 
+// ── DOCS ──
+function uploadDocs(input) {
+  var files=Array.prototype.slice.call(input.files);
+  var today=new Date().toLocaleDateString();
+  var rows=files.map(function(f){return{id:genId(),name:f.name,biz:BIZ[biz],uploaded:today};});
+  setSyncDot('syncing');
+  sbInsert('docs',rows).then(function(){return loadAll();}).then(function(){
+    toast('✓ '+files.length+' form(s) uploaded');render();
+  }).catch(function(){setSyncDot('error');toast('Upload failed');});
+}
+function deleteDoc(id) {
+  if(!confirm('Remove this document?')) return;
+  setSyncDot('syncing');
+  sbDelete('docs',id).then(function(){return loadAll();}).then(function(){toast('Removed');render();}).catch(function(){setSyncDot('error');});
+}
+
+// ── EXPORT ──
 function renderSchedC() {
-  var b = (document.getElementById('sc-biz')||{}).value || 'rover';
-  var exps = state[b].expenses || [];
-  var map = {};
-  exps.forEach(function(e){ var l=SC_MAP[e.category]||'Other expenses (ln 48)'; map[l]=(map[l]||0)+(parseFloat(e.amount)||0); });
-  var out = document.getElementById('sc-out'); if (!out) return;
-  if (!Object.keys(map).length) { out.innerHTML='<p style="font-size:13px;color:var(--text3);padding:8px 0">No expenses yet.</p>'; return; }
-  var total=0, h='<div class="card" style="margin:0">';
-  Object.keys(map).sort(function(a,b){ return map[b]-map[a]; }).forEach(function(k){ total+=map[k]; h+='<div class="schc-row"><span style="color:var(--text2)">'+k+'</span><strong>'+fmt(map[k])+'</strong></div>'; });
+  var b=(document.getElementById('sc-biz')||{}).value||'rover';
+  var exps=state[b].expenses||[], map={};
+  exps.forEach(function(e){var l=SC_MAP[e.category]||'Other expenses (ln 48)';map[l]=(map[l]||0)+(parseFloat(e.amount)||0);});
+  var out=document.getElementById('sc-out'); if(!out) return;
+  if(!Object.keys(map).length){out.innerHTML='<p style="font-size:13px;color:var(--text3);padding:8px 0">No expenses yet.</p>';return;}
+  var total=0,h='<div class="card" style="margin:0">';
+  Object.keys(map).sort(function(a,b){return map[b]-map[a];}).forEach(function(k){total+=map[k];h+='<div class="schc-row"><span style="color:var(--text2)">'+k+'</span><strong>'+fmt(map[k])+'</strong></div>';});
   h+='<div class="schc-row" style="background:var(--bg2)"><span>Total deductible</span><strong style="color:var(--red)">'+fmt(total)+'</strong></div></div>';
-  out.innerHTML = h;
+  out.innerHTML=h;
 }
 
 function exportCSV(b) {
-  var rows = [['Business','Date','Time','Vendor','Amount','Category','Payment Method','Note','Receipts']];
-  var keys = b==='all' ? ['rover','wyzant','itt','eve'] : [b];
-  keys.forEach(function(k) {
-    (state[k].expenses||[]).forEach(function(e){ rows.push([BIZ[k],e.date,e.time,e.vendor,e.amount,e.category,e.payMethod,e.note,(e.files||[]).join('; ')]); });
-    if (TICKET_BIZ.indexOf(k)>=0 && (state[k].events||[]).length) {
+  var rows=[['Business','Date','Time','Vendor','Amount','Category','Payment Method','Note','Receipts']];
+  var keys=b==='all'?['rover','wyzant','itt','eve']:[b];
+  keys.forEach(function(k){
+    (state[k].expenses||[]).forEach(function(e){rows.push([BIZ[k],e.date,e.time,e.vendor,e.amount,e.category,e.payMethod,e.note,(e.files||[]).join('; ')]);});
+    if(TICKET_BIZ.indexOf(k)>=0&&(state[k].events||[]).length){
       rows.push([]);
       rows.push([BIZ[k]+' Events','Date','Name','Singles','Couples','Attendance','Op Costs','Revenue']);
-      var tp = state[k].ticketPrices;
-      state[k].events.slice().sort(function(a,c){ return new Date(a.date)-new Date(c.date); }).forEach(function(ev){
+      var tp=state[k].ticketPrices;
+      state[k].events.slice().sort(function(a,c){return new Date(a.date)-new Date(c.date);}).forEach(function(ev){
         var rev=(parseInt(ev.singleSold)||0)*parseFloat(tp.single)+(parseInt(ev.coupleSold)||0)*parseFloat(tp.couple);
         rows.push([BIZ[k],ev.date,ev.name,ev.singleSold,ev.coupleSold,(parseInt(ev.singleSold)||0)+(parseInt(ev.coupleSold)||0)*2,ev.opCost,rev.toFixed(2)]);
       });
     }
   });
-  dl(rows, (b==='all'?'all_businesses':BIZ[b])+'_expenses.csv');
+  dl(rows,(b==='all'?'all_businesses':BIZ[b])+'_expenses.csv');
 }
 
 function exportSchC() {
-  var b = (document.getElementById('sc-biz')||{}).value||'rover';
-  var exps = state[b].expenses||[];
-  var map={};
-  exps.forEach(function(e){ var l=SC_MAP[e.category]||'Other expenses (ln 48)'; map[l]=(map[l]||0)+(parseFloat(e.amount)||0); });
-  var rows=[['IRS Schedule C — '+BIZ[b]],['Line item','Amount']];
-  var total=0;
-  Object.keys(map).sort(function(a,b){ return map[b]-map[a]; }).forEach(function(k){ total+=map[k]; rows.push([k,map[k].toFixed(2)]); });
+  var b=(document.getElementById('sc-biz')||{}).value||'rover';
+  var exps=state[b].expenses||[], map={};
+  exps.forEach(function(e){var l=SC_MAP[e.category]||'Other expenses (ln 48)';map[l]=(map[l]||0)+(parseFloat(e.amount)||0);});
+  var rows=[['IRS Schedule C — '+BIZ[b]],['Line item','Amount']], total=0;
+  Object.keys(map).sort(function(a,b){return map[b]-map[a];}).forEach(function(k){total+=map[k];rows.push([k,map[k].toFixed(2)]);});
   rows.push(['Total deductible',total.toFixed(2)]);
-  dl(rows, BIZ[b]+'_schedule_c.csv');
+  dl(rows,BIZ[b]+'_schedule_c.csv');
 }
 
-function dl(rows, name) {
-  var csv = rows.map(function(r){ return r.map(function(c){ return '"'+String(c||'').replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
-  var a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+function dl(rows,name) {
+  var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
   toast('↗ Downloaded');
 }
 
-render();
+// ── INIT ──
+loadAll().then(function() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  render();
+}).catch(function() {
+  document.getElementById('loading').querySelector('.load-sub').textContent = 'Could not connect. Check your internet.';
+});
 </script>
 </body>
 </html>
