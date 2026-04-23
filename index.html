@@ -163,6 +163,9 @@ body { display: flex; flex-direction: column; overflow: hidden; }
     <button class="nav-btn" id="nav-docs" onclick="switchView('docs')">
       <span class="nav-icon">📄</span><span class="nav-lbl">1099s</span>
     </button>
+    <button class="nav-btn" id="nav-earnings" onclick="switchView('earnings')">
+      <span class="nav-icon">💰</span><span class="nav-lbl">Earnings</span>
+    </button>
     <button class="nav-btn" id="nav-export" onclick="switchView('export')">
       <span class="nav-icon">↗</span><span class="nav-lbl">Export</span>
     </button>
@@ -200,7 +203,8 @@ var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov',
 
 // In-memory state loaded from Supabase
 var state = {
-  rover:{expenses:[]}, wyzant:{expenses:[]},
+  rover:{expenses:[],income:{amount:0,date:'',asOf:''}},
+  wyzant:{expenses:[],income:{amount:0,date:'',asOf:''}},
   itt:{expenses:[],events:[],ticketPrices:{single:65,couple:115}},
   eve:{expenses:[],events:[],ticketPrices:{single:65,couple:115}},
   docs:[]
@@ -270,13 +274,15 @@ function loadAll() {
     sbGet('expenses', 'order=date.desc'),
     sbGet('events', 'order=date.desc'),
     sbGet('ticket_prices', ''),
-    sbGet('docs', 'order=uploaded.desc')
+    sbGet('docs', 'order=uploaded.desc'),
+    sbGet('income_records', '')
   ];
   return Promise.all(promises).then(function(results) {
     var expenses = results[0] || [];
     var events   = results[1] || [];
     var prices   = results[2] || [];
     var docs     = results[3] || [];
+    var incomes  = results[4] || [];
 
     // Reset state
     var keys = ['rover','wyzant','itt','eve'];
@@ -317,6 +323,13 @@ function loadAll() {
     // Map docs
     docs.forEach(function(d) {
       state.docs.push({ id: d.id, name: d.name, biz: d.biz, uploaded: d.uploaded });
+    });
+
+    // Map income records
+    incomes.forEach(function(r) {
+      if (state[r.biz]) {
+        state[r.biz].income = { amount: r.amount||0, date: r.date||'', asOf: r.as_of||'' };
+      }
     });
 
     setSyncDot('synced');
@@ -391,12 +404,12 @@ function switchBiz(b2) {
 }
 function switchView(v) {
   curView = v;
-  ['overview','add','docs','export'].forEach(function(x){
+  ['overview','add','docs','earnings','export'].forEach(function(x){
     var el = document.getElementById('nav-'+x);
     if(el) el.classList.toggle('active',x===v);
   });
-  // Refresh data when switching to overview
-  if (v === 'overview') {
+  // Refresh data when switching to overview or earnings
+  if (v === 'overview' || v === 'earnings') {
     setSyncDot('syncing');
     loadAll().then(function(){ render(); });
   } else {
@@ -410,6 +423,7 @@ function render() {
   if (curView==='overview') el.innerHTML = buildOverview();
   else if (curView==='add') el.innerHTML = buildAdd();
   else if (curView==='docs') el.innerHTML = buildDocs();
+  else if (curView==='earnings') el.innerHTML = buildEarnings();
   else el.innerHTML = buildExport();
   if (curView==='add') initAddDefaults();
   if (curView==='export') renderSchedC();
@@ -458,9 +472,26 @@ function buildOverview() {
     h += '<div class="metric"><div class="metric-lbl">Net profit</div><div class="metric-val '+(profit>=0?'green':'red')+'">'+fmt(profit)+'</div></div>';
     h += '<div class="metric"><div class="metric-lbl">Attendance</div><div class="metric-val">'+totalAtt(biz)+'</div></div>';
   } else {
+    var inc = state[biz].income || {amount:0,date:'',asOf:''};
+    var incProfit = (parseFloat(inc.amount)||0) - te;
     h += '<div class="metric"><div class="metric-lbl">Logged</div><div class="metric-val">'+exps.length+'</div></div>';
+    h += '<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Income YTD</div><div class="metric-val green">'+fmt(inc.amount)+'</div>'+(inc.asOf?'<div style="font-size:10px;color:var(--text3);margin-top:3px">As of '+fmtDate(inc.asOf)+'</div>':'')+'</div>';
+    h += '<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Net profit YTD</div><div class="metric-val '+(incProfit>=0?'green':'red')+'">'+fmt(incProfit)+'</div></div>';
   }
   h += '</div>';
+
+  // Income input for non-ticket businesses (Rover, Wyzant)
+  if (!isT) {
+    var inc2 = state[biz].income || {amount:0,date:'',asOf:''};
+    h += '<div class="sec-label">Update income</div><div class="card"><div class="card-body" style="padding-top:12px">';
+    h += '<p style="font-size:12px;color:var(--text2);margin-bottom:10px">Log your total income earned year to date from '+BIZ[biz]+'. Update this whenever you check your earnings.</p>';
+    h += '<div class="form-row">';
+    h += '<div class="fg" style="flex:2"><label>Income YTD ($)</label><input type="number" id="inc-amount" value="'+(inc2.amount||'')+'" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div>';
+    h += '<div class="fg"><label>As of date</label><input type="date" id="inc-date" value="'+(inc2.asOf||'')+'"></div>';
+    h += '</div>';
+    h += '<button class="btn-full" onclick="saveIncome()">Update Income</button>';
+    h += '</div></div>';
+  }
 
   var hasCats = cats.some(function(c){return ct[c]>0;});
   if (hasCats) {
@@ -554,6 +585,64 @@ function buildDocs() {
     h+='<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:600;min-width:110px;color:var(--text)">'+n[0]+'</span><span style="color:var(--text2)">'+n[1]+'</span></div>';
   });
   h+='</div></div>';
+  return h;
+}
+
+function saveIncome() {
+  var amount = parseFloat(document.getElementById('inc-amount').value)||0;
+  var asOf = document.getElementById('inc-date').value;
+  var row = { biz: biz, amount: amount, as_of: asOf, date: new Date().toISOString().split('T')[0] };
+  setSyncDot('syncing');
+  sbUpsert('income_records', row).then(function(){ return loadAll(); }).then(function(){
+    toast('✓ Income updated'); render();
+  }).catch(function(){ setSyncDot('error'); toast('Save failed'); });
+}
+
+function buildEarnings() {
+  var keys = ['rover','wyzant','itt','eve'];
+  var totalIncome = 0, totalExpAll = 0, totalProfitAll = 0;
+  var h = '<div class="sec-label">Total Earnings — All Businesses</div>';
+
+  // Per-business cards
+  keys.forEach(function(k) {
+    var isT = TICKET_BIZ.indexOf(k) >= 0;
+    var exp = (state[k].expenses||[]).reduce(function(s,e){return s+(parseFloat(e.amount)||0);},0);
+    var inc, profit;
+    if (isT) {
+      var p = state[k].ticketPrices;
+      inc = (state[k].events||[]).reduce(function(s,ev){return s+(parseInt(ev.singleSold)||0)*parseFloat(p.single)+(parseInt(ev.coupleSold)||0)*parseFloat(p.couple);},0);
+    } else {
+      inc = parseFloat((state[k].income||{}).amount)||0;
+    }
+    profit = inc - exp;
+    totalIncome += inc;
+    totalExpAll += exp;
+    totalProfitAll += profit;
+
+    var emoji = {rover:'🐾',wyzant:'📚',itt:'💃',eve:'🌿'}[k];
+    h += '<div class="card" style="margin-bottom:10px">';
+    h += '<div style="padding:12px 14px 0;font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">'+emoji+' '+BIZ[k]+'</div>';
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--border)">';
+    h += '<div style="padding:12px 10px;border-right:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Income</div><div style="font-size:16px;font-weight:700;color:var(--accent)">'+fmt(inc)+'</div>'+((!isT&&(state[k].income||{}).asOf)?'<div style="font-size:10px;color:var(--text3);margin-top:2px">As of '+fmtDate(state[k].income.asOf)+'</div>':'')+'</div>';
+    h += '<div style="padding:12px 10px;border-right:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Expenses</div><div style="font-size:16px;font-weight:700;color:var(--red)">'+fmt(exp)+'</div></div>';
+    h += '<div style="padding:12px 10px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Net profit</div><div style="font-size:16px;font-weight:700;color:'+(profit>=0?'var(--accent)':'var(--red)')+'">'+fmt(profit)+'</div></div>';
+    h += '</div></div>';
+  });
+
+  // Grand total card
+  h += '<div class="sec-label">Combined total</div>';
+  h += '<div class="card" style="overflow:hidden">';
+  h += '<div style="background:var(--accent);padding:14px 16px">';
+  h += '<div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Total income across all businesses</div>';
+  h += '<div style="font-size:32px;font-weight:700;color:#fff">'+fmt(totalIncome)+'</div>';
+  h += '</div>';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)">';
+  h += '<div style="padding:14px;border-right:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Total expenses</div><div style="font-size:22px;font-weight:700;color:var(--red)">'+fmt(totalExpAll)+'</div></div>';
+  h += '<div style="padding:14px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Total net profit</div><div style="font-size:22px;font-weight:700;color:'+(totalProfitAll>=0?'var(--accent)':'var(--red)')+'">'+fmt(totalProfitAll)+'</div></div>';
+  h += '</div>';
+  h += '<div style="padding:12px 16px;background:var(--bg2);border-top:1px solid var(--border)">';
+  h += '<p style="font-size:12px;color:var(--text2)">⚠️ This is an estimate of taxable income. Net profit is your approximate gross income for Schedule C. Consult a tax professional for your actual tax liability.</p>';
+  h += '</div></div>';
   return h;
 }
 
