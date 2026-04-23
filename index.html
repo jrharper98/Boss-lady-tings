@@ -571,27 +571,66 @@ function buildExport() {
 }
 
 // ── EDIT MODAL ──
+var editPendingFiles = []; // new files added in edit modal
+var editExistingFiles = []; // existing files kept from original
+
 function openEdit(id) {
   var e=null, exps=state[biz].expenses||[];
   for(var i=0;i<exps.length;i++){if(exps[i].id===id){e=exps[i];break;}}
   if(!e) return;
   editingId=id;
+  editPendingFiles=[];
+  editExistingFiles=(e.files||[]).slice(); // pre-load existing files
   var cats=CATS[biz];
   var h='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal">';
   h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span class="modal-title">Edit Expense</span><span onclick="closeModalDirect()" style="font-size:22px;cursor:pointer;color:var(--text3)">✕</span></div>';
   h+='<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+(e.date||'')+'"></div><div class="fg"><label>Time</label><input type="time" id="ed-time" value="'+(e.time||'')+'"></div></div>';
   h+='<div class="form-row"><div class="fg" style="flex:2"><label>Vendor</label><input type="text" id="ed-vendor" value="'+(e.vendor||'')+'" autocorrect="off"></div><div class="fg"><label>Amount ($)</label><input type="number" id="ed-amount" value="'+(e.amount||'')+'" step="0.01" inputmode="decimal"></div></div>';
   h+='<div class="form-row"><div class="fg"><label>Category</label><select id="ed-cat">'+cats.map(function(c){return'<option'+(c===e.category?' selected':'')+'>'+c+'</option>';}).join('')+'</select></div><div class="fg"><label>Payment</label><select id="ed-pay">'+PAY.map(function(p){return'<option'+(p===e.payMethod?' selected':'')+'>'+p+'</option>';}).join('')+'</select></div></div>';
-  h+='<div class="fg" style="margin-bottom:16px"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'" autocorrect="off"></div>';
+  h+='<div class="fg" style="margin-bottom:12px"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'" autocorrect="off"></div>';
+  // Files section
+  h+='<div class="fg" style="margin-bottom:16px"><label>Receipts & files</label>';
+  // Show existing files with remove buttons
+  h+='<div id="ed-existing-chips" style="margin-bottom:6px">';
+  editExistingFiles.forEach(function(f){
+    h+='<span class="file-chip">📎 '+f+' <span onclick="removeEditExisting(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';
+  });
+  h+='</div>';
+  // Upload zone for new files
+  h+='<div class="upload-zone" onclick="document.getElementById(\'ed-file\').click()">📎 Tap to add new receipt or file<input type="file" id="ed-file" style="display:none" accept="image/*,.pdf" multiple onchange="handleEditFiles(this)"></div>';
+  h+='<div id="ed-new-chips"></div>';
+  h+='</div>';
   h+='<button class="btn-full" onclick="saveEdit()">Save Changes</button>';
   h+='<button class="btn-full" style="background:var(--bg2);color:var(--text2);margin-top:8px" onclick="closeModalDirect()">Cancel</button>';
   h+='</div></div>';
   document.getElementById('modal-root').innerHTML=h;
 }
+
+function handleEditFiles(input) {
+  var names=Array.prototype.map.call(input.files,function(f){return f.name;});
+  editPendingFiles=editPendingFiles.concat(names).filter(function(v,i,a){return a.indexOf(v)===i;});
+  var chips=document.getElementById('ed-new-chips');
+  if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
+}
+
+function removeEditExisting(fname) {
+  editExistingFiles=editExistingFiles.filter(function(f){return f!==fname;});
+  var chips=document.getElementById('ed-existing-chips');
+  if(chips) chips.innerHTML=editExistingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removeEditExisting(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
+}
+
+function removeEditNew(fname) {
+  editPendingFiles=editPendingFiles.filter(function(f){return f!==fname;});
+  var chips=document.getElementById('ed-new-chips');
+  if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
+}
+
 function closeModal(evt){if(evt.target.classList.contains('modal-overlay'))closeModalDirect();}
-function closeModalDirect(){document.getElementById('modal-root').innerHTML='';editingId=null;}
+function closeModalDirect(){document.getElementById('modal-root').innerHTML='';editingId=null;editPendingFiles=[];editExistingFiles=[];}
 
 function saveEdit() {
+  // Merge kept existing files + newly added files
+  var allFiles = editExistingFiles.concat(editPendingFiles);
   var data = {
     date: document.getElementById('ed-date').value,
     time: document.getElementById('ed-time').value,
@@ -599,7 +638,8 @@ function saveEdit() {
     amount: parseFloat(document.getElementById('ed-amount').value)||0,
     category: document.getElementById('ed-cat').value,
     pay_method: document.getElementById('ed-pay').value,
-    note: (document.getElementById('ed-note').value||'').trim()
+    note: (document.getElementById('ed-note').value||'').trim(),
+    files: allFiles.join('|')
   };
   setSyncDot('syncing');
   sbUpdate('expenses', editingId, data).then(function(){
