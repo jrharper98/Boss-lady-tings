@@ -492,8 +492,9 @@ function buildOverview(){
     if(e.note) h+='<div class="exp-note">'+e.note+'</div>';
     if(e.files&&e.files.length) h+='<div style="margin-top:4px">'+e.files.map(function(f){
   var name=typeof f==='object'?f.name:f;
-  var url=typeof f==='object'?f.url:null;
-  return'<span class="file-chip" onclick="viewFile(\''+encodeURIComponent(JSON.stringify({name:name,url:url}))+'\')" >👁 '+name+'</span>';
+  var url=(typeof f==='object'&&f.url)?f.url:null;
+  var payload=encodeURIComponent(JSON.stringify({name:name,url:url}));
+  return'<span class="file-chip" onclick="viewFile(\''+payload+'\')">👁 '+name+'</span>';
 }).join('')+'</div>';
     h+='<span class="badge '+(isUnassigned(e.category)?'b-unassigned':catCls(e.category))+'">'+(isUnassigned(e.category)?'⚠️ Unassigned':e.category)+'</span></div>';
     h+='<div class="exp-right"><div class="exp-amt">'+fmt(e.amount)+'</div><div class="exp-actions"><button class="btn-edit" onclick="openEdit(\''+e.id+'\')">Edit</button><button class="btn-dupe" onclick="dupeExp(\''+e.id+'\')">Dupe</button><button class="btn-del" onclick="deleteExp(\''+e.id+'\')">Del</button></div></div></div>';
@@ -761,23 +762,7 @@ function logRepeat(id){
 function deleteRepeat(id){ if(!confirm('Remove this repeating expense?')) return; setSyncDot('syncing'); sbDelete('repeat_expenses',id).then(function(){return loadAll();}).then(function(){toast('Removed');render();}); }
 
 // ── VIEW FILE ──
-function viewFile(filename){
-  var h='<div class="modal-overlay" onclick="closeModalDirect()"><div class="modal" onclick="event.stopPropagation()">';
-  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span class="modal-title">'+filename+'</span><span onclick="closeModalDirect()" style="font-size:22px;cursor:pointer;color:var(--text3)">✕</span></div>';
-  var ext=filename.toLowerCase().split('.').pop();
-  if(ext==='pdf'){
-    h+='<p style="font-size:13px;color:var(--text2);margin-bottom:12px">PDF files can\'t be previewed here. Use the button below to open it.</p>';
-    h+='<button class="btn-full" onclick="window.open(\''+filename+'\',\'_blank\')">Open PDF</button>';
-  } else if(['jpg','jpeg','png','gif','webp','heic'].indexOf(ext)>=0){
-    h+='<img src="'+filename+'" style="width:100%;border-radius:8px;max-height:60vh;object-fit:contain" onerror="this.style.display=\'none\';document.getElementById(\'img-err\').style.display=\'block\'">';
-    h+='<div id="img-err" style="display:none;font-size:13px;color:var(--text3);padding:16px 0;text-align:center">Image preview not available — receipts are stored by filename only. Use cloud storage (Google Drive, iCloud) to store the actual files and reference them by name here.</div>';
-  } else {
-    h+='<p style="font-size:13px;color:var(--text2)">Preview not available for this file type.</p>';
-  }
-  h+='<button class="btn-full" style="background:var(--bg2);color:var(--text2);margin-top:8px" onclick="closeModalDirect()">Close</button>';
-  h+='</div></div>';
-  document.getElementById('modal-root').innerHTML=h;
-}
+// viewFile moved above
 
 // ── 1099 DOCS ──
 function buildDocs(){
