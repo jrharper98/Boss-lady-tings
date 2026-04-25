@@ -242,14 +242,15 @@ function setSyncDot(s){ var d=document.getElementById('sync-dot'); if(d) d.class
 
 function loadAll() {
   setSyncDot('syncing');
+  var safe = function(p){ return p.catch(function(){ return []; }); };
   return Promise.all([
-    sbGet('expenses','order=date.desc'),
-    sbGet('events','order=date.desc'),
-    sbGet('ticket_prices',''),
-    sbGet('docs','order=uploaded.desc'),
-    sbGet('income_records',''),
-    sbGet('repeat_expenses','order=next_date.asc'),
-    sbGet('ownit_sales','order=date.desc')
+    safe(sbGet('expenses','order=date.desc')),
+    safe(sbGet('events','order=date.desc')),
+    safe(sbGet('ticket_prices','')),
+    safe(sbGet('docs','order=uploaded.desc')),
+    safe(sbGet('income_records','')),
+    safe(sbGet('repeat_expenses','order=next_date.asc')),
+    safe(sbGet('ownit_sales','order=date.desc'))
   ]).then(function(r) {
     var expenses=r[0]||[], events=r[1]||[], prices=r[2]||[], docs=r[3]||[], incomes=r[4]||[], repeats=r[5]||[], sales=r[6]||[];
     var keys=['rover','wyzant','itt','eve','ownit'];
@@ -910,9 +911,11 @@ loadAll().then(function(){
   clearTimeout(initTimeout);
   showApp();
   autoLogDueRepeats().catch(function(e){ console.error('Auto-log failed', e); });
-}).catch(function(){
+}).catch(function(err){
   clearTimeout(initTimeout);
-  document.getElementById('loading').querySelector('.load-sub').textContent='Could not connect. Check your internet.';
+  console.error('Load error:', err);
+  // Still show the app even on error so user isn't stuck
+  showApp();
 });
 </script>
 </body>
