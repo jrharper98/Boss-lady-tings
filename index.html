@@ -1,10 +1,12 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-touch-fullscreen" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Boss Lady Tings">
 <meta name="theme-color" content="#1e3d1a">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -46,7 +48,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .biz-tab { padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text3); white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; user-select: none; }
 .biz-tab.active { color: var(--forest); border-color: var(--softgold); }
 .content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 14px 14px calc(80px + var(--safe-bottom)); }
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: var(--bg); border-top: 1px solid var(--beige); padding-bottom: var(--safe-bottom); z-index: 50; }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: var(--bg); border-top: 1px solid var(--beige); padding-bottom: var(--safe-bottom); z-index: 9999; }
 .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 0 4px; cursor: pointer; user-select: none; gap: 2px; border: none; background: none; -webkit-appearance: none; }
 .nav-icon { font-size: 20px; line-height: 1; }
 .nav-lbl { font-size: 9px; font-weight: 600; color: var(--text3); }
@@ -161,10 +163,10 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   </div>
   <div class="content" id="content"></div>
   <div class="bottom-nav">
-    <button class="nav-btn active" id="nav-overview" onclick="switchView('overview')"><span class="nav-icon">📊</span><span class="nav-lbl">Overview</span></button>
+    <button class="nav-btn active" id="nav-earnings" onclick="switchView('earnings')"><span class="nav-icon">💰</span><span class="nav-lbl">Earnings</span></button>
     <button class="nav-btn" id="nav-add" onclick="switchView('add')"><span class="nav-icon" style="font-size:26px;line-height:0.85">+</span><span class="nav-lbl">Add</span></button>
-<button class="nav-btn" id="nav-docs" onclick="switchView('docs')"><span class="nav-icon">📄</span><span class="nav-lbl">1099s</span></button>
-    <button class="nav-btn" id="nav-earnings" onclick="switchView('earnings')"><span class="nav-icon">💰</span><span class="nav-lbl">Earnings</span></button>
+    <button class="nav-btn" id="nav-overview" onclick="switchView('overview')"><span class="nav-icon">📊</span><span class="nav-lbl">Overview</span></button>
+    <button class="nav-btn" id="nav-docs" onclick="switchView('docs')"><span class="nav-icon">📄</span><span class="nav-lbl">1099s</span></button>
     <button class="nav-btn" id="nav-export" onclick="switchView('export')"><span class="nav-icon">↗</span><span class="nav-lbl">Export</span></button>
   </div>
 </div>
