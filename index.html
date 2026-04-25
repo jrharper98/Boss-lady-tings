@@ -492,9 +492,8 @@ function buildOverview(){
     if(e.note) h+='<div class="exp-note">'+e.note+'</div>';
     if(e.files&&e.files.length) h+='<div style="margin-top:4px">'+e.files.map(function(f){
   var name=typeof f==='object'?f.name:f;
-  var url=(typeof f==='object'&&f.url)?f.url:null;
-  var payload=encodeURIComponent(JSON.stringify({name:name,url:url}));
-  return'<span class="file-chip" onclick="viewFile(\''+payload+'\')">👁 '+name+'</span>';
+  var url=(typeof f==='object'&&f.url)?f.url:'';
+  return'<span class="file-chip viewable-file" data-name="'+name.replace(/"/g,'&quot;')+'" data-url="'+url.replace(/"/g,'&quot;')+'" style="cursor:pointer">👁 '+name+'</span>';
 }).join('')+'</div>';
     h+='<span class="badge '+(isUnassigned(e.category)?'b-unassigned':catCls(e.category))+'">'+(isUnassigned(e.category)?'⚠️ Unassigned':e.category)+'</span></div>';
     h+='<div class="exp-right"><div class="exp-amt">'+fmt(e.amount)+'</div><div class="exp-actions"><button class="btn-edit" onclick="openEdit(\''+e.id+'\')">Edit</button><button class="btn-dupe" onclick="dupeExp(\''+e.id+'\')">Dupe</button><button class="btn-del" onclick="deleteExp(\''+e.id+'\')">Del</button></div></div></div>';
