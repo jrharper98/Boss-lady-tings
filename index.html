@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -234,7 +233,15 @@ var editingId=null, editPendingFiles=[], editExistingFiles=[];
 
 // ── SUPABASE ──
 function sbH() { return {'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'}; }
-function sbGet(t,p){ return fetch(SB_URL+'/rest/v1/'+t+'?'+(p||''),{method:'GET',headers:sbH()}).then(function(r){return r.json();}); }
+function sbGet(t,p){
+  var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  var opts = {method:'GET', headers:sbH()};
+  if(controller) opts.signal = controller.signal;
+  var timer = controller ? setTimeout(function(){ controller.abort(); }, 10000) : null;
+  return fetch(SB_URL+'/rest/v1/'+t+'?'+(p||''), opts)
+    .then(function(r){ if(timer) clearTimeout(timer); return r.json(); })
+    .catch(function(e){ if(timer) clearTimeout(timer); return []; });
+}
 function sbInsert(t,d){ return fetch(SB_URL+'/rest/v1/'+t,{method:'POST',headers:sbH(),body:JSON.stringify(d)}); }
 function sbUpdate(t,id,d){ return fetch(SB_URL+'/rest/v1/'+t+'?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:sbH(),body:JSON.stringify(d)}); }
 function sbDelete(t,id){ return fetch(SB_URL+'/rest/v1/'+t+'?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:sbH()}); }
@@ -289,7 +296,11 @@ function switchBiz(b2){ biz=b2; periodMode='all'; periodMonth=''; periodYear='';
 function switchView(v){
   curView=v;
   ['overview','add','docs','earnings','export'].forEach(function(x){ var el=document.getElementById('nav-'+x); if(el) el.classList.toggle('active',x===v); });
-  if(v==='overview'||v==='earnings'){ setSyncDot('syncing'); loadAll().then(function(){render();}); } else render();
+  if(v==='overview'||v==='earnings'){
+    setSyncDot('syncing');
+    var t=setTimeout(function(){render();},6000);
+    loadAll().then(function(){clearTimeout(t);render();}).catch(function(){clearTimeout(t);render();});
+  } else render();
 }
 function setPeriod(m){ periodMode=m; periodMonth=''; periodYear=''; render(); }
 function setPeriodYear(v){ if(!v){periodMode='all';periodYear='';render();return;} periodMode='year';periodYear=v;periodMonth='';render(); }
@@ -921,4 +932,3 @@ loadAll().then(function(){
 </script>
 </body>
 </html>
-
