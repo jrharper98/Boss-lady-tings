@@ -883,13 +883,12 @@ function handleEditFiles(input){
   var chips=document.getElementById('ed-new-chips');
   if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+encodeURIComponent(f)+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
 }
-function removeEditExisting(encodedName){
-  var fname=decodeURIComponent(encodedName);
+function removeEditExisting(fname){
   editExistingFiles=editExistingFiles.filter(function(f){return (typeof f==='object'?f.name:f)!==fname;});
   var chips=document.getElementById('ed-existing-chips');
   if(chips) chips.innerHTML=editExistingFiles.map(function(f){
     var n=typeof f==='object'?f.name:f;
-    return'<span class="file-chip">📎 '+n+' <span onclick="removeEditExisting(\''+encodeURIComponent(n)+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';
+    return'<span class="file-chip">📎 '+n+' <span class="remove-existing" data-name="'+n.replace(/"/g,'&quot;')+'" style="cursor:pointer;color:var(--red)">×</span></span>';
   }).join('');
 }
 function removeEditNew(fname){ editPendingFiles=editPendingFiles.filter(function(f){return f!==fname;}); var chips=document.getElementById('ed-new-chips'); if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join(''); }
@@ -982,6 +981,21 @@ function exportSchC(){
   dl(rows,BIZ[b]+'_schedule_c.csv');
 }
 function dl(rows,name){ var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n'); var a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a); toast('↗ Downloaded'); }
+
+// ── GLOBAL FILE CHIP HANDLER ──
+document.addEventListener('click', function(evt) {
+  var t = evt.target;
+  // Walk up to find viewable-file chip
+  while(t && t !== document.body) {
+    if(t.classList && t.classList.contains('viewable-file')) {
+      var name = t.getAttribute('data-name');
+      var url = t.getAttribute('data-url') || '';
+      viewFile(name, url);
+      return;
+    }
+    t = t.parentNode;
+  }
+});
 
 // ── AUTO-LOG REPEATS ──
 function autoLogDueRepeats(){
