@@ -231,7 +231,7 @@ var state = {
   ownit:{expenses:[],sales:[]},
   docs:[], repeats:[]
 };
-var biz='rover', curView='overview';
+var biz='rover', curView='earnings';
 var pendingFiles=[], pendingFileObjects=[], periodMode='all', periodMonth='', periodYear='';
 var editingId=null, editPendingFiles=[], editExistingFiles=[], editNewFileObjects=[];
 
@@ -343,7 +343,7 @@ function getAvailableMonths(b){ var m={}; (state[b].expenses||[]).forEach(functi
 function switchBiz(b2){ biz=b2; periodMode='all'; periodMonth=''; periodYear=''; var tabs=document.querySelectorAll('.biz-tab'); var keys=['rover','wyzant','itt','eve','ownit']; for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle('active',keys[i]===b2); render(); }
 function switchView(v){
   curView=v;
-  ['overview','add','docs','earnings','export'].forEach(function(x){ var el=document.getElementById('nav-'+x); if(el) el.classList.toggle('active',x===v); });
+  ['earnings','add','overview','docs','export'].forEach(function(x){ var el=document.getElementById('nav-'+x); if(el) el.classList.toggle('active',x===v); });
   if(v==='overview'||v==='earnings'){
     setSyncDot('syncing');
     var t=setTimeout(function(){try{render();}catch(e){console.error(e);}},6000);
