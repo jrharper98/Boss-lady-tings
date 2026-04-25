@@ -232,7 +232,7 @@ var state = {
   docs:[], repeats:[]
 };
 var biz='rover', curView='overview';
-var pendingFiles=[], periodMode='all', periodMonth='', periodYear='';
+var pendingFiles=[], pendingFileObjects=[], periodMode='all', periodMonth='', periodYear='';
 var editingId=null, editPendingFiles=[], editExistingFiles=[], editNewFileObjects=[];
 
 // ── SUPABASE ──
@@ -577,7 +577,7 @@ function initAddDefaults(){
   var ti=document.getElementById('a-time'); if(ti) ti.value=t;
   var ed=document.getElementById('ev-date'); if(ed) ed.value=today;
   var sd=document.getElementById('sale-date'); if(sd) sd.value=today;
-  pendingFiles=[];
+  pendingFiles=[]; pendingFileObjects=[];
   var chips=document.getElementById('file-chips'); if(chips) chips.innerHTML='';
 }
 
@@ -605,13 +605,17 @@ function addExp(){
   setSyncDot('syncing');
 
   // Upload files first if any, then save expense
-  var fileUploadPromise = pendingFileObjects.length > 0
-    ? uploadFiles(pendingFileObjects, newId)
-    : Promise.resolve([]);
+  var fileUploadPromise;
+  try {
+    fileUploadPromise = (pendingFileObjects && pendingFileObjects.length > 0)
+      ? uploadFiles(pendingFileObjects, newId)
+      : Promise.resolve([]);
+  } catch(e) {
+    fileUploadPromise = Promise.resolve([]);
+  }
 
   fileUploadPromise.then(function(uploadedFiles) {
-    // Store as JSON array of {name, url} pairs
-    var filesJson = JSON.stringify(uploadedFiles);
+    var filesJson = JSON.stringify(uploadedFiles || []);
     var row={id:newId,biz:biz,date:date,time:time,vendor:vendor,amount:amount,category:cat||'',pay_method:pay||'',note:note,files:filesJson};
     var ops=[sbInsert('expenses',row)];
     if(isRepeat){
@@ -627,7 +631,7 @@ function addExp(){
     var catSel=document.getElementById('a-cat'); if(catSel){catSel.value='';catSel.classList.add('unassigned');}
     var paySel=document.getElementById('a-pay'); if(paySel){paySel.value='';paySel.classList.add('unassigned');}
     var cb=document.getElementById('a-repeat'); if(cb){cb.checked=false;toggleRepeatOpts();}
-  }).catch(function(e){setSyncDot('error');toast('Upload failed: '+e.message);});
+  }).catch(function(e){setSyncDot('error');console.error('addExp error:',e);toast('Error: '+(e.message||'unknown'));});
 }
 
 function toggleRepeatOpts(){
@@ -761,7 +765,48 @@ function logRepeat(id){
 function deleteRepeat(id){ if(!confirm('Remove this repeating expense?')) return; setSyncDot('syncing'); sbDelete('repeat_expenses',id).then(function(){return loadAll();}).then(function(){toast('Removed');render();}); }
 
 // ── VIEW FILE ──
-// viewFile moved above
+function viewFile(nameOrEncoded, urlParam){
+  var filename, fileUrl;
+  if(urlParam !== undefined){
+    filename = nameOrEncoded || '';
+    fileUrl = urlParam || null;
+  } else {
+    try {
+      var fi = JSON.parse(decodeURIComponent(nameOrEncoded));
+      filename = fi.name || ''; fileUrl = fi.url || null;
+    } catch(e){ filename = nameOrEncoded || ''; fileUrl = null; }
+  }
+  if(!filename){ return; }
+  var displayName = filename.split('/').pop();
+  var ext = displayName.toLowerCase().split('.').pop().trim();
+  var isImage = ['jpg','jpeg','png','gif','webp','heic','heif','bmp'].indexOf(ext) >= 0;
+  var isPdf = ext === 'pdf';
+  var h = '<div class="modal-overlay" onclick="closeModalDirect()"><div class="modal" onclick="event.stopPropagation()">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+  h += '<span class="modal-title" style="font-size:14px;word-break:break-all;max-width:85%">'+displayName+'</span>';
+  h += '<span onclick="closeModalDirect()" style="font-size:24px;cursor:pointer;color:var(--text3);flex-shrink:0">✕</span></div>';
+  if(fileUrl){
+    if(isPdf){
+      h += '<div style="text-align:center;padding:20px 0"><div style="font-size:48px;margin-bottom:12px">📄</div>';
+      h += '<p style="font-size:13px;color:var(--text2);margin-bottom:16px">Tap to open your receipt PDF.</p>';
+      h += '<button class="btn-full" onclick="window.open(''+fileUrl+'','_blank')">Open PDF</button></div>';
+    } else if(isImage){
+      h += '<img src="'+fileUrl+'" style="width:100%;border-radius:10px;max-height:62vh;object-fit:contain;background:var(--bg2)" onerror="this.style.display='none';document.getElementById('img-err').style.display='block'">';
+      h += '<div id="img-err" style="display:none;text-align:center;padding:16px;font-size:13px;color:var(--red)">Could not load — <a href="'+fileUrl+'" target="_blank" style="color:var(--income)">open directly</a></div>';
+      h += '<button class="btn-full" style="margin-top:10px" onclick="window.open(''+fileUrl+'','_blank')">↗ Open full size</button>';
+    } else {
+      h += '<div style="text-align:center;padding:20px 0"><div style="font-size:48px;margin-bottom:12px">📎</div>';
+      h += '<button class="btn-full" onclick="window.open(''+fileUrl+'','_blank')">Open file</button></div>';
+    }
+  } else {
+    h += '<div style="text-align:center;padding:24px 0"><div style="font-size:40px;margin-bottom:12px">📎</div>';
+    h += '<p style="font-size:13px;color:var(--text2);margin-bottom:8px">This receipt was saved before cloud storage was enabled.</p>';
+    h += '<p style="font-size:12px;color:var(--text3)">Tap Edit on this expense and re-attach the file to upload it.</p></div>';
+  }
+  h += '<button class="btn-full" style="background:var(--bg2);color:var(--text2);margin-top:8px" onclick="closeModalDirect()">Close</button>';
+  h += '</div></div>';
+  document.getElementById('modal-root').innerHTML = h;
+}
 
 // ── 1099 DOCS ──
 function buildDocs(){
