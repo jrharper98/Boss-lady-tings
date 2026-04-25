@@ -864,7 +864,7 @@ function openEdit(id){
   h+='<div class="form-row"><div class="fg"><label>Category</label><select id="ed-cat"><option value="">— Select —</option>'+cats.map(function(c){return'<option'+(c===e.category?' selected':'')+'>'+c+'</option>';}).join('')+'</select></div><div class="fg"><label>Payment</label><select id="ed-pay"><option value="">— Select —</option>'+PAY.slice(1).map(function(p){return'<option'+(p===e.payMethod?' selected':'')+'>'+p+'</option>';}).join('')+'</select></div></div>';
   h+='<div class="fg" style="margin-bottom:12px"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'" autocorrect="off"></div>';
   h+='<div class="fg" style="margin-bottom:16px"><label>Receipts & files</label>';
-  h+='<div id="ed-existing-chips" style="margin-bottom:6px">'+editExistingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removeEditExisting(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join('')+'</div>';
+  h+='<div id="ed-existing-chips" style="margin-bottom:6px">'+renderExistingChips()+'</div>';
   h+='<div class="upload-zone" onclick="document.getElementById(\'ed-file\').click()">📎 Add new receipt or file<input type="file" id="ed-file" style="display:none" accept="image/*,.pdf" multiple onchange="handleEditFiles(this)"></div>';
   h+='<div id="ed-new-chips"></div></div>';
   h+='<button class="btn-full" onclick="saveEdit()">Save Changes</button>';
@@ -872,26 +872,35 @@ function openEdit(id){
   h+='</div></div>';
   document.getElementById('modal-root').innerHTML=h;
 }
-function handleEditFiles(input){
-  var newFiles=Array.prototype.slice.call(input.files);
-  newFiles.forEach(function(f){
-    if(!editPendingFiles.some(function(n){return n===f.name;})){
-      editPendingFiles.push(f.name);
-      editNewFileObjects.push(f);
-    }
-  });
-  var chips=document.getElementById('ed-new-chips');
-  if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+encodeURIComponent(f)+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
-}
-function removeEditExisting(fname){
-  editExistingFiles=editExistingFiles.filter(function(f){return (typeof f==='object'?f.name:f)!==fname;});
-  var chips=document.getElementById('ed-existing-chips');
-  if(chips) chips.innerHTML=editExistingFiles.map(function(f){
-    var n=typeof f==='object'?f.name:f;
-    return'<span class="file-chip">📎 '+n+' <span class="remove-existing" data-name="'+n.replace(/"/g,'&quot;')+'" style="cursor:pointer;color:var(--red)">×</span></span>';
+function renderExistingChips(){
+  return editExistingFiles.map(function(f,i){
+    var n=typeof f==='object'?f.name:String(f);
+    return '<span class="file-chip">📎 '+n+' <button onclick="rmExisting('+i+')" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:15px;font-weight:700;padding:0 3px">×</button></span>';
   }).join('');
 }
-function removeEditNew(fname){ editPendingFiles=editPendingFiles.filter(function(f){return f!==fname;}); var chips=document.getElementById('ed-new-chips'); if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join(''); }
+function rmExisting(idx){
+  editExistingFiles.splice(idx,1);
+  var c=document.getElementById('ed-existing-chips');
+  if(c) c.innerHTML=renderExistingChips();
+}
+function handleEditFiles(input){
+  Array.prototype.forEach.call(input.files,function(f){
+    if(!editPendingFiles.some(function(n){return n===f.name;})){
+      editPendingFiles.push(f.name); editNewFileObjects.push(f);
+    }
+  });
+  renderNewChips();
+}
+function renderNewChips(){
+  var c=document.getElementById('ed-new-chips');
+  if(c) c.innerHTML=editPendingFiles.map(function(f,i){
+    return '<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <button onclick="rmNew('+i+')" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:15px;font-weight:700;padding:0 3px">×</button></span>';
+  }).join('');
+}
+function rmNew(idx){
+  editPendingFiles.splice(idx,1); editNewFileObjects.splice(idx,1);
+  renderNewChips();
+}
 function closeModal(evt){ if(evt.target.classList.contains('modal-overlay')) closeModalDirect(); }
 function closeModalDirect(){ document.getElementById('modal-root').innerHTML=''; editingId=null; editPendingFiles=[]; editExistingFiles=[]; editNewFileObjects=[]; }
 function saveEdit(){
