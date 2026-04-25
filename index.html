@@ -319,7 +319,7 @@ function render(){
     el.scrollTop=0;
   } catch(e) {
     console.error('Render error in '+curView+':', e);
-    el.innerHTML='<div style="padding:24px;text-align:center;color:#3d4f2e"><p style="font-size:15px;font-weight:600;margin-bottom:8px">Error loading this view</p><p style="font-size:12px;color:#8EA86F;margin-bottom:16px">'+e.message+'</p><button onclick="switchView('overview')" style="padding:10px 20px;background:#8EA86F;color:#DCF2C2;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Go to Overview</button></div>';
+    el.innerHTML='<div style="padding:24px;text-align:center;color:#3d4f2e"><p style="font-size:15px;font-weight:600;margin-bottom:8px">Error loading this view</p><p style="font-size:12px;color:#8EA86F;margin-bottom:16px">'+e.message+'</p><button onclick="location.reload()" style="padding:10px 20px;background:#8EA86F;color:#DCF2C2;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Tap to retry</button></div>';
   }
 }
 
@@ -428,7 +428,7 @@ function buildOverview(){
       h+='<div style="font-size:14px;font-weight:600">'+r.vendor+'</div>';
       h+='<div style="font-size:12px;color:var(--text3)">'+fmt(r.amount)+' · '+(r.freq==='monthly'?'Monthly':'Annual')+(r.payMethod?' · '+r.payMethod:'')+'</div>';
       h+='<div style="font-size:12px;color:'+(isOverdue?'var(--red)':'var(--orange)')+'">Due: '+fmtDate(r.nextDate)+(isOverdue?' ⚠️ overdue':' — today')+'</div>';
-      h+='</div><button class="btn-edit" style="flex-shrink:0;margin-left:8px" onclick="logRepeat(''+r.id+'')">Log it</button></div>';
+      h+='</div><button class="btn-edit" style="flex-shrink:0;margin-left:8px" onclick="logRepeat(\''+r.id+'\')">Log it</button></div>';
     });
     h+='</div>';
   }
