@@ -233,7 +233,7 @@ var state = {
 };
 var biz='rover', curView='overview';
 var pendingFiles=[], periodMode='all', periodMonth='', periodYear='';
-var editingId=null, editPendingFiles=[], editExistingFiles=[];
+var editingId=null, editPendingFiles=[], editExistingFiles=[], editNewFileObjects=[];
 
 // ── SUPABASE ──
 function sbH() { return {'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'}; }
@@ -250,6 +250,36 @@ function sbInsert(t,d){ return fetch(SB_URL+'/rest/v1/'+t,{method:'POST',headers
 function sbUpdate(t,id,d){ return fetch(SB_URL+'/rest/v1/'+t+'?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:sbH(),body:JSON.stringify(d)}); }
 function sbDelete(t,id){ return fetch(SB_URL+'/rest/v1/'+t+'?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:sbH()}); }
 function sbUpsert(t,d){ return fetch(SB_URL+'/rest/v1/'+t,{method:'POST',headers:Object.assign({},sbH(),{'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify(d)}); }
+
+// Upload file to Supabase Storage, returns public URL
+function sbUploadFile(file, path) {
+  var uploadHeaders = {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + SB_KEY,
+    'Content-Type': file.type || 'application/octet-stream',
+    'x-upsert': 'true'
+  };
+  return fetch(SB_URL + '/storage/v1/object/receipts/' + path, {
+    method: 'POST',
+    headers: uploadHeaders,
+    body: file
+  }).then(function(r) {
+    if (!r.ok) throw new Error('Upload failed: ' + r.status);
+    return SB_URL + '/storage/v1/object/public/receipts/' + path;
+  });
+}
+
+// Upload multiple files, returns array of {name, url}
+function uploadFiles(files, expenseId) {
+  var uploads = Array.prototype.map.call(files, function(file) {
+    var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    var path = expenseId + '/' + safeName;
+    return sbUploadFile(file, path).then(function(url) {
+      return { name: file.name, url: url };
+    });
+  });
+  return Promise.all(uploads);
+}
 function setSyncDot(s){ var d=document.getElementById('sync-dot'); if(d) d.className='sync-dot '+s; }
 
 function loadAll() {
@@ -268,7 +298,7 @@ function loadAll() {
     var keys=['rover','wyzant','itt','eve','ownit'];
     keys.forEach(function(k){ state[k].expenses=[]; if(state[k].events) state[k].events=[]; if(state[k].sales) state[k].sales=[]; });
     state.docs=[]; state.repeats=[];
-    expenses.forEach(function(e){ if(state[e.biz]) state[e.biz].expenses.push({id:e.id,date:e.date,time:e.time,vendor:e.vendor,amount:e.amount,category:e.category,payMethod:e.pay_method,note:e.note,files:e.files?e.files.split('|').filter(Boolean):[]}); });
+    expenses.forEach(function(e){ if(state[e.biz]) state[e.biz].expenses.push({id:e.id,date:e.date,time:e.time,vendor:e.vendor,amount:e.amount,category:e.category,payMethod:e.pay_method,note:e.note,files:e.files?parseFiles(e.files):[]}); });
     events.forEach(function(e){ if(state[e.biz]) state[e.biz].events.push({id:e.id,name:e.name,date:e.date,ticketType:e.ticket_type,ticketQty:e.ticket_qty,revenue:e.revenue}); });
     prices.forEach(function(p){ if(state[p.biz]) state[p.biz].ticketPrices={single:p.single_price,couple:p.couple_price}; });
     docs.forEach(function(d){ state.docs.push({id:d.id,name:d.name,biz:d.biz,uploaded:d.uploaded,year:d.year||''}); });
@@ -285,6 +315,17 @@ function fmt(n){ return '$'+parseFloat(n||0).toFixed(2); }
 function fmtDate(d){ if(!d) return ''; var p=d.split('-'); return p[1]+'/'+p[2]+'/'+p[0].slice(2); }
 function catCls(c){ return CAT_CLS[c]||'b-other'; }
 function genId(){ return Date.now()+'-'+Math.random().toString(36).slice(2,7); }
+
+// Parse files field — supports new JSON format [{name,url}] and old pipe-separated names
+function parseFiles(raw) {
+  if(!raw) return [];
+  try {
+    var parsed = JSON.parse(raw);
+    if(Array.isArray(parsed)) return parsed; // new format
+  } catch(e) {}
+  // Old format: pipe-separated filenames
+  return raw.split('|').filter(Boolean).map(function(n){ return {name:n, url:null}; });
+}
 function fmtMonthLabel(ym){ var p=ym.split('-'); return MONTHS[parseInt(p[1])-1]+' '+p[0]; }
 function isUnassigned(v){ return !v||v===''||v==='— Select —'; }
 
@@ -449,7 +490,11 @@ function buildOverview(){
     h+='<div class="exp-row'+(isFlagged?' flagged':'')+'"><div class="exp-main"><div class="exp-vendor">'+(e.vendor||'—')+'</div>';
     h+='<div class="exp-meta">'+fmtDate(e.date)+(e.time?' · '+e.time:'')+(e.payMethod&&!isUnassigned(e.payMethod)?' · '+e.payMethod:'<span style="color:var(--orange)"> · ⚠️ No payment</span>')+'</div>';
     if(e.note) h+='<div class="exp-note">'+e.note+'</div>';
-    if(e.files&&e.files.length) h+='<div style="margin-top:4px">'+e.files.map(function(f){return'<span class="file-chip" onclick="viewFile(\''+f+'\')">👁 '+f+'</span>';}).join('')+'</div>';
+    if(e.files&&e.files.length) h+='<div style="margin-top:4px">'+e.files.map(function(f){
+  var name=typeof f==='object'?f.name:f;
+  var url=typeof f==='object'?f.url:null;
+  return'<span class="file-chip" onclick="viewFile(\''+encodeURIComponent(JSON.stringify({name:name,url:url}))+'\')" >👁 '+name+'</span>';
+}).join('')+'</div>';
     h+='<span class="badge '+(isUnassigned(e.category)?'b-unassigned':catCls(e.category))+'">'+(isUnassigned(e.category)?'⚠️ Unassigned':e.category)+'</span></div>';
     h+='<div class="exp-right"><div class="exp-amt">'+fmt(e.amount)+'</div><div class="exp-actions"><button class="btn-edit" onclick="openEdit(\''+e.id+'\')">Edit</button><button class="btn-dupe" onclick="dupeExp(\''+e.id+'\')">Dupe</button><button class="btn-del" onclick="deleteExp(\''+e.id+'\')">Del</button></div></div></div>';
   });
@@ -556,21 +601,33 @@ function addExp(){
   if(!date){toast('Select a date');return;}
   var isRepeat=(document.getElementById('a-repeat')||{}).checked;
   var freq=(document.getElementById('a-freq')||{}).value||'monthly';
-  var row={id:genId(),biz:biz,date:date,time:time,vendor:vendor,amount:amount,category:cat||'',pay_method:pay||'',note:note,files:pendingFiles.join('|')};
+  var newId = genId();
   setSyncDot('syncing');
-  var ops=[sbInsert('expenses',row)];
-  if(isRepeat){
-    var nextDate=calcNextDate(date,freq);
-    ops.push(sbInsert('repeat_expenses',{id:genId(),biz:biz,vendor:vendor,amount:amount,category:cat||'',pay_method:pay||'',note:note,freq:freq,next_date:nextDate}));
-  }
-  Promise.all(ops).then(function(){return loadAll();}).then(function(){
-    toast(isRepeat?'✓ Expense added & repeat scheduled':'✓ Expense added'); pendingFiles=[];
+
+  // Upload files first if any, then save expense
+  var fileUploadPromise = pendingFileObjects.length > 0
+    ? uploadFiles(pendingFileObjects, newId)
+    : Promise.resolve([]);
+
+  fileUploadPromise.then(function(uploadedFiles) {
+    // Store as JSON array of {name, url} pairs
+    var filesJson = JSON.stringify(uploadedFiles);
+    var row={id:newId,biz:biz,date:date,time:time,vendor:vendor,amount:amount,category:cat||'',pay_method:pay||'',note:note,files:filesJson};
+    var ops=[sbInsert('expenses',row)];
+    if(isRepeat){
+      var nextDate=calcNextDate(date,freq);
+      ops.push(sbInsert('repeat_expenses',{id:genId(),biz:biz,vendor:vendor,amount:amount,category:cat||'',pay_method:pay||'',note:note,freq:freq,next_date:nextDate}));
+    }
+    return Promise.all(ops);
+  }).then(function(){return loadAll();}).then(function(){
+    toast(isRepeat?'✓ Expense added & repeat scheduled':'✓ Expense added');
+    pendingFiles=[]; pendingFileObjects=[];
     document.getElementById('a-vendor').value=''; document.getElementById('a-amount').value=''; document.getElementById('a-note').value='';
     var chips=document.getElementById('file-chips'); if(chips) chips.innerHTML='';
     var catSel=document.getElementById('a-cat'); if(catSel){catSel.value='';catSel.classList.add('unassigned');}
     var paySel=document.getElementById('a-pay'); if(paySel){paySel.value='';paySel.classList.add('unassigned');}
     var cb=document.getElementById('a-repeat'); if(cb){cb.checked=false;toggleRepeatOpts();}
-  }).catch(function(){setSyncDot('error');toast('Save failed');});
+  }).catch(function(e){setSyncDot('error');toast('Upload failed: '+e.message);});
 }
 
 function toggleRepeatOpts(){
@@ -812,7 +869,9 @@ function buildEarnings(){
 function openEdit(id){
   var e=null, exps=state[biz].expenses||[];
   for(var i=0;i<exps.length;i++){if(exps[i].id===id){e=exps[i];break;}} if(!e) return;
-  editingId=id; editPendingFiles=[]; editExistingFiles=(e.files||[]).slice();
+  editingId=id; editPendingFiles=[]; editNewFileObjects=[];
+  // Parse existing files - could be objects {name,url} or strings
+  editExistingFiles=(e.files||[]).map(function(f){ return typeof f==='object'?f:{name:f,url:null}; });
   var cats=CATS[biz];
   var h='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal">';
   h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span class="modal-title">Edit Expense</span><span onclick="closeModalDirect()" style="font-size:22px;cursor:pointer;color:var(--text3)">✕</span></div>';
@@ -829,16 +888,52 @@ function openEdit(id){
   h+='</div></div>';
   document.getElementById('modal-root').innerHTML=h;
 }
-function handleEditFiles(input){ var names=Array.prototype.map.call(input.files,function(f){return f.name;}); editPendingFiles=editPendingFiles.concat(names).filter(function(v,i,a){return a.indexOf(v)===i;}); var chips=document.getElementById('ed-new-chips'); if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join(''); }
-function removeEditExisting(fname){ editExistingFiles=editExistingFiles.filter(function(f){return f!==fname;}); var chips=document.getElementById('ed-existing-chips'); if(chips) chips.innerHTML=editExistingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removeEditExisting(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join(''); }
+function handleEditFiles(input){
+  var newFiles=Array.prototype.slice.call(input.files);
+  newFiles.forEach(function(f){
+    if(!editPendingFiles.some(function(n){return n===f.name;})){
+      editPendingFiles.push(f.name);
+      editNewFileObjects.push(f);
+    }
+  });
+  var chips=document.getElementById('ed-new-chips');
+  if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+encodeURIComponent(f)+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
+}
+function removeEditExisting(encodedName){
+  var fname=decodeURIComponent(encodedName);
+  editExistingFiles=editExistingFiles.filter(function(f){return (typeof f==='object'?f.name:f)!==fname;});
+  var chips=document.getElementById('ed-existing-chips');
+  if(chips) chips.innerHTML=editExistingFiles.map(function(f){
+    var n=typeof f==='object'?f.name:f;
+    return'<span class="file-chip">📎 '+n+' <span onclick="removeEditExisting(\''+encodeURIComponent(n)+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';
+  }).join('');
+}
 function removeEditNew(fname){ editPendingFiles=editPendingFiles.filter(function(f){return f!==fname;}); var chips=document.getElementById('ed-new-chips'); if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join(''); }
 function closeModal(evt){ if(evt.target.classList.contains('modal-overlay')) closeModalDirect(); }
-function closeModalDirect(){ document.getElementById('modal-root').innerHTML=''; editingId=null; editPendingFiles=[]; editExistingFiles=[]; }
+function closeModalDirect(){ document.getElementById('modal-root').innerHTML=''; editingId=null; editPendingFiles=[]; editExistingFiles=[]; editNewFileObjects=[]; }
 function saveEdit(){
-  var allFiles=editExistingFiles.concat(editPendingFiles);
-  var data={date:document.getElementById('ed-date').value,time:document.getElementById('ed-time').value,vendor:(document.getElementById('ed-vendor').value||'').trim(),amount:parseFloat(document.getElementById('ed-amount').value)||0,category:document.getElementById('ed-cat').value,pay_method:document.getElementById('ed-pay').value,note:(document.getElementById('ed-note').value||'').trim(),files:allFiles.join('|')};
+  var date=document.getElementById('ed-date').value;
+  var time=document.getElementById('ed-time').value;
+  var vendor=(document.getElementById('ed-vendor').value||'').trim();
+  var amount=parseFloat(document.getElementById('ed-amount').value)||0;
+  var category=document.getElementById('ed-cat').value;
+  var payMethod=document.getElementById('ed-pay').value;
+  var note=(document.getElementById('ed-note').value||'').trim();
   setSyncDot('syncing');
-  sbUpdate('expenses',editingId,data).then(function(){return loadAll();}).then(function(){closeModalDirect();toast('✓ Updated');render();}).catch(function(){setSyncDot('error');toast('Save failed');});
+
+  // Upload any new files, then save
+  var uploadPromise = editNewFileObjects && editNewFileObjects.length > 0
+    ? uploadFiles(editNewFileObjects, editingId+'-edit'+Date.now())
+    : Promise.resolve([]);
+
+  uploadPromise.then(function(newUploaded){
+    // Merge kept existing files + newly uploaded files
+    var allFiles = editExistingFiles.concat(newUploaded);
+    var data={date:date,time:time,vendor:vendor,amount:amount,category:category,pay_method:payMethod,note:note,files:JSON.stringify(allFiles)};
+    return sbUpdate('expenses',editingId,data);
+  }).then(function(){return loadAll();}).then(function(){
+    closeModalDirect(); toast('✓ Updated'); render();
+  }).catch(function(e){setSyncDot('error');toast('Save failed: '+e.message);});
 }
 
 // ── DUPLICATE ──
