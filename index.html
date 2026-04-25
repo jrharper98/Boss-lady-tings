@@ -23,7 +23,7 @@
   --red: #b03a2e; --red-light: #fdf0ee;
   --gold: #b89a00; --gold-light: #fdf7cc;
   --blue: #6a4fa0; --blue-light: #f0e8fc;
-  --income: #6a4fa0; --profit: #4a7a30;
+  --income: #6a4fa0; --profit: #1db954;
   --orange: #c45c00; --orange-light: #fff3e8;
   --lavender: #DABAF5; --forest: #3d4f2e;
   --sage: #DCF2C2; --olive: #8EA86F;
@@ -289,7 +289,10 @@ function fmtMonthLabel(ym){ var p=ym.split('-'); return MONTHS[parseInt(p[1])-1]
 function isUnassigned(v){ return !v||v===''||v==='— Select —'; }
 
 function filteredExps(b){ var all=state[b].expenses||[]; if(periodMode==='all') return all; return all.filter(function(e){ if(!e.date) return false; if(periodMode==='year') return e.date.slice(0,4)===periodYear; if(periodMode==='month') return e.date.slice(0,7)===periodMonth; return true; }); }
-function totalExp(b){ return filteredExps(b).reduce(function(s,e){return s+(parseFloat(e.amount)||0);},0); }
+function totalExp(b){ return filteredExps(b).reduce(function(s,e){
+  var mult = SC_MULT[e.category] !== undefined ? SC_MULT[e.category] : 1;
+  return s+(parseFloat(e.amount)||0)*mult;
+},0); }
 function filteredEvs(b){ var evs=state[b].events||[]; if(periodMode==='all') return evs; return evs.filter(function(ev){ if(!ev.date) return false; if(periodMode==='year') return ev.date.slice(0,4)===periodYear; if(periodMode==='month') return ev.date.slice(0,7)===periodMonth; return true; }); }
 function totalRev(b){ return filteredEvs(b).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0); }
 function totalAtt(b){ return filteredEvs(b).reduce(function(s,ev){return s+(parseInt(ev.ticketQty)||0);},0); }
@@ -775,7 +778,10 @@ function buildEarnings(){
   var totalIncome=0, totalExpAll=0, totalProfitAll=0;
   var h='<div class="sec-label">Total Earnings — All Businesses</div>';
   keys.forEach(function(k){
-    var exp=(state[k].expenses||[]).reduce(function(s,e){return s+(parseFloat(e.amount)||0);},0);
+    var exp=(state[k].expenses||[]).reduce(function(s,e){
+  var mult = SC_MULT[e.category] !== undefined ? SC_MULT[e.category] : 1;
+  return s+(parseFloat(e.amount)||0)*mult;
+},0);
     var inc;
     if(k==='ownit') inc=(state.ownit.sales||[]).reduce(function(s,sa){return s+(parseFloat(sa.quote)||0);},0);
     else if(TICKET_BIZ.indexOf(k)>=0){
