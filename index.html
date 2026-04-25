@@ -20,6 +20,7 @@
   --gold: #8a6d1e; --gold-light: #fdf6e3;
   --blue: #185FA5; --blue-light: #e6f1fb;
   --income: #0070e0; --profit: #1a7a12;
+  --orange: #c45c00; --orange-light: #fff3e8;
   --r: 14px; --r-sm: 10px;
   --safe-top: env(safe-area-inset-top, 44px);
   --safe-bottom: env(safe-area-inset-bottom, 20px);
@@ -32,50 +33,42 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .header-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
 .header-title em { font-style: italic; color: var(--accent); font-weight: 400; }
 .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); display: inline-block; margin-left: 6px; vertical-align: middle; transition: background 0.3s; }
-.sync-dot.synced { background: #4caf50; }
-.sync-dot.syncing { background: #ff9800; }
-.sync-dot.error { background: var(--red); }
+.sync-dot.synced { background: #4caf50; } .sync-dot.syncing { background: #ff9800; } .sync-dot.error { background: var(--red); }
 .biz-tabs { display: flex; overflow-x: auto; padding: 0 12px; background: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .biz-tabs::-webkit-scrollbar { display: none; }
-.biz-tab { padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text3); white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; user-select: none; transition: color 0.15s; }
+.biz-tab { padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text3); white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; user-select: none; }
 .biz-tab.active { color: var(--accent); border-color: var(--accent); }
 .content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 14px 14px calc(80px + var(--safe-bottom)); }
 .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding-bottom: var(--safe-bottom); z-index: 50; }
-.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0 6px; cursor: pointer; user-select: none; gap: 3px; border: none; background: none; -webkit-appearance: none; }
-.nav-icon { font-size: 22px; line-height: 1; }
-.nav-lbl { font-size: 10px; font-weight: 600; color: var(--text3); }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 0 4px; cursor: pointer; user-select: none; gap: 2px; border: none; background: none; -webkit-appearance: none; }
+.nav-icon { font-size: 20px; line-height: 1; }
+.nav-lbl { font-size: 9px; font-weight: 600; color: var(--text3); }
 .nav-btn.active .nav-lbl { color: var(--accent); }
 .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 .metric { background: var(--card); border-radius: var(--r); padding: 14px 12px; border: 1px solid var(--border); }
 .metric-lbl { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
 .metric-val { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-.metric-val.green { color: var(--accent); }
-.metric-val.red { color: var(--red); }
+.metric-val.green { color: var(--profit); } .metric-val.red { color: var(--red); }
 .card { background: var(--card); border-radius: var(--r); border: 1px solid var(--border); margin-bottom: 12px; overflow: hidden; }
 .card-body { padding: 0 14px 14px; }
 .sec-label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin: 14px 0 8px; }
 .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
 .fg { flex: 1; min-width: 0; }
 .fg label { font-size: 11px; font-weight: 700; color: var(--text3); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.03em; }
-.fg input, .fg select {
-  width: 100%; padding: 12px 12px; border: 1.5px solid var(--border2); border-radius: var(--r-sm);
-  font-size: 16px; background: #fff; color: var(--text);
-  -webkit-appearance: none; appearance: none;
-  font-family: -apple-system, 'Helvetica Neue', sans-serif;
-  display: block; min-height: 46px;
-}
-.fg select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b67' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 12px center; background-color: #fff; padding-right: 34px;
-}
+.fg input, .fg select { width: 100%; padding: 12px 12px; border: 1.5px solid var(--border2); border-radius: var(--r-sm); font-size: 16px; background: #fff; color: var(--text); -webkit-appearance: none; appearance: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; display: block; min-height: 46px; }
+.fg input.unassigned, .fg select.unassigned { border-color: var(--orange); background: var(--orange-light); }
+.fg select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b67' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-color: #fff; padding-right: 34px; }
+.fg select.unassigned { background-color: var(--orange-light); }
 .btn-full { width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: var(--r-sm); font-size: 16px; font-weight: 700; cursor: pointer; -webkit-appearance: none; margin-top: 4px; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
 .btn-full:active { opacity: 0.8; }
 .btn-sm { padding: 8px 14px; background: var(--bg2); color: var(--text2); border: 1px solid var(--border2); border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; -webkit-appearance: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
-.btn-sm:active { opacity: 0.7; }
 .btn-del { padding: 6px 10px; background: var(--red-light); color: var(--red); border: 1px solid var(--red); border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer; -webkit-appearance: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
 .btn-edit { padding: 6px 10px; background: var(--blue-light); color: var(--blue); border: 1px solid var(--blue); border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer; -webkit-appearance: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
 .btn-dupe { padding: 6px 10px; background: var(--gold-light); color: var(--gold); border: 1px solid var(--gold); border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer; -webkit-appearance: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
+.btn-view { padding: 6px 10px; background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent); border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer; -webkit-appearance: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
+.flag-banner { background: var(--orange-light); border: 1px solid var(--orange); border-radius: var(--r-sm); padding: 8px 12px; margin-bottom: 10px; font-size: 12px; color: var(--orange); font-weight: 600; }
 .exp-row { display: flex; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.exp-row.flagged { background: var(--orange-light); }
 .exp-row:last-child { border-bottom: none; }
 .exp-main { flex: 1; min-width: 0; }
 .exp-vendor { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -83,14 +76,16 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .exp-note { font-size: 12px; color: var(--text2); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .exp-right { text-align: right; flex-shrink: 0; }
 .exp-amt { font-size: 16px; font-weight: 700; }
-.exp-actions { display: flex; gap: 5px; margin-top: 6px; justify-content: flex-end; }
+.exp-actions { display: flex; gap: 5px; margin-top: 6px; justify-content: flex-end; flex-wrap: wrap; }
 .badge { display: inline-block; padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; margin-top: 4px; }
 .b-decor{background:#eeedfe;color:#3c3489;} .b-food{background:#faeeda;color:#633806;}
 .b-marketing{background:#e1f5ee;color:#085041;} .b-utilities{background:#e6f1fb;color:#0c447c;}
 .b-venue{background:#fbeaf0;color:#72243e;} .b-supplies{background:#eaf3de;color:#27500a;}
 .b-platform{background:#f1efe8;color:#444441;} .b-travel{background:#fcebeb;color:#791f1f;}
 .b-transport{background:#dbeafe;color:#1e3a8a;} .b-software{background:#faece7;color:#712b13;}
-.b-other{background:#f1efe8;color:#444441;}
+.b-meals{background:#fef9c3;color:#713f12;} .b-phone{background:#f0fdf4;color:#14532d;}
+.b-ipad{background:#eff6ff;color:#1e3a8a;} .b-other{background:#f1efe8;color:#444441;}
+.b-unassigned{background:var(--orange-light);color:var(--orange);}
 .cat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border); }
 .cat-row:last-child { border-bottom: none; }
 .cat-amt { font-size: 15px; font-weight: 700; }
@@ -101,12 +96,14 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .ev-stats { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
 .ev-stat { font-size: 12px; color: var(--text3); }
 .ev-stat strong { color: var(--text); }
+.sale-item { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.sale-item:last-child { border-bottom: none; }
 .preview { background: var(--bg2); border-radius: var(--r-sm); padding: 12px; margin: 8px 0; }
 .preview-row { display: flex; justify-content: space-between; font-size: 14px; padding: 3px 0; }
 .total-row { display: flex; justify-content: space-between; padding: 12px 14px; border-top: 1px solid var(--border); font-weight: 700; font-size: 14px; background: var(--bg2); }
 .empty { text-align: center; padding: 28px 0; color: var(--text3); font-size: 14px; }
 .upload-zone { border: 2px dashed var(--border2); border-radius: var(--r-sm); padding: 16px; text-align: center; font-size: 14px; color: var(--text3); cursor: pointer; margin-bottom: 6px; }
-.file-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: var(--bg2); border-radius: 99px; font-size: 12px; border: 1px solid var(--border); margin: 3px; }
+.file-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: var(--bg2); border-radius: 99px; font-size: 12px; border: 1px solid var(--border); margin: 3px; cursor: pointer; }
 .schc-row { display: flex; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
 .schc-row:last-child { border-bottom: none; font-weight: 700; }
 .export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
@@ -115,7 +112,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .period-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .period-select { padding: 8px 12px; border-radius: var(--r-sm); font-size: 14px; border: 1.5px solid var(--border2); background: #fff; color: var(--text); -webkit-appearance: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; min-height: 40px; }
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 300; display: flex; align-items: flex-end; }
-.modal { background: var(--bg); border-radius: 20px 20px 0 0; padding: 20px 16px calc(20px + var(--safe-bottom)); width: 100%; max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.modal { background: var(--bg); border-radius: 20px 20px 0 0; padding: 20px 16px calc(20px + var(--safe-bottom)); width: 100%; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .modal-title { font-size: 17px; font-weight: 700; color: var(--text); }
 .doc-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
 .doc-row:last-child { border-bottom: none; }
@@ -123,7 +120,10 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .doc-info { flex: 1; min-width: 0; }
 .doc-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .doc-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
-/* Loading screen */
+.repeat-row { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.repeat-row:last-child { border-bottom: none; }
+.repeat-row.due-today { background: #fff3e8; }
+.repeat-row.overdue { background: var(--red-light); }
 #loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
 #loading .load-title { font-size: 24px; font-weight: 700; color: var(--accent); }
 #loading .load-title em { font-style: italic; font-weight: 400; color: var(--text2); }
@@ -134,42 +134,31 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 </style>
 </head>
 <body>
-
 <div id="loading">
   <div class="load-title">Boss <em>Lady</em> Tings</div>
   <div class="spinner"></div>
   <div class="load-sub">Syncing your data...</div>
 </div>
-
 <div id="app" style="display:none">
   <div class="safe-top"></div>
   <div class="header">
     <div class="header-title">Boss <em>Lady</em> Tings <span class="sync-dot" id="sync-dot"></span></div>
-    <button class="btn-sm" onclick="exportCSV('all')">↗ Export</button>
+    <button class="btn-sm" onclick="exportCSV('all')" style="font-size:12px">↗ Export</button>
   </div>
-  <div class="biz-tabs">
+  <div class="biz-tabs" id="biz-tabs">
     <div class="biz-tab active" onclick="switchBiz('rover')">🐾 Rover</div>
     <div class="biz-tab" onclick="switchBiz('wyzant')">📚 Wyzant</div>
     <div class="biz-tab" onclick="switchBiz('itt')">💃 It Takes Two</div>
     <div class="biz-tab" onclick="switchBiz('eve')">🌿 EVE</div>
+    <div class="biz-tab" onclick="switchBiz('ownit')">💻 OwnIt</div>
   </div>
   <div class="content" id="content"></div>
   <div class="bottom-nav">
-    <button class="nav-btn active" id="nav-overview" onclick="switchView('overview')">
-      <span class="nav-icon">📊</span><span class="nav-lbl">Overview</span>
-    </button>
-    <button class="nav-btn" id="nav-add" onclick="switchView('add')">
-      <span class="nav-icon" style="font-size:28px;line-height:0.85">+</span><span class="nav-lbl">Add</span>
-    </button>
-    <button class="nav-btn" id="nav-docs" onclick="switchView('docs')">
-      <span class="nav-icon">📄</span><span class="nav-lbl">1099s</span>
-    </button>
-    <button class="nav-btn" id="nav-earnings" onclick="switchView('earnings')">
-      <span class="nav-icon">💰</span><span class="nav-lbl">Earnings</span>
-    </button>
-    <button class="nav-btn" id="nav-export" onclick="switchView('export')">
-      <span class="nav-icon">↗</span><span class="nav-lbl">Export</span>
-    </button>
+    <button class="nav-btn active" id="nav-overview" onclick="switchView('overview')"><span class="nav-icon">📊</span><span class="nav-lbl">Overview</span></button>
+    <button class="nav-btn" id="nav-add" onclick="switchView('add')"><span class="nav-icon" style="font-size:26px;line-height:0.85">+</span><span class="nav-lbl">Add</span></button>
+<button class="nav-btn" id="nav-docs" onclick="switchView('docs')"><span class="nav-icon">📄</span><span class="nav-lbl">1099s</span></button>
+    <button class="nav-btn" id="nav-earnings" onclick="switchView('earnings')"><span class="nav-icon">💰</span><span class="nav-lbl">Earnings</span></button>
+    <button class="nav-btn" id="nav-export" onclick="switchView('export')"><span class="nav-icon">↗</span><span class="nav-lbl">Export</span></button>
   </div>
 </div>
 <div id="modal-root"></div>
@@ -179,628 +168,355 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 var SB_URL = 'https://ckamlcpgucshevharpxg.supabase.co';
 var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrYW1sY3BndWNzaGV2aGFycHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4ODE0OTcsImV4cCI6MjA5MjQ1NzQ5N30.WTGAY6BURpfyBioyRlNFTIe_BiTAKa65k4IhWnM4Oi4';
 
+// All businesses share these base categories
+var BASE_CATS = ['Supplies','Food & Bev','Business Meals','Transportation','Travel','Platform Fees','Marketing','Software','Phone Bill','iPad','Other'];
 var CATS = {
-  rover:  ['Supplies','Food & Bev','Transportation','Travel','Platform Fees','Marketing','Software','Other'],
-  wyzant: ['Supplies','Transportation','Travel','Platform Fees','Marketing','Software','Other'],
-  itt:    ['Decor','Food & Bev','Marketing','Utilities','Venue','Supplies','Transportation','Other'],
-  eve:    ['Decor','Food & Bev','Marketing','Utilities','Venue','Supplies','Transportation','Software','Other']
+  rover:  BASE_CATS.slice(),
+  wyzant: BASE_CATS.slice(),
+  itt:    ['Decor','Food & Bev','Business Meals','Marketing','Utilities','Venue','Supplies','Transportation','Software','Phone Bill','iPad','Other'],
+  eve:    ['Decor','Food & Bev','Business Meals','Marketing','Utilities','Venue','Supplies','Transportation','Software','Phone Bill','iPad','Other'],
+  ownit:  BASE_CATS.slice()
 };
-var PAY = ['BoA CC','Apple Card','Venmo','PayPal','Personal Debit','Personal Checking','EventBrite Portal','Cash','Other'];
+var PAY = ['— Select —','BoA CC','Apple Card','Venmo','PayPal','Personal Debit','Personal Checking','EventBrite Portal','Cash','Other'];
+// ITT ticket options (dropdown)
+var ITT_TICKETS = [
+  {label:'Single $65',    qty:1, price:65},
+  {label:'Couple $115',   qty:2, price:115},
+  {label:'Single disc. $55.25',  qty:1, price:55.25},
+  {label:'Couple disc. $103.50', qty:2, price:103.50}
+];
 var SC_MAP = {
-  'Supplies':'Supplies (ln 22)','Food & Bev':'Meals (ln 24b)','Travel':'Travel (ln 24a)',
-  'Transportation':'Car & truck (ln 9)','Platform Fees':'Commissions (ln 10)',
-  'Marketing':'Advertising (ln 8)','Software':'Office expense (ln 18)',
-  'Utilities':'Utilities (ln 25)','Venue':'Rent/lease (ln 20b)',
-  'Decor':'Supplies (ln 22)','Other':'Other expenses (ln 48)'
+  'Supplies':'Supplies (ln 22)',
+  'Food & Bev':'Meals (ln 24b)',
+  'Business Meals':'Meals — 50% deductible (ln 24b)',
+  'Travel':'Travel (ln 24a)',
+  'Transportation':'Car & truck (ln 9)',
+  'Platform Fees':'Commissions (ln 10)',
+  'Marketing':'Advertising (ln 8)',
+  'Software':'Office expense (ln 18)',
+  'Utilities':'Utilities (ln 25)',
+  'Venue':'Rent/lease (ln 20b)',
+  'Decor':'Supplies (ln 22)',
+  'Phone Bill':'Office expense — 15% (ln 18)',
+  'iPad':'Depreciation/equipment — 25% (ln 13)',
+  'Other':'Other expenses (ln 48)'
 };
-var BIZ = {rover:'Rover',wyzant:'Wyzant',itt:'It Takes Two',eve:'EVE'};
+// Special Schedule C multipliers
+var SC_MULT = { 'Business Meals': 0.5, 'Phone Bill': 0.15, 'iPad': 0.25 };
+
+var BIZ = {rover:'Rover',wyzant:'Wyzant',itt:'It Takes Two',eve:'EVE',ownit:'OwnIt'};
 var TICKET_BIZ = ['itt','eve'];
 var CAT_CLS = {
-  'Decor':'b-decor','Food & Bev':'b-food','Marketing':'b-marketing','Utilities':'b-utilities',
-  'Venue':'b-venue','Supplies':'b-supplies','Platform Fees':'b-platform','Travel':'b-travel',
-  'Transportation':'b-transport','Software':'b-software','Other':'b-other'
+  'Decor':'b-decor','Food & Bev':'b-food','Business Meals':'b-meals','Marketing':'b-marketing',
+  'Utilities':'b-utilities','Venue':'b-venue','Supplies':'b-supplies','Platform Fees':'b-platform',
+  'Travel':'b-travel','Transportation':'b-transport','Software':'b-software',
+  'Phone Bill':'b-phone','iPad':'b-ipad','Other':'b-other'
 };
 var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var OWNIT_SALE_TYPES = ['Initial Package','Aesthetic Revision','Function Revision'];
+var FREQ_LABELS = {monthly:'Monthly',annual:'Annual'};
 
-// In-memory state loaded from Supabase
 var state = {
   rover:{expenses:[],income:{amount:0,date:'',asOf:''}},
   wyzant:{expenses:[],income:{amount:0,date:'',asOf:''}},
   itt:{expenses:[],events:[],ticketPrices:{single:65,couple:115}},
   eve:{expenses:[],events:[],ticketPrices:{single:65,couple:115}},
-  docs:[]
+  ownit:{expenses:[],sales:[]},
+  docs:[], repeats:[]
 };
-var biz = 'rover', curView = 'overview';
-var pendingFiles = [];
-var periodMode = 'all', periodMonth = '', periodYear = '';
-var editingId = null;
+var biz='rover', curView='overview';
+var pendingFiles=[], periodMode='all', periodMonth='', periodYear='';
+var editingId=null, editPendingFiles=[], editExistingFiles=[];
 
-// ── SUPABASE HELPERS ──
-function sbHeaders() {
-  return {
-    'apikey': SB_KEY,
-    'Authorization': 'Bearer ' + SB_KEY,
-    'Content-Type': 'application/json',
-    'Prefer': 'return=minimal'
-  };
-}
+// ── SUPABASE ──
+function sbH() { return {'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'}; }
+function sbGet(t,p){ return fetch(SB_URL+'/rest/v1/'+t+'?'+(p||''),{method:'GET',headers:sbH()}).then(function(r){return r.json();}); }
+function sbInsert(t,d){ return fetch(SB_URL+'/rest/v1/'+t,{method:'POST',headers:sbH(),body:JSON.stringify(d)}); }
+function sbUpdate(t,id,d){ return fetch(SB_URL+'/rest/v1/'+t+'?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:sbH(),body:JSON.stringify(d)}); }
+function sbDelete(t,id){ return fetch(SB_URL+'/rest/v1/'+t+'?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:sbH()}); }
+function sbUpsert(t,d){ return fetch(SB_URL+'/rest/v1/'+t,{method:'POST',headers:Object.assign({},sbH(),{'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify(d)}); }
+function setSyncDot(s){ var d=document.getElementById('sync-dot'); if(d) d.className='sync-dot '+s; }
 
-function sbGet(table, params) {
-  var url = SB_URL + '/rest/v1/' + table + '?';
-  if (params) url += params;
-  return fetch(url, { method: 'GET', headers: sbHeaders() }).then(function(r) { return r.json(); });
-}
-
-function sbInsert(table, data) {
-  return fetch(SB_URL + '/rest/v1/' + table, {
-    method: 'POST',
-    headers: sbHeaders(),
-    body: JSON.stringify(data)
-  });
-}
-
-function sbUpdate(table, id, data) {
-  return fetch(SB_URL + '/rest/v1/' + table + '?id=eq.' + encodeURIComponent(id), {
-    method: 'PATCH',
-    headers: sbHeaders(),
-    body: JSON.stringify(data)
-  });
-}
-
-function sbDelete(table, id) {
-  return fetch(SB_URL + '/rest/v1/' + table + '?id=eq.' + encodeURIComponent(id), {
-    method: 'DELETE',
-    headers: sbHeaders()
-  });
-}
-
-function sbUpsert(table, data) {
-  return fetch(SB_URL + '/rest/v1/' + table, {
-    method: 'POST',
-    headers: Object.assign({}, sbHeaders(), {'Prefer': 'resolution=merge-duplicates,return=minimal'}),
-    body: JSON.stringify(data)
-  });
-}
-
-function setSyncDot(status) {
-  var dot = document.getElementById('sync-dot');
-  if (!dot) return;
-  dot.className = 'sync-dot ' + status;
-}
-
-// ── LOAD ALL DATA FROM SUPABASE ──
 function loadAll() {
   setSyncDot('syncing');
-  var promises = [
-    sbGet('expenses', 'order=date.desc'),
-    sbGet('events', 'order=date.desc'),
-    sbGet('ticket_prices', ''),
-    sbGet('docs', 'order=uploaded.desc'),
-    sbGet('income_records', '')
-  ];
-  return Promise.all(promises).then(function(results) {
-    var expenses = results[0] || [];
-    var events   = results[1] || [];
-    var prices   = results[2] || [];
-    var docs     = results[3] || [];
-    var incomes  = results[4] || [];
-
-    // Reset state
-    var keys = ['rover','wyzant','itt','eve'];
-    keys.forEach(function(k) {
-      state[k].expenses = [];
-      state[k].events = [];
-    });
-    state.docs = [];
-
-    // Map expenses to businesses
-    expenses.forEach(function(e) {
-      if (state[e.biz]) {
-        state[e.biz].expenses.push({
-          id: e.id, date: e.date, time: e.time, vendor: e.vendor,
-          amount: e.amount, category: e.category, payMethod: e.pay_method,
-          note: e.note, files: e.files ? e.files.split('|').filter(Boolean) : []
-        });
-      }
-    });
-
-    // Map events
-    events.forEach(function(e) {
-      if (state[e.biz]) {
-        state[e.biz].events.push({
-          id: e.id, name: e.name, date: e.date,
-          singleSold: e.single_sold, coupleSold: e.couple_sold, opCost: e.op_cost
-        });
-      }
-    });
-
-    // Map ticket prices
-    prices.forEach(function(p) {
-      if (state[p.biz]) {
-        state[p.biz].ticketPrices = { single: p.single_price, couple: p.couple_price };
-      }
-    });
-
-    // Map docs
-    docs.forEach(function(d) {
-      state.docs.push({ id: d.id, name: d.name, biz: d.biz, uploaded: d.uploaded });
-    });
-
-    // Map income records
-    incomes.forEach(function(r) {
-      if (state[r.biz]) {
-        state[r.biz].income = { amount: r.amount||0, date: r.date||'', asOf: r.as_of||'' };
-      }
-    });
-
-    setSyncDot('synced');
-    return true;
-  }).catch(function(err) {
-    setSyncDot('error');
-    console.error('Sync error:', err);
-    return false;
-  });
+  return Promise.all([
+    sbGet('expenses','order=date.desc'),
+    sbGet('events','order=date.desc'),
+    sbGet('ticket_prices',''),
+    sbGet('docs','order=uploaded.desc'),
+    sbGet('income_records',''),
+    sbGet('repeat_expenses','order=next_date.asc'),
+    sbGet('ownit_sales','order=date.desc')
+  ]).then(function(r) {
+    var expenses=r[0]||[], events=r[1]||[], prices=r[2]||[], docs=r[3]||[], incomes=r[4]||[], repeats=r[5]||[], sales=r[6]||[];
+    var keys=['rover','wyzant','itt','eve','ownit'];
+    keys.forEach(function(k){ state[k].expenses=[]; if(state[k].events) state[k].events=[]; if(state[k].sales) state[k].sales=[]; });
+    state.docs=[]; state.repeats=[];
+    expenses.forEach(function(e){ if(state[e.biz]) state[e.biz].expenses.push({id:e.id,date:e.date,time:e.time,vendor:e.vendor,amount:e.amount,category:e.category,payMethod:e.pay_method,note:e.note,files:e.files?e.files.split('|').filter(Boolean):[]}); });
+    events.forEach(function(e){ if(state[e.biz]) state[e.biz].events.push({id:e.id,name:e.name,date:e.date,ticketType:e.ticket_type,ticketQty:e.ticket_qty,revenue:e.revenue}); });
+    prices.forEach(function(p){ if(state[p.biz]) state[p.biz].ticketPrices={single:p.single_price,couple:p.couple_price}; });
+    docs.forEach(function(d){ state.docs.push({id:d.id,name:d.name,biz:d.biz,uploaded:d.uploaded,year:d.year||''}); });
+    incomes.forEach(function(r){ if(state[r.biz]) state[r.biz].income={amount:r.amount||0,date:r.date||'',asOf:r.as_of||''}; });
+    repeats.forEach(function(r){ state.repeats.push({id:r.id,biz:r.biz,vendor:r.vendor,amount:r.amount,category:r.category,payMethod:r.pay_method,note:r.note,freq:r.freq,nextDate:r.next_date}); });
+    sales.forEach(function(s){ if(state.ownit) state.ownit.sales.push({id:s.id,date:s.date,clientName:s.client_name,appName:s.app_name,quote:s.quote,saleType:s.sale_type}); });
+    setSyncDot('synced'); return true;
+  }).catch(function(err){ setSyncDot('error'); console.error(err); return false; });
 }
 
-// ── UI HELPERS ──
-function toast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.style.opacity = '1';
-  setTimeout(function() { t.style.opacity = '0'; }, 2200);
-}
-function fmt(n) { return '$' + parseFloat(n||0).toFixed(2); }
-function fmtDate(d) { if (!d) return ''; var p = d.split('-'); return p[1]+'/'+p[2]+'/'+p[0].slice(2); }
-function catCls(c) { return CAT_CLS[c] || 'b-other'; }
-function genId() { return Date.now() + '-' + Math.random().toString(36).slice(2,7); }
-function fmtMonthLabel(ym) { var p = ym.split('-'); return MONTHS[parseInt(p[1])-1] + ' ' + p[0]; }
+// ── HELPERS ──
+function toast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.style.opacity='1'; setTimeout(function(){t.style.opacity='0';},2200); }
+function fmt(n){ return '$'+parseFloat(n||0).toFixed(2); }
+function fmtDate(d){ if(!d) return ''; var p=d.split('-'); return p[1]+'/'+p[2]+'/'+p[0].slice(2); }
+function catCls(c){ return CAT_CLS[c]||'b-other'; }
+function genId(){ return Date.now()+'-'+Math.random().toString(36).slice(2,7); }
+function fmtMonthLabel(ym){ var p=ym.split('-'); return MONTHS[parseInt(p[1])-1]+' '+p[0]; }
+function isUnassigned(v){ return !v||v===''||v==='— Select —'; }
 
-function filteredExps(b) {
-  var all = state[b].expenses || [];
-  if (periodMode === 'all') return all;
-  return all.filter(function(e) {
-    if (!e.date) return false;
-    if (periodMode === 'year') return e.date.slice(0,4) === periodYear;
-    if (periodMode === 'month') return e.date.slice(0,7) === periodMonth;
-    return true;
-  });
-}
-function totalExp(b) { return filteredExps(b).reduce(function(s,e){ return s+(parseFloat(e.amount)||0); },0); }
-function totalRev(b) {
-  if (TICKET_BIZ.indexOf(b)<0) return 0;
-  var p = state[b].ticketPrices;
-  var evs = filteredEvs(b);
-  return evs.reduce(function(s,ev){ return s+(parseInt(ev.singleSold)||0)*parseFloat(p.single)+(parseInt(ev.coupleSold)||0)*parseFloat(p.couple); },0);
-}
-function filteredEvs(b) {
-  var evs = state[b].events || [];
-  if (periodMode === 'all') return evs;
-  return evs.filter(function(ev) {
-    if (!ev.date) return false;
-    if (periodMode === 'year') return ev.date.slice(0,4) === periodYear;
-    if (periodMode === 'month') return ev.date.slice(0,7) === periodMonth;
-    return true;
-  });
-}
-function totalAtt(b) { return filteredEvs(b).reduce(function(s,ev){ return s+(parseInt(ev.singleSold)||0)+(parseInt(ev.coupleSold)||0)*2; },0); }
+function filteredExps(b){ var all=state[b].expenses||[]; if(periodMode==='all') return all; return all.filter(function(e){ if(!e.date) return false; if(periodMode==='year') return e.date.slice(0,4)===periodYear; if(periodMode==='month') return e.date.slice(0,7)===periodMonth; return true; }); }
+function totalExp(b){ return filteredExps(b).reduce(function(s,e){return s+(parseFloat(e.amount)||0);},0); }
+function filteredEvs(b){ var evs=state[b].events||[]; if(periodMode==='all') return evs; return evs.filter(function(ev){ if(!ev.date) return false; if(periodMode==='year') return ev.date.slice(0,4)===periodYear; if(periodMode==='month') return ev.date.slice(0,7)===periodMonth; return true; }); }
+function totalRev(b){ return filteredEvs(b).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0); }
+function totalAtt(b){ return filteredEvs(b).reduce(function(s,ev){return s+(parseInt(ev.ticketQty)||0);},0); }
+function getAvailableYears(b){ var y={}; (state[b].expenses||[]).forEach(function(e){if(e.date)y[e.date.slice(0,4)]=1;}); return Object.keys(y).sort().reverse(); }
+function getAvailableMonths(b){ var m={}; (state[b].expenses||[]).forEach(function(e){if(e.date)m[e.date.slice(0,7)]=1;}); return Object.keys(m).sort().reverse(); }
 
-function getAvailableYears(b) {
-  var years = {};
-  (state[b].expenses||[]).forEach(function(e){ if(e.date) years[e.date.slice(0,4)]=1; });
-  (state[b].events||[]).forEach(function(e){ if(e.date) years[e.date.slice(0,4)]=1; });
-  return Object.keys(years).sort().reverse();
-}
-function getAvailableMonths(b) {
-  var months = {};
-  (state[b].expenses||[]).forEach(function(e){ if(e.date) months[e.date.slice(0,7)]=1; });
-  (state[b].events||[]).forEach(function(e){ if(e.date) months[e.date.slice(0,7)]=1; });
-  return Object.keys(months).sort().reverse();
-}
-
-function switchBiz(b2) {
-  biz = b2; periodMode='all'; periodMonth=''; periodYear='';
-  var tabs = document.querySelectorAll('.biz-tab');
-  var keys = ['rover','wyzant','itt','eve'];
-  for (var i=0;i<tabs.length;i++) tabs[i].classList.toggle('active',keys[i]===b2);
-  render();
-}
-function switchView(v) {
-  curView = v;
-  ['overview','add','docs','earnings','export'].forEach(function(x){
-    var el = document.getElementById('nav-'+x);
-    if(el) el.classList.toggle('active',x===v);
-  });
-  // Refresh data when switching to overview or earnings
-  if (v === 'overview' || v === 'earnings') {
-    setSyncDot('syncing');
-    loadAll().then(function(){ render(); });
-  } else {
-    render();
-  }
-}
-
-function render() {
-  var el = document.getElementById('content');
-  if (!el) return;
-  if (curView==='overview') el.innerHTML = buildOverview();
-  else if (curView==='add') el.innerHTML = buildAdd();
-  else if (curView==='docs') el.innerHTML = buildDocs();
-  else if (curView==='earnings') el.innerHTML = buildEarnings();
-  else el.innerHTML = buildExport();
-  if (curView==='add') initAddDefaults();
-  if (curView==='export') renderSchedC();
-  el.scrollTop = 0;
-}
-
-function buildPeriodBar() {
-  var years = getAvailableYears(biz);
-  var months = getAvailableMonths(biz);
-  var h = '<div class="period-bar">';
-  h += '<button class="period-pill'+(periodMode==='all'?' active':'')+'" onclick="setPeriod(\'all\')">All time</button>';
-  if (years.length) {
-    h += '<select class="period-select" onchange="setPeriodYear(this.value)" style="max-width:100px"><option value="">Year...</option>';
-    years.forEach(function(y){ h+='<option value="'+y+'"'+(periodMode==='year'&&periodYear===y?' selected':'')+'>'+y+'</option>'; });
-    h += '</select>';
-  }
-  if (months.length) {
-    h += '<select class="period-select" onchange="setPeriodMonth(this.value)" style="max-width:120px"><option value="">Month...</option>';
-    months.forEach(function(m){ h+='<option value="'+m+'"'+(periodMode==='month'&&periodMonth===m?' selected':'')+'>'+fmtMonthLabel(m)+'</option>'; });
-    h += '</select>';
-  }
-  h += '</div>';
-  if (periodMode!=='all') {
-    var label = periodMode==='year'?periodYear:fmtMonthLabel(periodMonth);
-    h += '<div style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:10px">Showing: '+label+'</div>';
-  }
-  return h;
+function switchBiz(b2){ biz=b2; periodMode='all'; periodMonth=''; periodYear=''; var tabs=document.querySelectorAll('.biz-tab'); var keys=['rover','wyzant','itt','eve','ownit']; for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle('active',keys[i]===b2); render(); }
+function switchView(v){
+  curView=v;
+  ['overview','add','docs','earnings','export'].forEach(function(x){ var el=document.getElementById('nav-'+x); if(el) el.classList.toggle('active',x===v); });
+  if(v==='overview'||v==='earnings'){ setSyncDot('syncing'); loadAll().then(function(){render();}); } else render();
 }
 function setPeriod(m){ periodMode=m; periodMonth=''; periodYear=''; render(); }
 function setPeriodYear(v){ if(!v){periodMode='all';periodYear='';render();return;} periodMode='year';periodYear=v;periodMonth='';render(); }
 function setPeriodMonth(v){ if(!v){periodMode='all';periodMonth='';render();return;} periodMode='month';periodMonth=v;periodYear='';render(); }
 
-function buildOverview() {
-  var exps = filteredExps(biz);
-  var isT = TICKET_BIZ.indexOf(biz)>=0;
-  var te=totalExp(biz), tr=totalRev(biz), profit=tr-te;
-  var cats=CATS[biz], ct={};
-  cats.forEach(function(c){ct[c]=0;});
-  exps.forEach(function(e){ ct[e.category]!==undefined?ct[e.category]+=parseFloat(e.amount)||0:ct['Other']=(ct['Other']||0)+(parseFloat(e.amount)||0); });
+function render(){
+  var el=document.getElementById('content'); if(!el) return;
+  if(curView==='overview') el.innerHTML=buildOverview();
+  else if(curView==='add') el.innerHTML=buildAdd();
+  else if(curView==='docs') el.innerHTML=buildDocs();
+  else if(curView==='earnings') el.innerHTML=buildEarnings();
+  else el.innerHTML=buildExport();
+  if(curView==='add') initAddDefaults();
+  if(curView==='export') renderSchedC();
+  el.scrollTop=0;
+}
 
-  var h = buildPeriodBar();
-  h += '<div class="metrics">';
-  h += '<div class="metric"><div class="metric-lbl">Expenses</div><div class="metric-val red">'+fmt(te)+'</div></div>';
-  if (isT) {
-    h += '<div class="metric"><div class="metric-lbl">Revenue</div><div class="metric-val green">'+fmt(tr)+'</div></div>';
-    h += '<div class="metric"><div class="metric-lbl">Net profit</div><div class="metric-val '+(profit>=0?'green':'red')+'">'+fmt(profit)+'</div></div>';
-    h += '<div class="metric"><div class="metric-lbl">Attendance</div><div class="metric-val">'+totalAtt(biz)+'</div></div>';
-  } else {
-    var inc = state[biz].income || {amount:0,date:'',asOf:''};
-    var incProfit = (parseFloat(inc.amount)||0) - te;
-    h += '<div class="metric"><div class="metric-lbl">Logged</div><div class="metric-val">'+exps.length+'</div></div>';
-    h += '<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Income YTD</div><div class="metric-val" style="color:var(--income)">'+fmt(inc.amount)+'</div>'+(inc.asOf?'<div style="font-size:10px;color:var(--text3);margin-top:3px">As of '+fmtDate(inc.asOf)+'</div>':'')+'</div>';
-    h += '<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Net profit YTD</div><div class="metric-val '+(incProfit>=0?'green':'red')+'">'+fmt(incProfit)+'</div></div>';
-  }
-  h += '</div>';
-
-  // Income input for non-ticket businesses (Rover, Wyzant)
-  if (!isT) {
-    var inc2 = state[biz].income || {amount:0,date:'',asOf:''};
-    h += '<div class="sec-label">Update income</div><div class="card"><div class="card-body" style="padding-top:12px">';
-    h += '<p style="font-size:12px;color:var(--text2);margin-bottom:10px">Log your total income earned year to date from '+BIZ[biz]+'. Update this whenever you check your earnings.</p>';
-    h += '<div class="form-row">';
-    h += '<div class="fg" style="flex:2"><label>Income YTD ($)</label><input type="number" id="inc-amount" value="'+(inc2.amount||'')+'" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div>';
-    h += '<div class="fg"><label>As of date</label><input type="date" id="inc-date" value="'+(inc2.asOf||'')+'"></div>';
-    h += '</div>';
-    h += '<button class="btn-full" onclick="saveIncome()">Update Income</button>';
-    h += '</div></div>';
-  }
-
-  var hasCats = cats.some(function(c){return ct[c]>0;});
-  if (hasCats) {
-    h += '<div class="sec-label">By category</div><div class="card">';
-    cats.filter(function(c){return ct[c]>0;}).sort(function(a,b){return ct[b]-ct[a];}).forEach(function(c){
-      h += '<div class="cat-row"><span class="badge '+catCls(c)+'">'+c+'</span><span class="cat-amt">'+fmt(ct[c])+'</span></div>';
-    });
-    h += '</div>';
-  }
-
-  if (isT) {
-    var evs = filteredEvs(biz).slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
-    var tp = state[biz].ticketPrices;
-    h += '<div class="sec-label">Events</div><div class="card">';
-    if (!evs.length) h += '<div class="empty">No events for this period.</div>';
-    else {
-      evs.forEach(function(ev){
-        var rev=(parseInt(ev.singleSold)||0)*parseFloat(tp.single)+(parseInt(ev.coupleSold)||0)*parseFloat(tp.couple);
-        var att=(parseInt(ev.singleSold)||0)+(parseInt(ev.coupleSold)||0)*2;
-        var net=rev-(parseFloat(ev.opCost)||0);
-        h+='<div class="ev-item"><div style="display:flex;justify-content:space-between;align-items:flex-start">';
-        h+='<div><div class="ev-name">'+(ev.name||'Unnamed')+'</div><div class="ev-date">'+fmtDate(ev.date)+'</div></div>';
-        h+='<span style="font-size:16px;font-weight:700;color:'+(net>=0?'var(--profit)':'var(--red)')+'">'+fmt(net)+'</span></div>';
-        h+='<div class="ev-stats"><div class="ev-stat">🎟 <strong>'+att+'</strong> attended</div><div class="ev-stat">💰 <strong>'+fmt(rev)+'</strong></div>';
-        h+='<div class="ev-stat">Singles: <strong>'+(ev.singleSold||0)+'</strong></div><div class="ev-stat">Couples: <strong>'+(ev.coupleSold||0)+'</strong></div></div>';
-        h+='<div style="margin-top:8px"><button class="btn-del" onclick="deleteEvent(\''+ev.id+'\')">Delete</button></div></div>';
-      });
-      h+='<div class="total-row"><span>Period revenue</span><span style="color:var(--income)">'+fmt(tr)+'</span></div>';
-    }
-    h += '</div>';
-  }
-
-  var sorted = exps.slice().sort(function(a,b){return new Date(b.date+' '+(b.time||'00:00'))-new Date(a.date+' '+(a.time||'00:00'));});
-  h += '<div class="sec-label">Expense log ('+sorted.length+')</div><div class="card">';
-  if (!sorted.length) h += '<div class="empty">No expenses for this period.</div>';
-  else sorted.forEach(function(e){
-    h+='<div class="exp-row"><div class="exp-main"><div class="exp-vendor">'+(e.vendor||'—')+'</div>';
-    h+='<div class="exp-meta">'+fmtDate(e.date)+(e.time?' · '+e.time:'')+(e.payMethod?' · '+e.payMethod:'')+'</div>';
-    if(e.note) h+='<div class="exp-note">'+e.note+'</div>';
-    if(e.files&&e.files.length) h+='<div style="font-size:11px;color:var(--text3);margin-top:3px">📎 '+e.files.join(', ')+'</div>';
-    h+='<span class="badge '+catCls(e.category)+'">'+e.category+'</span></div>';
-    h+='<div class="exp-right"><div class="exp-amt">'+fmt(e.amount)+'</div>';
-    h+='<div class="exp-actions">';
-    h+='<button class="btn-edit" onclick="openEdit(\''+e.id+'\')">Edit</button>';
-    h+='<button class="btn-dupe" onclick="dupeExp(\''+e.id+'\')">Dupe</button>';
-    h+='<button class="btn-del" onclick="deleteExp(\''+e.id+'\')">Del</button>';
-    h+='</div></div></div>';
-  });
-  h += '</div>';
+// ── PERIOD BAR ──
+function buildPeriodBar(){
+  var years=getAvailableYears(biz), months=getAvailableMonths(biz);
+  var h='<div class="period-bar"><button class="period-pill'+(periodMode==='all'?' active':'')+'" onclick="setPeriod(\'all\')">All time</button>';
+  if(years.length){ h+='<select class="period-select" onchange="setPeriodYear(this.value)" style="max-width:90px"><option value="">Year...</option>'; years.forEach(function(y){h+='<option value="'+y+'"'+(periodMode==='year'&&periodYear===y?' selected':'')+'>'+y+'</option>'}); h+='</select>'; }
+  if(months.length){ h+='<select class="period-select" onchange="setPeriodMonth(this.value)" style="max-width:110px"><option value="">Month...</option>'; months.forEach(function(m){h+='<option value="'+m+'"'+(periodMode==='month'&&periodMonth===m?' selected':'')+'>'+fmtMonthLabel(m)+'</option>'}); h+='</select>'; }
+  h+='</div>';
+  if(periodMode!=='all'){ var label=periodMode==='year'?periodYear:fmtMonthLabel(periodMonth); h+='<div style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:10px">Showing: '+label+'</div>'; }
   return h;
 }
 
-function buildAdd() {
-  var cats=CATS[biz], isT=TICKET_BIZ.indexOf(biz)>=0, tp=isT?state[biz].ticketPrices:null;
+// ── OVERVIEW ──
+function buildOverview(){
+  var exps=filteredExps(biz);
+  var isT=TICKET_BIZ.indexOf(biz)>=0, isOwnit=biz==='ownit';
+  var te=totalExp(biz), tr=isT?totalRev(biz):0, profit=tr-te;
+  var cats=CATS[biz], ct={}; cats.forEach(function(c){ct[c]=0;});
+  exps.forEach(function(e){ ct[e.category]!==undefined?ct[e.category]+=parseFloat(e.amount)||0:ct['Other']=(ct['Other']||0)+(parseFloat(e.amount)||0); });
+  var flagged=exps.filter(function(e){return isUnassigned(e.category)||isUnassigned(e.payMethod);});
+
+  var h=buildPeriodBar();
+  // Flag banner
+  if(flagged.length) h+='<div class="flag-banner">⚠️ '+flagged.length+' expense'+(flagged.length>1?'s':'')+' missing category or payment method — tap Edit to assign</div>';
+  // Due repeats banner
+  var today0=new Date().toISOString().split('T')[0];
+  var dueRepeats=state.repeats.filter(function(r){return r.biz===biz&&r.nextDate<=today0;});
+  if(dueRepeats.length){
+    h+='<div class="flag-banner" style="background:#e6f1fb;border-color:var(--blue);color:var(--blue)">🔁 '+dueRepeats.length+' repeat expense'+(dueRepeats.length>1?'s':'')+' due — scroll down to log</div>';
+  }
+
+  h+='<div class="metrics">';
+  h+='<div class="metric"><div class="metric-lbl">Expenses</div><div class="metric-val red">'+fmt(te)+'</div></div>';
+  if(isT){
+    h+='<div class="metric"><div class="metric-lbl">Revenue</div><div class="metric-val" style="color:var(--income)">'+fmt(tr)+'</div></div>';
+    h+='<div class="metric"><div class="metric-lbl">Net profit</div><div class="metric-val '+(profit>=0?'green':'red')+'">'+fmt(profit)+'</div></div>';
+    h+='<div class="metric"><div class="metric-lbl">Attendance</div><div class="metric-val">'+totalAtt(biz)+'</div></div>';
+  } else if(isOwnit){
+    var ownRev=(state.ownit.sales||[]).reduce(function(s,sa){return s+(parseFloat(sa.quote)||0);},0);
+    var ownProfit=ownRev-te;
+    h+='<div class="metric"><div class="metric-lbl">Sales revenue</div><div class="metric-val" style="color:var(--income)">'+fmt(ownRev)+'</div></div>';
+    h+='<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Net profit</div><div class="metric-val '+(ownProfit>=0?'green':'red')+'">'+fmt(ownProfit)+'</div></div>';
+  } else {
+    var inc=state[biz].income||{amount:0,asOf:''};
+    var incProfit=(parseFloat(inc.amount)||0)-te;
+    h+='<div class="metric"><div class="metric-lbl">Logged</div><div class="metric-val">'+exps.length+'</div></div>';
+    h+='<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Income YTD</div><div class="metric-val" style="color:var(--income)">'+fmt(inc.amount)+'</div>'+(inc.asOf?'<div style="font-size:10px;color:var(--text3);margin-top:3px">As of '+fmtDate(inc.asOf)+'</div>':'')+'</div>';
+    h+='<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Net profit YTD</div><div class="metric-val '+(incProfit>=0?'green':'red')+'">'+fmt(incProfit)+'</div></div>';
+    // Income update inline
+    h+='</div><div class="sec-label">Update income</div><div class="card"><div class="card-body" style="padding-top:12px"><div class="form-row"><div class="fg" style="flex:2"><label>Income YTD ($)</label><input type="number" id="inc-amount" value="'+(inc.amount||'')+'" placeholder="0.00" step="0.01" inputmode="decimal"></div><div class="fg"><label>As of date</label><input type="date" id="inc-date" value="'+(inc.asOf||'')+'"></div></div><button class="btn-full" onclick="saveIncome()">Update Income</button></div></div>';
+    h+='<div class="metrics">';
+  }
+  h+='</div>';
+
+  // Category breakdown
+  var hasCats=cats.some(function(c){return ct[c]>0;});
+  if(hasCats){ h+='<div class="sec-label">By category</div><div class="card">'; cats.filter(function(c){return ct[c]>0;}).sort(function(a,b){return ct[b]-ct[a];}).forEach(function(c){ h+='<div class="cat-row"><span class="badge '+catCls(c)+'">'+c+'</span><span class="cat-amt">'+fmt(ct[c])+'</span></div>'; }); h+='</div>'; }
+
+  // Events (ticket businesses)
+  if(isT){
+    var evs=filteredEvs(biz).slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    h+='<div class="sec-label">Events</div><div class="card">';
+    if(!evs.length) h+='<div class="empty">No events for this period.</div>';
+    else {
+      evs.forEach(function(ev){
+        var rev=parseFloat(ev.revenue)||0;
+        h+='<div class="ev-item"><div style="display:flex;justify-content:space-between;align-items:flex-start">';
+        h+='<div><div class="ev-name">'+(ev.name||'Unnamed')+'</div><div class="ev-date">'+fmtDate(ev.date)+'</div></div>';
+        h+='<span style="font-size:16px;font-weight:700;color:var(--income)">'+fmt(rev)+'</span></div>';
+        h+='<div class="ev-stats"><div class="ev-stat">🎟 <strong>'+(ev.ticketQty||0)+'</strong> tickets</div><div class="ev-stat">Type: <strong>'+(ev.ticketType||'—')+'</strong></div></div>';
+        h+='<div style="margin-top:8px"><button class="btn-del" onclick="deleteEvent(\''+ev.id+'\')">Delete</button></div></div>';
+      });
+      h+='<div class="total-row"><span>Period revenue</span><span style="color:var(--income)">'+fmt(totalRev(biz))+'</span></div>';
+    }
+    h+='</div>';
+  }
+
+  // OwnIt sales log
+  if(isOwnit){
+    var sales=(state.ownit.sales||[]).slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    h+='<div class="sec-label">App sales</div><div class="card">';
+    if(!sales.length) h+='<div class="empty">No sales logged yet.</div>';
+    else {
+      sales.forEach(function(s){
+        h+='<div class="sale-item"><div style="display:flex;justify-content:space-between;align-items:flex-start">';
+        h+='<div><div style="font-size:14px;font-weight:600">'+(s.clientName||'—')+'</div>';
+        h+='<div style="font-size:12px;color:var(--text3)">'+(s.appName||'')+(s.appName&&s.date?' · ':'')+fmtDate(s.date)+'</div>';
+        h+='<span class="badge b-software" style="margin-top:4px">'+(s.saleType||'')+'</span></div>';
+        h+='<div style="text-align:right"><div style="font-size:16px;font-weight:700;color:var(--income)">'+fmt(s.quote)+'</div>';
+        h+='<button class="btn-del" style="margin-top:4px" onclick="deleteSale(\''+s.id+'\')">Del</button></div></div></div>';
+      });
+    }
+    h+='</div>';
+  }
+
+  // Due repeats for this business
+  var today1=new Date().toISOString().split('T')[0];
+  var bizDueRepeats=state.repeats.filter(function(r){return r.biz===biz&&r.nextDate<=today1;});
+  if(bizDueRepeats.length){
+    h+='<div class="sec-label">🔁 Repeat expenses due</div><div class="card">';
+    bizDueRepeats.forEach(function(r){
+      var isOverdue=r.nextDate<today1;
+      h+='<div class="repeat-row '+(isOverdue?'overdue':'due-today')+'"><div style="flex:1;min-width:0">';
+      h+='<div style="font-size:14px;font-weight:600">'+r.vendor+'</div>';
+      h+='<div style="font-size:12px;color:var(--text3)">'+fmt(r.amount)+' · '+(r.freq==='monthly'?'Monthly':'Annual')+(r.payMethod?' · '+r.payMethod:'')+'</div>';
+      h+='<div style="font-size:12px;color:'+(isOverdue?'var(--red)':'var(--orange)')+'">Due: '+fmtDate(r.nextDate)+(isOverdue?' ⚠️ overdue':' — today')+'</div>';
+      h+='</div><button class="btn-edit" style="flex-shrink:0;margin-left:8px" onclick="logRepeat(''+r.id+'')">Log it</button></div>';
+    });
+    h+='</div>';
+  }
+
+  // Expense log
+  var sorted=exps.slice().sort(function(a,b){return new Date(b.date+' '+(b.time||'00:00'))-new Date(a.date+' '+(a.time||'00:00'));});
+  h+='<div class="sec-label">Expense log ('+sorted.length+')</div><div class="card">';
+  if(!sorted.length) h+='<div class="empty">No expenses for this period.</div>';
+  else sorted.forEach(function(e){
+    var isFlagged=isUnassigned(e.category)||isUnassigned(e.payMethod);
+    h+='<div class="exp-row'+(isFlagged?' flagged':'')+'"><div class="exp-main"><div class="exp-vendor">'+(e.vendor||'—')+'</div>';
+    h+='<div class="exp-meta">'+fmtDate(e.date)+(e.time?' · '+e.time:'')+(e.payMethod&&!isUnassigned(e.payMethod)?' · '+e.payMethod:'<span style="color:var(--orange)"> · ⚠️ No payment</span>')+'</div>';
+    if(e.note) h+='<div class="exp-note">'+e.note+'</div>';
+    if(e.files&&e.files.length) h+='<div style="margin-top:4px">'+e.files.map(function(f){return'<span class="file-chip" onclick="viewFile(\''+f+'\')">👁 '+f+'</span>';}).join('')+'</div>';
+    h+='<span class="badge '+(isUnassigned(e.category)?'b-unassigned':catCls(e.category))+'">'+(isUnassigned(e.category)?'⚠️ Unassigned':e.category)+'</span></div>';
+    h+='<div class="exp-right"><div class="exp-amt">'+fmt(e.amount)+'</div><div class="exp-actions"><button class="btn-edit" onclick="openEdit(\''+e.id+'\')">Edit</button><button class="btn-dupe" onclick="dupeExp(\''+e.id+'\')">Dupe</button><button class="btn-del" onclick="deleteExp(\''+e.id+'\')">Del</button></div></div></div>';
+  });
+  h+='</div>';
+  return h;
+}
+
+// ── ADD ──
+function buildAdd(){
+  var cats=CATS[biz], isT=TICKET_BIZ.indexOf(biz)>=0, isOwnit=biz==='ownit';
   var h='<div class="sec-label">Add expense — '+BIZ[biz]+'</div><div class="card"><div class="card-body">';
   h+='<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="a-date"></div><div class="fg"><label>Time</label><input type="time" id="a-time"></div></div>';
   h+='<div class="form-row"><div class="fg" style="flex:2"><label>Vendor</label><input type="text" id="a-vendor" placeholder="e.g. Amazon" autocomplete="off" autocorrect="off"></div><div class="fg"><label>Amount ($)</label><input type="number" id="a-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div></div>';
-  h+='<div class="form-row"><div class="fg"><label>Category</label><select id="a-cat">'+cats.map(function(c){return'<option>'+c+'</option>';}).join('')+'</select></div><div class="fg"><label>Payment</label><select id="a-pay">'+PAY.map(function(p){return'<option>'+p+'</option>';}).join('')+'</select></div></div>';
+  h+='<div class="form-row">';
+  h+='<div class="fg"><label>Category</label><select id="a-cat" class="unassigned" onchange="this.classList.toggle(\'unassigned\',this.value===\'— Select —\'||this.value===\'\')"><option value="">— Select —</option>'+cats.map(function(c){return'<option>'+c+'</option>';}).join('')+'</select></div>';
+  h+='<div class="fg"><label>Payment</label><select id="a-pay" class="unassigned" onchange="this.classList.toggle(\'unassigned\',this.value===\'— Select —\'||this.value===\'\')"><option value="">— Select —</option>'+PAY.slice(1).map(function(p){return'<option>'+p+'</option>';}).join('')+'</select></div>';
+  h+='</div>';
   h+='<div class="fg" style="margin-bottom:12px"><label>Note (optional)</label><input type="text" id="a-note" placeholder="Brief description" autocorrect="off"></div>';
   h+='<div class="fg" style="margin-bottom:12px"><label>Receipt</label><div class="upload-zone" onclick="document.getElementById(\'a-file\').click()">📎 Tap to attach photo or file<input type="file" id="a-file" style="display:none" accept="image/*,.pdf" multiple onchange="handleFiles(this)"></div><div id="file-chips"></div></div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border);margin-top:8px">';
+  h+='<input type="checkbox" id="a-repeat" style="width:20px;height:20px;cursor:pointer;flex-shrink:0" onchange="toggleRepeatOpts()">';
+  h+='<label for="a-repeat" style="font-size:14px;font-weight:600;color:var(--text);cursor:pointer">Repeat expense</label></div>';
+  h+='<div id="repeat-opts" style="display:none;margin-bottom:10px"><div class="form-row"><div class="fg"><label>Frequency</label><select id="a-freq"><option value="monthly">Monthly</option><option value="annual">Annual</option></select></div><div class="fg" style="display:flex;align-items:flex-end;padding-bottom:2px"><p style="font-size:11px;color:var(--text3);line-height:1.4">Auto-logs each month or year from the expense date you set above</p></div></div></div>';
   h+='<button class="btn-full" onclick="addExp()">Add Expense</button></div></div>';
-  if (isT) {
-    h+='<div class="sec-label">Log event — '+BIZ[biz]+'</div><div class="card"><div class="card-body">';
-    h+='<div class="form-row"><div class="fg" style="flex:2"><label>Event name</label><input type="text" id="ev-name" placeholder="e.g. Nov Tango Night" autocorrect="off"></div><div class="fg"><label>Date</label><input type="date" id="ev-date"></div></div>';
-    h+='<div class="form-row"><div class="fg"><label>Single ($)</label><input type="number" id="ev-sp" value="'+tp.single+'" step="0.01" inputmode="decimal"></div><div class="fg"><label>Couple ($)</label><input type="number" id="ev-cp" value="'+tp.couple+'" step="0.01" inputmode="decimal"></div></div>';
-    h+='<div class="form-row"><div class="fg"><label>Singles sold</label><input type="number" id="ev-ss" placeholder="0" min="0" inputmode="numeric"></div><div class="fg"><label>Couples sold</label><input type="number" id="ev-cs" placeholder="0" min="0" inputmode="numeric"></div><div class="fg"><label>Op costs ($)</label><input type="number" id="ev-oc" placeholder="0.00" step="0.01" inputmode="decimal"></div></div>';
-    h+='<div id="ev-preview"></div>';
-    h+='<button class="btn-full" style="background:#2d5a27" onclick="addEvent()">Log Event</button></div></div>';
+
+  // Event log (ticket businesses)
+  if(isT){
+    if(biz==='itt'){
+      // ITT: dropdown ticket types, individual only
+      h+='<div class="sec-label">Log event — It Takes Two</div><div class="card"><div class="card-body">';
+      h+='<div class="form-row"><div class="fg" style="flex:2"><label>Event name</label><input type="text" id="ev-name" placeholder="e.g. Nov Tango Night" autocorrect="off"></div><div class="fg"><label>Date</label><input type="date" id="ev-date"></div></div>';
+      h+='<div class="form-row"><div class="fg"><label>Ticket type</label><select id="ev-ticket" onchange="updateEventPreviewITT()"><option value="">— Select —</option>'+ITT_TICKETS.map(function(t){return'<option value="'+t.label+'">'+t.label+'</option>';}).join('')+'</select></div><div class="fg"><label>Qty sold</label><input type="number" id="ev-qty" placeholder="0" min="0" inputmode="numeric" oninput="updateEventPreviewITT()"></div></div>';
+      h+='<div id="ev-preview"></div>';
+      h+='<button class="btn-full" style="background:#2d5a27" onclick="addEventITT()">Log Event</button></div></div>';
+    } else {
+      // EVE: individual tickets only, price set per event
+      h+='<div class="sec-label">Log event — EVE</div><div class="card"><div class="card-body">';
+      h+='<div class="form-row"><div class="fg" style="flex:2"><label>Event name</label><input type="text" id="ev-name" placeholder="e.g. Spring Gathering" autocorrect="off"></div><div class="fg"><label>Date</label><input type="date" id="ev-date"></div></div>';
+      h+='<div class="form-row"><div class="fg"><label>Ticket price ($)</label><input type="number" id="ev-price" placeholder="65.00" step="0.01" inputmode="decimal" oninput="updateEventPreviewEVE()"></div><div class="fg"><label>Tickets sold</label><input type="number" id="ev-qty" placeholder="0" min="0" inputmode="numeric" oninput="updateEventPreviewEVE()"></div></div>';
+      h+='<div id="ev-preview"></div>';
+      h+='<button class="btn-full" style="background:#2d5a27" onclick="addEventEVE()">Log Event</button></div></div>';
+    }
+  }
+
+  // OwnIt app sale
+  if(isOwnit){
+    h+='<div class="sec-label">Log app sale — OwnIt</div><div class="card"><div class="card-body">';
+    h+='<div class="form-row"><div class="fg" style="flex:2"><label>Client name</label><input type="text" id="sale-client" placeholder="Client name" autocorrect="off"></div><div class="fg"><label>Date</label><input type="date" id="sale-date"></div></div>';
+    h+='<div class="form-row"><div class="fg" style="flex:2"><label>App name</label><input type="text" id="sale-app" placeholder="App / project name" autocorrect="off"></div><div class="fg"><label>Quote ($)</label><input type="number" id="sale-quote" placeholder="0.00" step="0.01" inputmode="decimal"></div></div>';
+    h+='<div class="fg" style="margin-bottom:12px"><label>Sale type</label><select id="sale-type"><option value="">— Select —</option>'+OWNIT_SALE_TYPES.map(function(t){return'<option>'+t+'</option>';}).join('')+'</select></div>';
+    h+='<button class="btn-full" onclick="addSale()">Log Sale</button></div></div>';
   }
   return h;
 }
 
-function buildDocs() {
-  var docs=state.docs||[];
-  var h='<div class="sec-label">1099 Tax Forms</div><div class="card"><div class="card-body" style="padding-top:14px">';
-  h+='<p style="font-size:13px;color:var(--text2);margin-bottom:12px">Store your 1099-NEC, 1099-K, and other tax forms here.</p>';
-  h+='<div class="upload-zone" onclick="document.getElementById(\'doc-file\').click()">📋 Tap to upload a 1099 or tax form<input type="file" id="doc-file" style="display:none" accept=".pdf,image/*" multiple onchange="uploadDocs(this)"></div></div></div>';
-  if (docs.length) {
-    h+='<div class="sec-label">Uploaded forms ('+docs.length+')</div><div class="card">';
-    docs.forEach(function(d){
-      var icon=d.name.toLowerCase().indexOf('.pdf')>=0?'📄':'🖼️';
-      h+='<div class="doc-row"><span class="doc-icon">'+icon+'</span><div class="doc-info"><div class="doc-name">'+d.name+'</div><div class="doc-meta">'+d.biz+' · '+d.uploaded+'</div></div>';
-      h+='<button class="btn-del" onclick="deleteDoc(\''+d.id+'\')">Del</button></div>';
-    });
-    h+='</div>';
-  } else { h+='<div class="card"><div class="empty">No forms uploaded yet.</div></div>'; }
-  h+='<div class="sec-label">What to expect</div><div class="card"><div class="card-body" style="padding-top:12px">';
-  [['🐾 Rover','1099-NEC if you earned $600+ in the year'],['📚 Wyzant','1099-NEC if you earned $600+ in the year'],
-   ['💃 It Takes Two','May receive 1099-K if using payment processors over threshold'],
-   ['🌿 EVE','May receive 1099-K if using payment processors over threshold']].forEach(function(n){
-    h+='<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:600;min-width:110px;color:var(--text)">'+n[0]+'</span><span style="color:var(--text2)">'+n[1]+'</span></div>';
-  });
-  h+='</div></div>';
-  return h;
+function updateEventPreviewITT(){
+  var ticketVal=document.getElementById('ev-ticket').value;
+  var qty=parseInt(document.getElementById('ev-qty').value)||0;
+  var prev=document.getElementById('ev-preview'); if(!prev) return;
+  if(!ticketVal||!qty){prev.innerHTML='';return;}
+  var match=ITT_TICKETS.filter(function(t){return t.label===ticketVal;})[0];
+  if(!match){prev.innerHTML='';return;}
+  var rev=match.price*qty, att=match.qty*qty;
+  prev.innerHTML='<div class="preview"><div class="preview-row"><span style="color:var(--text3)">Attendance</span><strong>'+att+' people</strong></div><div class="preview-row"><span style="color:var(--text3)">Revenue</span><strong style="color:var(--income)">'+fmt(rev)+'</strong></div></div>';
+}
+function updateEventPreviewEVE(){
+  var price=parseFloat(document.getElementById('ev-price').value)||0;
+  var qty=parseInt(document.getElementById('ev-qty').value)||0;
+  var prev=document.getElementById('ev-preview'); if(!prev) return;
+  if(!price||!qty){prev.innerHTML='';return;}
+  var rev=price*qty;
+  prev.innerHTML='<div class="preview"><div class="preview-row"><span style="color:var(--text3)">Attendance</span><strong>'+qty+' people</strong></div><div class="preview-row"><span style="color:var(--text3)">Revenue</span><strong style="color:var(--income)">'+fmt(rev)+'</strong></div></div>';
 }
 
-function saveIncome() {
-  var amount = parseFloat(document.getElementById('inc-amount').value)||0;
-  var asOf = document.getElementById('inc-date').value;
-  var row = { biz: biz, amount: amount, as_of: asOf, date: new Date().toISOString().split('T')[0] };
-  setSyncDot('syncing');
-  sbUpsert('income_records', row).then(function(){ return loadAll(); }).then(function(){
-    toast('✓ Income updated'); render();
-  }).catch(function(){ setSyncDot('error'); toast('Save failed'); });
-}
-
-function buildEarnings() {
-  var keys = ['rover','wyzant','itt','eve'];
-  var totalIncome = 0, totalExpAll = 0, totalProfitAll = 0;
-  var h = '<div class="sec-label">Total Earnings — All Businesses</div>';
-
-  // Per-business cards
-  keys.forEach(function(k) {
-    var isT = TICKET_BIZ.indexOf(k) >= 0;
-    var exp = (state[k].expenses||[]).reduce(function(s,e){return s+(parseFloat(e.amount)||0);},0);
-    var inc, profit;
-    if (isT) {
-      var p = state[k].ticketPrices;
-      inc = (state[k].events||[]).reduce(function(s,ev){return s+(parseInt(ev.singleSold)||0)*parseFloat(p.single)+(parseInt(ev.coupleSold)||0)*parseFloat(p.couple);},0);
-    } else {
-      inc = parseFloat((state[k].income||{}).amount)||0;
-    }
-    profit = inc - exp;
-    totalIncome += inc;
-    totalExpAll += exp;
-    totalProfitAll += profit;
-
-    var emoji = {rover:'🐾',wyzant:'📚',itt:'💃',eve:'🌿'}[k];
-    h += '<div class="card" style="margin-bottom:10px">';
-    h += '<div style="padding:12px 14px 0;font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">'+emoji+' '+BIZ[k]+'</div>';
-    h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--border)">';
-    h += '<div style="padding:12px 10px;border-right:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Income</div><div style="font-size:16px;font-weight:700;color:var(--income)">'+fmt(inc)+'</div>'+((!isT&&(state[k].income||{}).asOf)?'<div style="font-size:10px;color:var(--text3);margin-top:2px">As of '+fmtDate(state[k].income.asOf)+'</div>':'')+'</div>';
-    h += '<div style="padding:12px 10px;border-right:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Expenses</div><div style="font-size:16px;font-weight:700;color:var(--red)">'+fmt(exp)+'</div></div>';
-    h += '<div style="padding:12px 10px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Net profit</div><div style="font-size:16px;font-weight:700;color:'+(profit>=0?'var(--profit)':'var(--red)')+'">'+fmt(profit)+'</div></div>';
-    h += '</div></div>';
-  });
-
-  // Grand total card
-  h += '<div class="sec-label">Combined total</div>';
-  h += '<div class="card" style="overflow:hidden">';
-  h += '<div style="background:var(--income);padding:14px 16px">';
-  h += '<div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Total income across all businesses</div>';
-  h += '<div style="font-size:32px;font-weight:700;color:#fff">'+fmt(totalIncome)+'</div>';
-  h += '</div>';
-  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)">';
-  h += '<div style="padding:14px;border-right:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Total expenses</div><div style="font-size:22px;font-weight:700;color:var(--red)">'+fmt(totalExpAll)+'</div></div>';
-  h += '<div style="padding:14px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Total net profit</div><div style="font-size:22px;font-weight:700;color:'+(totalProfitAll>=0?'var(--profit)':'var(--red)')+'">'+fmt(totalProfitAll)+'</div></div>';
-  h += '</div>';
-  h += '<div style="padding:12px 16px;background:var(--bg2);border-top:1px solid var(--border)">';
-  h += '<p style="font-size:12px;color:var(--text2)">⚠️ This is an estimate of taxable income. Net profit is your approximate gross income for Schedule C. Consult a tax professional for your actual tax liability.</p>';
-  h += '</div></div>';
-  return h;
-}
-
-function buildExport() {
-  var h='<div class="sec-label">Download CSV for Google Sheets</div><div class="card"><div class="card-body">';
-  h+='<p style="font-size:13px;color:var(--text2);margin-bottom:12px">File → Import → Upload CSV in Google Sheets</p>';
-  h+='<div class="export-grid">';
-  ['rover','wyzant','itt','eve'].forEach(function(b){h+='<button class="btn-sm" onclick="exportCSV(\''+b+'\')">'+BIZ[b]+'</button>';});
-  h+='</div><button class="btn-full" style="margin-top:10px" onclick="exportCSV(\'all\')">↗ Export All Businesses</button></div></div>';
-  h+='<div class="sec-label">Schedule C (Tax)</div><div class="card"><div class="card-body">';
-  h+='<select id="sc-biz" onchange="renderSchedC()" style="width:100%;padding:12px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:16px;background:#fff;-webkit-appearance:none;margin-bottom:12px">';
-  h+='<option value="rover">Rover</option><option value="wyzant">Wyzant</option><option value="itt">It Takes Two</option><option value="eve">EVE</option></select>';
-  h+='<div id="sc-out"></div><button class="btn-full" style="margin-top:10px" onclick="exportSchC()">↗ Download Schedule C CSV</button></div></div>';
-  return h;
-}
-
-// ── EDIT MODAL ──
-var editPendingFiles = []; // new files added in edit modal
-var editExistingFiles = []; // existing files kept from original
-
-function openEdit(id) {
-  var e=null, exps=state[biz].expenses||[];
-  for(var i=0;i<exps.length;i++){if(exps[i].id===id){e=exps[i];break;}}
-  if(!e) return;
-  editingId=id;
-  editPendingFiles=[];
-  editExistingFiles=(e.files||[]).slice(); // pre-load existing files
-  var cats=CATS[biz];
-  var h='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal">';
-  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span class="modal-title">Edit Expense</span><span onclick="closeModalDirect()" style="font-size:22px;cursor:pointer;color:var(--text3)">✕</span></div>';
-  h+='<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+(e.date||'')+'"></div><div class="fg"><label>Time</label><input type="time" id="ed-time" value="'+(e.time||'')+'"></div></div>';
-  h+='<div class="form-row"><div class="fg" style="flex:2"><label>Vendor</label><input type="text" id="ed-vendor" value="'+(e.vendor||'')+'" autocorrect="off"></div><div class="fg"><label>Amount ($)</label><input type="number" id="ed-amount" value="'+(e.amount||'')+'" step="0.01" inputmode="decimal"></div></div>';
-  h+='<div class="form-row"><div class="fg"><label>Category</label><select id="ed-cat">'+cats.map(function(c){return'<option'+(c===e.category?' selected':'')+'>'+c+'</option>';}).join('')+'</select></div><div class="fg"><label>Payment</label><select id="ed-pay">'+PAY.map(function(p){return'<option'+(p===e.payMethod?' selected':'')+'>'+p+'</option>';}).join('')+'</select></div></div>';
-  h+='<div class="fg" style="margin-bottom:12px"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'" autocorrect="off"></div>';
-  // Files section
-  h+='<div class="fg" style="margin-bottom:16px"><label>Receipts & files</label>';
-  // Show existing files with remove buttons
-  h+='<div id="ed-existing-chips" style="margin-bottom:6px">';
-  editExistingFiles.forEach(function(f){
-    h+='<span class="file-chip">📎 '+f+' <span onclick="removeEditExisting(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';
-  });
-  h+='</div>';
-  // Upload zone for new files
-  h+='<div class="upload-zone" onclick="document.getElementById(\'ed-file\').click()">📎 Tap to add new receipt or file<input type="file" id="ed-file" style="display:none" accept="image/*,.pdf" multiple onchange="handleEditFiles(this)"></div>';
-  h+='<div id="ed-new-chips"></div>';
-  h+='</div>';
-  h+='<button class="btn-full" onclick="saveEdit()">Save Changes</button>';
-  h+='<button class="btn-full" style="background:var(--bg2);color:var(--text2);margin-top:8px" onclick="closeModalDirect()">Cancel</button>';
-  h+='</div></div>';
-  document.getElementById('modal-root').innerHTML=h;
-}
-
-function handleEditFiles(input) {
-  var names=Array.prototype.map.call(input.files,function(f){return f.name;});
-  editPendingFiles=editPendingFiles.concat(names).filter(function(v,i,a){return a.indexOf(v)===i;});
-  var chips=document.getElementById('ed-new-chips');
-  if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
-}
-
-function removeEditExisting(fname) {
-  editExistingFiles=editExistingFiles.filter(function(f){return f!==fname;});
-  var chips=document.getElementById('ed-existing-chips');
-  if(chips) chips.innerHTML=editExistingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removeEditExisting(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
-}
-
-function removeEditNew(fname) {
-  editPendingFiles=editPendingFiles.filter(function(f){return f!==fname;});
-  var chips=document.getElementById('ed-new-chips');
-  if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
-}
-
-function closeModal(evt){if(evt.target.classList.contains('modal-overlay'))closeModalDirect();}
-function closeModalDirect(){document.getElementById('modal-root').innerHTML='';editingId=null;editPendingFiles=[];editExistingFiles=[];}
-
-function saveEdit() {
-  // Merge kept existing files + newly added files
-  var allFiles = editExistingFiles.concat(editPendingFiles);
-  var data = {
-    date: document.getElementById('ed-date').value,
-    time: document.getElementById('ed-time').value,
-    vendor: (document.getElementById('ed-vendor').value||'').trim(),
-    amount: parseFloat(document.getElementById('ed-amount').value)||0,
-    category: document.getElementById('ed-cat').value,
-    pay_method: document.getElementById('ed-pay').value,
-    note: (document.getElementById('ed-note').value||'').trim(),
-    files: allFiles.join('|')
-  };
-  setSyncDot('syncing');
-  sbUpdate('expenses', editingId, data).then(function(){
-    return loadAll();
-  }).then(function(){
-    closeModalDirect(); toast('✓ Expense updated'); render();
-  }).catch(function(){ setSyncDot('error'); toast('Save failed — check connection'); });
-}
-
-// ── DUPLICATE ──
-function dupeExp(id) {
-  var exps=state[biz].expenses, orig=null;
-  for(var i=0;i<exps.length;i++){if(exps[i].id===id){orig=exps[i];break;}}
-  if(!orig) return;
-  var today = new Date().toISOString().split('T')[0];
-  var row = {
-    id: genId(), biz: biz,
-    date: today, time: orig.time,
-    vendor: orig.vendor, amount: orig.amount,
-    category: orig.category, pay_method: orig.payMethod,
-    note: (orig.note?orig.note+' (copy)':'(copy)'),
-    files: (orig.files||[]).join('|')
-  };
-  setSyncDot('syncing');
-  sbInsert('expenses', row).then(function(){ return loadAll(); }).then(function(){
-    toast('✓ Duplicated — update the date if needed'); render();
-  }).catch(function(){ setSyncDot('error'); toast('Duplicate failed'); });
-}
-
-// ── ADD EXPENSE ──
-function initAddDefaults() {
+function initAddDefaults(){
   var today=new Date().toISOString().split('T')[0];
   var now=new Date();
   var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
   var d=document.getElementById('a-date'); if(d) d.value=today;
   var ti=document.getElementById('a-time'); if(ti) ti.value=t;
   var ed=document.getElementById('ev-date'); if(ed) ed.value=today;
+  var sd=document.getElementById('sale-date'); if(sd) sd.value=today;
   pendingFiles=[];
   var chips=document.getElementById('file-chips'); if(chips) chips.innerHTML='';
-  var ss=document.getElementById('ev-ss'); if(ss) ss.addEventListener('input',updatePreview);
-  var cs=document.getElementById('ev-cs'); if(cs) cs.addEventListener('input',updatePreview);
-  var oc=document.getElementById('ev-oc'); if(oc) oc.addEventListener('input',updatePreview);
 }
 
-function updatePreview() {
-  var sp=parseFloat((document.getElementById('ev-sp')||{}).value)||0;
-  var cp=parseFloat((document.getElementById('ev-cp')||{}).value)||0;
-  var ss=parseInt((document.getElementById('ev-ss')||{}).value)||0;
-  var cs=parseInt((document.getElementById('ev-cs')||{}).value)||0;
-  var oc=parseFloat((document.getElementById('ev-oc')||{}).value)||0;
-  var rev=ss*sp+cs*cp, att=ss+cs*2;
-  var prev=document.getElementById('ev-preview'); if(!prev) return;
-  if(!ss&&!cs){prev.innerHTML='';return;}
-  prev.innerHTML='<div class="preview"><div class="preview-row"><span style="color:var(--text3)">Attendance</span><strong>'+att+' people</strong></div>'
-    +'<div class="preview-row"><span style="color:var(--text3)">Revenue</span><strong style="color:var(--accent)">'+fmt(rev)+'</strong></div>'
-    +'<div class="preview-row"><span style="color:var(--text3)">Net after op costs</span><strong style="color:'+(rev-oc>=0?'var(--accent)':'var(--red)')+'">'+fmt(rev-oc)+'</strong></div></div>';
-}
-
-function handleFiles(input) {
+function handleFiles(input){
   var names=Array.prototype.map.call(input.files,function(f){return f.name;});
   pendingFiles=pendingFiles.concat(names).filter(function(v,i,a){return a.indexOf(v)===i;});
   var chips=document.getElementById('file-chips');
-  if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removeFile(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
+  if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removePF(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join('');
 }
-function removeFile(n){
-  pendingFiles=pendingFiles.filter(function(f){return f!==n;});
-  var chips=document.getElementById('file-chips');
-  if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removeFile(\''+f+'\')" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
-}
+function removePF(n){ pendingFiles=pendingFiles.filter(function(f){return f!==n;}); var chips=document.getElementById('file-chips'); if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removePF(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join(''); }
 
-function addExp() {
+function addExp(){
   var vendor=(document.getElementById('a-vendor').value||'').trim();
   var amount=parseFloat(document.getElementById('a-amount').value);
   var date=document.getElementById('a-date').value;
@@ -810,124 +526,377 @@ function addExp() {
   var note=(document.getElementById('a-note').value||'').trim();
   if(!vendor||isNaN(amount)||amount<=0){toast('Enter vendor and amount');return;}
   if(!date){toast('Select a date');return;}
-  var row={id:genId(),biz:biz,date:date,time:time,vendor:vendor,amount:amount,category:cat,pay_method:pay,note:note,files:pendingFiles.join('|')};
+  var isRepeat=(document.getElementById('a-repeat')||{}).checked;
+  var freq=(document.getElementById('a-freq')||{}).value||'monthly';
+  var row={id:genId(),biz:biz,date:date,time:time,vendor:vendor,amount:amount,category:cat||'',pay_method:pay||'',note:note,files:pendingFiles.join('|')};
   setSyncDot('syncing');
-  sbInsert('expenses',row).then(function(){return loadAll();}).then(function(){
-    toast('✓ Expense added'); pendingFiles=[];
-    document.getElementById('a-vendor').value='';
-    document.getElementById('a-amount').value='';
-    document.getElementById('a-note').value='';
+  var ops=[sbInsert('expenses',row)];
+  if(isRepeat){
+    var nextDate=calcNextDate(date,freq);
+    ops.push(sbInsert('repeat_expenses',{id:genId(),biz:biz,vendor:vendor,amount:amount,category:cat||'',pay_method:pay||'',note:note,freq:freq,next_date:nextDate}));
+  }
+  Promise.all(ops).then(function(){return loadAll();}).then(function(){
+    toast(isRepeat?'✓ Expense added & repeat scheduled':'✓ Expense added'); pendingFiles=[];
+    document.getElementById('a-vendor').value=''; document.getElementById('a-amount').value=''; document.getElementById('a-note').value='';
     var chips=document.getElementById('file-chips'); if(chips) chips.innerHTML='';
-  }).catch(function(){setSyncDot('error');toast('Save failed — check connection');});
+    var catSel=document.getElementById('a-cat'); if(catSel){catSel.value='';catSel.classList.add('unassigned');}
+    var paySel=document.getElementById('a-pay'); if(paySel){paySel.value='';paySel.classList.add('unassigned');}
+    var cb=document.getElementById('a-repeat'); if(cb){cb.checked=false;toggleRepeatOpts();}
+  }).catch(function(){setSyncDot('error');toast('Save failed');});
 }
 
-function addEvent() {
+function toggleRepeatOpts(){
+  var cb=document.getElementById('a-repeat');
+  var opts=document.getElementById('repeat-opts');
+  if(opts) opts.style.display=(cb&&cb.checked)?'block':'none';
+}
+
+function calcNextDate(dateStr,freq){
+  var p=dateStr.split('-');
+  var d=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  if(freq==='monthly') d.setMonth(d.getMonth()+1);
+  else d.setFullYear(d.getFullYear()+1);
+  return d.toISOString().split('T')[0];
+}
+
+function addEventITT(){
   var name=(document.getElementById('ev-name').value||'').trim();
   var date=document.getElementById('ev-date').value;
-  var sp=parseFloat(document.getElementById('ev-sp').value)||0;
-  var cp=parseFloat(document.getElementById('ev-cp').value)||0;
-  var ss=parseInt(document.getElementById('ev-ss').value)||0;
-  var cs=parseInt(document.getElementById('ev-cs').value)||0;
-  var oc=parseFloat(document.getElementById('ev-oc').value)||0;
+  var ticketVal=document.getElementById('ev-ticket').value;
+  var qty=parseInt(document.getElementById('ev-qty').value)||0;
   if(!date){toast('Enter event date');return;}
-  if(!ss&&!cs){toast('Enter tickets sold');return;}
+  if(!ticketVal||!qty){toast('Select ticket type and quantity');return;}
+  var match=ITT_TICKETS.filter(function(t){return t.label===ticketVal;})[0];
+  var rev=match.price*qty, att=match.qty*qty;
   setSyncDot('syncing');
-  var priceRow={biz:biz,single_price:sp,couple_price:cp};
-  var evRow={id:genId(),biz:biz,name:name,date:date,single_sold:ss,couple_sold:cs,op_cost:oc};
-  Promise.all([sbUpsert('ticket_prices',priceRow), sbInsert('events',evRow)]).then(function(){return loadAll();}).then(function(){
-    toast('✓ Event logged');
-    document.getElementById('ev-name').value='';
-    document.getElementById('ev-ss').value='';
-    document.getElementById('ev-cs').value='';
-    document.getElementById('ev-oc').value='';
-    var prev=document.getElementById('ev-preview'); if(prev) prev.innerHTML='';
-  }).catch(function(){setSyncDot('error');toast('Save failed — check connection');});
+  sbInsert('events',{id:genId(),biz:'itt',name:name,date:date,ticket_type:ticketVal,ticket_qty:att,revenue:rev}).then(function(){return loadAll();}).then(function(){
+    toast('✓ Event logged'); document.getElementById('ev-name').value=''; document.getElementById('ev-qty').value=''; document.getElementById('ev-ticket').value=''; document.getElementById('ev-preview').innerHTML='';
+  }).catch(function(){setSyncDot('error');toast('Save failed');});
 }
 
-function deleteExp(id) {
-  if(!confirm('Delete this expense?')) return;
+function addEventEVE(){
+  var name=(document.getElementById('ev-name').value||'').trim();
+  var date=document.getElementById('ev-date').value;
+  var price=parseFloat(document.getElementById('ev-price').value)||0;
+  var qty=parseInt(document.getElementById('ev-qty').value)||0;
+  if(!date){toast('Enter event date');return;}
+  if(!price||!qty){toast('Enter price and tickets sold');return;}
+  var rev=price*qty;
   setSyncDot('syncing');
-  sbDelete('expenses',id).then(function(){return loadAll();}).then(function(){toast('Deleted');render();}).catch(function(){setSyncDot('error');});
-}
-function deleteEvent(id) {
-  if(!confirm('Delete this event?')) return;
-  setSyncDot('syncing');
-  sbDelete('events',id).then(function(){return loadAll();}).then(function(){toast('Deleted');render();}).catch(function(){setSyncDot('error');});
+  sbInsert('events',{id:genId(),biz:'eve',name:name,date:date,ticket_type:'Single $'+price.toFixed(2),ticket_qty:qty,revenue:rev}).then(function(){return loadAll();}).then(function(){
+    toast('✓ Event logged'); document.getElementById('ev-name').value=''; document.getElementById('ev-price').value=''; document.getElementById('ev-qty').value=''; document.getElementById('ev-preview').innerHTML='';
+  }).catch(function(){setSyncDot('error');toast('Save failed');});
 }
 
-// ── DOCS ──
-function uploadDocs(input) {
+function addSale(){
+  var client=(document.getElementById('sale-client').value||'').trim();
+  var appName=(document.getElementById('sale-app').value||'').trim();
+  var date=document.getElementById('sale-date').value;
+  var quote=parseFloat(document.getElementById('sale-quote').value)||0;
+  var saleType=document.getElementById('sale-type').value;
+  if(!client||!quote){toast('Enter client name and quote');return;}
+  setSyncDot('syncing');
+  sbInsert('ownit_sales',{id:genId(),date:date,client_name:client,app_name:appName,quote:quote,sale_type:saleType}).then(function(){return loadAll();}).then(function(){
+    toast('✓ Sale logged'); document.getElementById('sale-client').value=''; document.getElementById('sale-app').value=''; document.getElementById('sale-quote').value=''; document.getElementById('sale-type').value='';
+  }).catch(function(){setSyncDot('error');toast('Save failed');});
+}
+
+function deleteExp(id){ if(!confirm('Delete?')) return; setSyncDot('syncing'); sbDelete('expenses',id).then(function(){return loadAll();}).then(function(){toast('Deleted');render();}); }
+function deleteEvent(id){ if(!confirm('Delete?')) return; setSyncDot('syncing'); sbDelete('events',id).then(function(){return loadAll();}).then(function(){toast('Deleted');render();}); }
+function deleteSale(id){ if(!confirm('Delete?')) return; setSyncDot('syncing'); sbDelete('ownit_sales',id).then(function(){return loadAll();}).then(function(){toast('Deleted');render();}); }
+
+// ── REPEAT EXPENSES ──
+function buildRepeat(){
+  var today=new Date().toISOString().split('T')[0];
+  var due=state.repeats.filter(function(r){return r.nextDate<=today;});
+  var upcoming=state.repeats.filter(function(r){return r.nextDate>today;});
+  var h='';
+  if(due.length){ h+='<div class="flag-banner">⚠️ '+due.length+' repeat expense'+(due.length>1?'s':'')+' due — tap Log to record</div>'; }
+  h+='<div class="sec-label">Scheduled repeats</div>';
+  var allRepeats=state.repeats.slice().sort(function(a,b){return a.nextDate.localeCompare(b.nextDate);});
+  if(!allRepeats.length){ h+='<div class="card"><div class="empty">No repeating expenses set up yet.</div></div>'; }
+  else {
+    h+='<div class="card">';
+    allRepeats.forEach(function(r){
+      var isOverdue=r.nextDate<today, isDue=r.nextDate===today;
+      var cls=isOverdue?'overdue':isDue?'due-today':'';
+      h+='<div class="repeat-row '+cls+'"><div style="flex:1;min-width:0">';
+      h+='<div style="font-size:14px;font-weight:600">'+(r.vendor||'—')+'</div>';
+      h+='<div style="font-size:12px;color:var(--text3)">'+FREQ_LABELS[r.freq]+' · '+fmt(r.amount)+' · '+BIZ[r.biz]+'</div>';
+      h+='<div style="font-size:12px;color:'+(isOverdue?'var(--red)':isDue?'var(--orange)':'var(--text3)')+'">Next: '+fmtDate(r.nextDate)+(isOverdue?' ⚠️ overdue':isDue?' — due today':'')+'</div>';
+      if(r.note) h+='<div style="font-size:11px;color:var(--text2);font-style:italic">'+r.note+'</div>';
+      h+='</div><div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:8px">';
+      h+='<button class="btn-edit" onclick="logRepeat(\''+r.id+'\')">Log</button>';
+      h+='<button class="btn-del" onclick="deleteRepeat(\''+r.id+'\')">Del</button>';
+      h+='</div></div>';
+    });
+    h+='</div>';
+  }
+  h+='<div class="sec-label">Add repeating expense</div><div class="card"><div class="card-body" style="padding-top:12px">';
+  var allCats=['Supplies','Food & Bev','Business Meals','Transportation','Travel','Platform Fees','Marketing','Software','Phone Bill','iPad','Decor','Utilities','Venue','Other'];
+  h+='<div class="form-row"><div class="fg" style="flex:2"><label>Vendor</label><input type="text" id="rp-vendor" placeholder="e.g. QR Code Generator" autocorrect="off"></div><div class="fg"><label>Amount ($)</label><input type="number" id="rp-amount" placeholder="0.00" step="0.01" inputmode="decimal"></div></div>';
+  h+='<div class="form-row"><div class="fg"><label>Business</label><select id="rp-biz"><option value="">— Select —</option>'+Object.keys(BIZ).map(function(k){return'<option value="'+k+'">'+BIZ[k]+'</option>';}).join('')+'</select></div><div class="fg"><label>Frequency</label><select id="rp-freq"><option value="monthly">Monthly</option><option value="annual">Annual</option></select></div></div>';
+  h+='<div class="form-row"><div class="fg"><label>Category</label><select id="rp-cat"><option value="">— Select —</option>'+allCats.map(function(c){return'<option>'+c+'</option>';}).join('')+'</select></div><div class="fg"><label>Payment</label><select id="rp-pay"><option value="">— Select —</option>'+PAY.slice(1).map(function(p){return'<option>'+p+'</option>';}).join('')+'</select></div></div>';
+  h+='<div class="form-row"><div class="fg"><label>Next charge date</label><input type="date" id="rp-date"></div><div class="fg"><label>Note (optional)</label><input type="text" id="rp-note" autocorrect="off"></div></div>';
+  h+='<button class="btn-full" onclick="addRepeat()">Add Repeating Expense</button></div></div>';
+  return h;
+}
+
+function addRepeat(){
+  var vendor=(document.getElementById('rp-vendor').value||'').trim();
+  var amount=parseFloat(document.getElementById('rp-amount').value)||0;
+  var rbiz=document.getElementById('rp-biz').value;
+  var freq=document.getElementById('rp-freq').value;
+  var cat=document.getElementById('rp-cat').value;
+  var pay=document.getElementById('rp-pay').value;
+  var date=document.getElementById('rp-date').value;
+  var note=(document.getElementById('rp-note').value||'').trim();
+  if(!vendor||!amount||!rbiz||!date){toast('Fill in vendor, amount, business, and date');return;}
+  setSyncDot('syncing');
+  sbInsert('repeat_expenses',{id:genId(),biz:rbiz,vendor:vendor,amount:amount,category:cat,pay_method:pay,note:note,freq:freq,next_date:date}).then(function(){return loadAll();}).then(function(){
+    toast('✓ Repeating expense added'); render();
+  }).catch(function(){setSyncDot('error');toast('Save failed');});
+}
+
+function logRepeat(id){
+  var r=null; for(var i=0;i<state.repeats.length;i++){if(state.repeats[i].id===id){r=state.repeats[i];break;}} if(!r) return;
+  var today=new Date().toISOString().split('T')[0];
+  // Calculate next date
+  var parts=r.nextDate.split('-'); var d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  var next;
+  if(r.freq==='monthly'){ d.setMonth(d.getMonth()+1); next=d.toISOString().split('T')[0]; }
+  else { d.setFullYear(d.getFullYear()+1); next=d.toISOString().split('T')[0]; }
+  setSyncDot('syncing');
+  var expRow={id:genId(),biz:r.biz,date:today,time:'',vendor:r.vendor,amount:r.amount,category:r.category,pay_method:r.payMethod,note:r.note||'',files:''};
+  Promise.all([sbInsert('expenses',expRow), sbUpdate('repeat_expenses',id,{next_date:next})]).then(function(){return loadAll();}).then(function(){
+    toast('✓ Logged & next date updated to '+fmtDate(next)); render();
+  }).catch(function(){setSyncDot('error');toast('Failed');});
+}
+
+function deleteRepeat(id){ if(!confirm('Remove this repeating expense?')) return; setSyncDot('syncing'); sbDelete('repeat_expenses',id).then(function(){return loadAll();}).then(function(){toast('Removed');render();}); }
+
+// ── VIEW FILE ──
+function viewFile(filename){
+  var h='<div class="modal-overlay" onclick="closeModalDirect()"><div class="modal" onclick="event.stopPropagation()">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span class="modal-title">'+filename+'</span><span onclick="closeModalDirect()" style="font-size:22px;cursor:pointer;color:var(--text3)">✕</span></div>';
+  var ext=filename.toLowerCase().split('.').pop();
+  if(ext==='pdf'){
+    h+='<p style="font-size:13px;color:var(--text2);margin-bottom:12px">PDF files can\'t be previewed here. Use the button below to open it.</p>';
+    h+='<button class="btn-full" onclick="window.open(\''+filename+'\',\'_blank\')">Open PDF</button>';
+  } else if(['jpg','jpeg','png','gif','webp','heic'].indexOf(ext)>=0){
+    h+='<img src="'+filename+'" style="width:100%;border-radius:8px;max-height:60vh;object-fit:contain" onerror="this.style.display=\'none\';document.getElementById(\'img-err\').style.display=\'block\'">';
+    h+='<div id="img-err" style="display:none;font-size:13px;color:var(--text3);padding:16px 0;text-align:center">Image preview not available — receipts are stored by filename only. Use cloud storage (Google Drive, iCloud) to store the actual files and reference them by name here.</div>';
+  } else {
+    h+='<p style="font-size:13px;color:var(--text2)">Preview not available for this file type.</p>';
+  }
+  h+='<button class="btn-full" style="background:var(--bg2);color:var(--text2);margin-top:8px" onclick="closeModalDirect()">Close</button>';
+  h+='</div></div>';
+  document.getElementById('modal-root').innerHTML=h;
+}
+
+// ── 1099 DOCS ──
+function buildDocs(){
+  var docs=state.docs||[];
+  var byYear={};
+  docs.forEach(function(d){ var y=d.year||'Unknown year'; if(!byYear[y]) byYear[y]=[]; byYear[y].push(d); });
+  var years=Object.keys(byYear).sort().reverse();
+  var h='<div class="sec-label">Upload tax form</div><div class="card"><div class="card-body" style="padding-top:14px">';
+  h+='<div class="form-row"><div class="fg"><label>Tax year</label><input type="number" id="doc-year" placeholder="2025" inputmode="numeric" style="text-align:center"></div></div>';
+  h+='<div class="upload-zone" onclick="document.getElementById(\'doc-file\').click()">📋 Tap to upload a 1099 or tax form<input type="file" id="doc-file" style="display:none" accept=".pdf,image/*" multiple onchange="uploadDocs(this)"></div></div></div>';
+  if(!docs.length){ h+='<div class="card"><div class="empty">No forms uploaded yet.</div></div>'; }
+  else {
+    years.forEach(function(y){
+      h+='<div class="sec-label">'+y+'</div><div class="card">';
+      byYear[y].forEach(function(d){
+        var icon=d.name.toLowerCase().indexOf('.pdf')>=0?'📄':'🖼️';
+        h+='<div class="doc-row"><span class="doc-icon">'+icon+'</span><div class="doc-info"><div class="doc-name">'+d.name+'</div><div class="doc-meta">'+d.biz+' · '+d.uploaded+'</div></div>';
+        h+='<button class="btn-del" onclick="deleteDoc(\''+d.id+'\')">Del</button></div>';
+      });
+      h+='</div>';
+    });
+  }
+  h+='<div class="sec-label">What to expect</div><div class="card"><div class="card-body" style="padding-top:12px">';
+  [['🐾 Rover','1099-NEC if you earned $600+ in the year'],['📚 Wyzant','1099-NEC if you earned $600+ in the year'],
+   ['💃 It Takes Two','May receive 1099-K if using payment processors over threshold'],
+   ['🌿 EVE','May receive 1099-K if using payment processors over threshold'],
+   ['💻 OwnIt','1099-NEC from clients who paid you $600+ in the year']].forEach(function(n){
+    h+='<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:600;min-width:110px;color:var(--text)">'+n[0]+'</span><span style="color:var(--text2)">'+n[1]+'</span></div>';
+  });
+  h+='</div></div>';
+  return h;
+}
+
+function uploadDocs(input){
   var files=Array.prototype.slice.call(input.files);
   var today=new Date().toLocaleDateString();
-  var rows=files.map(function(f){return{id:genId(),name:f.name,biz:BIZ[biz],uploaded:today};});
+  var year=(document.getElementById('doc-year').value||new Date().getFullYear())+'';
+  var rows=files.map(function(f){return{id:genId(),name:f.name,biz:BIZ[biz],uploaded:today,year:year};});
   setSyncDot('syncing');
-  sbInsert('docs',rows).then(function(){return loadAll();}).then(function(){
-    toast('✓ '+files.length+' form(s) uploaded');render();
-  }).catch(function(){setSyncDot('error');toast('Upload failed');});
+  sbInsert('docs',rows).then(function(){return loadAll();}).then(function(){toast('✓ '+files.length+' form(s) uploaded');render();}).catch(function(){setSyncDot('error');toast('Upload failed');});
 }
-function deleteDoc(id) {
-  if(!confirm('Remove this document?')) return;
+function deleteDoc(id){ if(!confirm('Remove?')) return; setSyncDot('syncing'); sbDelete('docs',id).then(function(){return loadAll();}).then(function(){toast('Removed');render();}); }
+
+// ── INCOME ──
+function saveIncome(){
+  var amount=parseFloat(document.getElementById('inc-amount').value)||0;
+  var asOf=document.getElementById('inc-date').value;
   setSyncDot('syncing');
-  sbDelete('docs',id).then(function(){return loadAll();}).then(function(){toast('Removed');render();}).catch(function(){setSyncDot('error');});
+  sbUpsert('income_records',{biz:biz,amount:amount,as_of:asOf,date:new Date().toISOString().split('T')[0]}).then(function(){return loadAll();}).then(function(){toast('✓ Income updated');render();}).catch(function(){setSyncDot('error');toast('Save failed');});
+}
+
+// ── EARNINGS ──
+function buildEarnings(){
+  var keys=['rover','wyzant','itt','eve','ownit'];
+  var totalIncome=0, totalExpAll=0, totalProfitAll=0;
+  var h='<div class="sec-label">Total Earnings — All Businesses</div>';
+  keys.forEach(function(k){
+    var exp=(state[k].expenses||[]).reduce(function(s,e){return s+(parseFloat(e.amount)||0);},0);
+    var inc;
+    if(k==='ownit') inc=(state.ownit.sales||[]).reduce(function(s,sa){return s+(parseFloat(sa.quote)||0);},0);
+    else if(TICKET_BIZ.indexOf(k)>=0){
+      var p=state[k].ticketPrices||{single:65,couple:115};
+      inc=(state[k].events||[]).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0);
+    } else inc=parseFloat((state[k].income||{}).amount)||0;
+    var profit=inc-exp;
+    totalIncome+=inc; totalExpAll+=exp; totalProfitAll+=profit;
+    var emoji={rover:'🐾',wyzant:'📚',itt:'💃',eve:'🌿',ownit:'💻'}[k];
+    h+='<div class="card" style="margin-bottom:10px">';
+    h+='<div style="padding:12px 14px 0;font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">'+emoji+' '+BIZ[k]+'</div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--border)">';
+    h+='<div style="padding:12px 10px;border-right:1px solid var(--border)"><div class="metric-lbl">Income</div><div style="font-size:16px;font-weight:700;color:var(--income)">'+fmt(inc)+'</div>'+(k!=='ownit'&&TICKET_BIZ.indexOf(k)<0&&(state[k].income||{}).asOf?'<div style="font-size:10px;color:var(--text3);margin-top:2px">As of '+fmtDate(state[k].income.asOf)+'</div>':'')+'</div>';
+    h+='<div style="padding:12px 10px;border-right:1px solid var(--border)"><div class="metric-lbl">Expenses</div><div style="font-size:16px;font-weight:700;color:var(--red)">'+fmt(exp)+'</div></div>';
+    h+='<div style="padding:12px 10px"><div class="metric-lbl">Net profit</div><div style="font-size:16px;font-weight:700;color:'+(profit>=0?'var(--profit)':'var(--red)')+'">'+fmt(profit)+'</div></div>';
+    h+='</div></div>';
+  });
+  h+='<div class="sec-label">Combined total</div><div class="card" style="overflow:hidden">';
+  h+='<div style="background:var(--income);padding:14px 16px"><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Total income — all businesses</div>';
+  h+='<div style="font-size:32px;font-weight:700;color:#fff">'+fmt(totalIncome)+'</div></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr"><div style="padding:14px;border-right:1px solid var(--border)"><div class="metric-lbl">Total expenses</div><div style="font-size:22px;font-weight:700;color:var(--red)">'+fmt(totalExpAll)+'</div></div>';
+  h+='<div style="padding:14px"><div class="metric-lbl">Total net profit</div><div style="font-size:22px;font-weight:700;color:'+(totalProfitAll>=0?'var(--profit)':'var(--red)')+'">'+fmt(totalProfitAll)+'</div></div></div>';
+  h+='<div style="padding:12px 16px;background:var(--bg2);border-top:1px solid var(--border)"><p style="font-size:12px;color:var(--text2)">⚠️ Estimate only. Consult a tax professional for actual liability.</p></div></div>';
+  return h;
+}
+
+// ── EDIT MODAL ──
+function openEdit(id){
+  var e=null, exps=state[biz].expenses||[];
+  for(var i=0;i<exps.length;i++){if(exps[i].id===id){e=exps[i];break;}} if(!e) return;
+  editingId=id; editPendingFiles=[]; editExistingFiles=(e.files||[]).slice();
+  var cats=CATS[biz];
+  var h='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span class="modal-title">Edit Expense</span><span onclick="closeModalDirect()" style="font-size:22px;cursor:pointer;color:var(--text3)">✕</span></div>';
+  h+='<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+(e.date||'')+'"></div><div class="fg"><label>Time</label><input type="time" id="ed-time" value="'+(e.time||'')+'"></div></div>';
+  h+='<div class="form-row"><div class="fg" style="flex:2"><label>Vendor</label><input type="text" id="ed-vendor" value="'+(e.vendor||'')+'" autocorrect="off"></div><div class="fg"><label>Amount ($)</label><input type="number" id="ed-amount" value="'+(e.amount||'')+'" step="0.01" inputmode="decimal"></div></div>';
+  h+='<div class="form-row"><div class="fg"><label>Category</label><select id="ed-cat"><option value="">— Select —</option>'+cats.map(function(c){return'<option'+(c===e.category?' selected':'')+'>'+c+'</option>';}).join('')+'</select></div><div class="fg"><label>Payment</label><select id="ed-pay"><option value="">— Select —</option>'+PAY.slice(1).map(function(p){return'<option'+(p===e.payMethod?' selected':'')+'>'+p+'</option>';}).join('')+'</select></div></div>';
+  h+='<div class="fg" style="margin-bottom:12px"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'" autocorrect="off"></div>';
+  h+='<div class="fg" style="margin-bottom:16px"><label>Receipts & files</label>';
+  h+='<div id="ed-existing-chips" style="margin-bottom:6px">'+editExistingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removeEditExisting(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join('')+'</div>';
+  h+='<div class="upload-zone" onclick="document.getElementById(\'ed-file\').click()">📎 Add new receipt or file<input type="file" id="ed-file" style="display:none" accept="image/*,.pdf" multiple onchange="handleEditFiles(this)"></div>';
+  h+='<div id="ed-new-chips"></div></div>';
+  h+='<button class="btn-full" onclick="saveEdit()">Save Changes</button>';
+  h+='<button class="btn-full" style="background:var(--bg2);color:var(--text2);margin-top:8px" onclick="closeModalDirect()">Cancel</button>';
+  h+='</div></div>';
+  document.getElementById('modal-root').innerHTML=h;
+}
+function handleEditFiles(input){ var names=Array.prototype.map.call(input.files,function(f){return f.name;}); editPendingFiles=editPendingFiles.concat(names).filter(function(v,i,a){return a.indexOf(v)===i;}); var chips=document.getElementById('ed-new-chips'); if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join(''); }
+function removeEditExisting(fname){ editExistingFiles=editExistingFiles.filter(function(f){return f!==fname;}); var chips=document.getElementById('ed-existing-chips'); if(chips) chips.innerHTML=editExistingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removeEditExisting(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join(''); }
+function removeEditNew(fname){ editPendingFiles=editPendingFiles.filter(function(f){return f!==fname;}); var chips=document.getElementById('ed-new-chips'); if(chips) chips.innerHTML=editPendingFiles.map(function(f){return'<span class="file-chip" style="background:var(--accent-light)">📎 '+f+' <span onclick="removeEditNew(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join(''); }
+function closeModal(evt){ if(evt.target.classList.contains('modal-overlay')) closeModalDirect(); }
+function closeModalDirect(){ document.getElementById('modal-root').innerHTML=''; editingId=null; editPendingFiles=[]; editExistingFiles=[]; }
+function saveEdit(){
+  var allFiles=editExistingFiles.concat(editPendingFiles);
+  var data={date:document.getElementById('ed-date').value,time:document.getElementById('ed-time').value,vendor:(document.getElementById('ed-vendor').value||'').trim(),amount:parseFloat(document.getElementById('ed-amount').value)||0,category:document.getElementById('ed-cat').value,pay_method:document.getElementById('ed-pay').value,note:(document.getElementById('ed-note').value||'').trim(),files:allFiles.join('|')};
+  setSyncDot('syncing');
+  sbUpdate('expenses',editingId,data).then(function(){return loadAll();}).then(function(){closeModalDirect();toast('✓ Updated');render();}).catch(function(){setSyncDot('error');toast('Save failed');});
+}
+
+// ── DUPLICATE ──
+function dupeExp(id){
+  var exps=state[biz].expenses, orig=null;
+  for(var i=0;i<exps.length;i++){if(exps[i].id===id){orig=exps[i];break;}} if(!orig) return;
+  var today=new Date().toISOString().split('T')[0];
+  var row={id:genId(),biz:biz,date:today,time:orig.time,vendor:orig.vendor,amount:orig.amount,category:orig.category,pay_method:orig.payMethod,note:(orig.note?orig.note+' (copy)':'(copy)'),files:(orig.files||[]).join('|')};
+  setSyncDot('syncing');
+  sbInsert('expenses',row).then(function(){return loadAll();}).then(function(){toast('✓ Duplicated');render();}).catch(function(){setSyncDot('error');toast('Failed');});
 }
 
 // ── EXPORT ──
-function renderSchedC() {
+function buildExport(){
+  var h='<div class="sec-label">Download CSV for Google Sheets</div><div class="card"><div class="card-body">';
+  h+='<div class="export-grid">'+Object.keys(BIZ).map(function(k){return'<button class="btn-sm" onclick="exportCSV(\''+k+'\')">'+BIZ[k]+'</button>';}).join('')+'</div>';
+  h+='<button class="btn-full" style="margin-top:10px" onclick="exportCSV(\'all\')">↗ Export All Businesses</button></div></div>';
+  h+='<div class="sec-label">Schedule C (Tax)</div><div class="card"><div class="card-body">';
+  h+='<select id="sc-biz" onchange="renderSchedC()" style="width:100%;padding:12px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:16px;background:#fff;-webkit-appearance:none;margin-bottom:12px">';
+  h+=Object.keys(BIZ).map(function(k){return'<option value="'+k+'">'+BIZ[k]+'</option>';}).join('');
+  h+='</select><div id="sc-out"></div><button class="btn-full" style="margin-top:10px" onclick="exportSchC()">↗ Download Schedule C CSV</button></div></div>';
+  return h;
+}
+
+function renderSchedC(){
   var b=(document.getElementById('sc-biz')||{}).value||'rover';
   var exps=state[b].expenses||[], map={};
-  exps.forEach(function(e){var l=SC_MAP[e.category]||'Other expenses (ln 48)';map[l]=(map[l]||0)+(parseFloat(e.amount)||0);});
+  exps.forEach(function(e){
+    if(!e.category||e.category==='') return;
+    var l=SC_MAP[e.category]||'Other expenses (ln 48)';
+    var mult=SC_MULT[e.category]||1;
+    map[l]=(map[l]||0)+(parseFloat(e.amount)||0)*mult;
+  });
   var out=document.getElementById('sc-out'); if(!out) return;
   if(!Object.keys(map).length){out.innerHTML='<p style="font-size:13px;color:var(--text3);padding:8px 0">No expenses yet.</p>';return;}
-  var total=0,h='<div class="card" style="margin:0">';
+  var total=0, h='<div class="card" style="margin:0">';
   Object.keys(map).sort(function(a,b){return map[b]-map[a];}).forEach(function(k){total+=map[k];h+='<div class="schc-row"><span style="color:var(--text2)">'+k+'</span><strong>'+fmt(map[k])+'</strong></div>';});
-  h+='<div class="schc-row" style="background:var(--bg2)"><span>Total deductible</span><strong style="color:var(--red)">'+fmt(total)+'</strong></div></div>';
+  h+='<div class="schc-row" style="background:var(--bg2)"><span>Total deductible</span><strong style="color:var(--red)">'+fmt(total)+'</strong></div>';
+  h+='<div style="padding:10px 14px;font-size:11px;color:var(--text3)">* Business Meals at 50%, Phone Bill at 15%, iPad at 25% per IRS rules</div></div>';
   out.innerHTML=h;
 }
 
-function exportCSV(b) {
-  var rows=[['Business','Date','Time','Vendor','Amount','Category','Payment Method','Note','Receipts']];
-  var keys=b==='all'?['rover','wyzant','itt','eve']:[b];
+function exportCSV(b){
+  var rows=[['Business','Date','Time','Vendor','Amount','Category','Payment Method','Note','Receipts','Schedule C Line']];
+  var keys=b==='all'?Object.keys(BIZ):[b];
   keys.forEach(function(k){
-    (state[k].expenses||[]).forEach(function(e){rows.push([BIZ[k],e.date,e.time,e.vendor,e.amount,e.category,e.payMethod,e.note,(e.files||[]).join('; ')]);});
-    if(TICKET_BIZ.indexOf(k)>=0&&(state[k].events||[]).length){
-      rows.push([]);
-      rows.push([BIZ[k]+' Events','Date','Name','Singles','Couples','Attendance','Op Costs','Revenue']);
-      var tp=state[k].ticketPrices;
-      state[k].events.slice().sort(function(a,c){return new Date(a.date)-new Date(c.date);}).forEach(function(ev){
-        var rev=(parseInt(ev.singleSold)||0)*parseFloat(tp.single)+(parseInt(ev.coupleSold)||0)*parseFloat(tp.couple);
-        rows.push([BIZ[k],ev.date,ev.name,ev.singleSold,ev.coupleSold,(parseInt(ev.singleSold)||0)+(parseInt(ev.coupleSold)||0)*2,ev.opCost,rev.toFixed(2)]);
-      });
-    }
+    (state[k].expenses||[]).forEach(function(e){
+      var line=SC_MAP[e.category]||'';
+      rows.push([BIZ[k],e.date,e.time,e.vendor,e.amount,e.category,e.payMethod,e.note,(e.files||[]).join('; '),line]);
+    });
+    if(k==='ownit'&&state.ownit.sales.length){ rows.push([]); rows.push(['OwnIt Sales','Date','Client','App','Quote','Type']); state.ownit.sales.forEach(function(s){rows.push(['OwnIt',s.date,s.clientName,s.appName,s.quote,s.saleType]);}); }
   });
   dl(rows,(b==='all'?'all_businesses':BIZ[b])+'_expenses.csv');
 }
-
-function exportSchC() {
+function exportSchC(){
   var b=(document.getElementById('sc-biz')||{}).value||'rover';
-  var exps=state[b].expenses||[], map={};
-  exps.forEach(function(e){var l=SC_MAP[e.category]||'Other expenses (ln 48)';map[l]=(map[l]||0)+(parseFloat(e.amount)||0);});
-  var rows=[['IRS Schedule C — '+BIZ[b]],['Line item','Amount']], total=0;
+  var exps=state[b].expenses||[], map={}, total=0;
+  exps.forEach(function(e){ if(!e.category) return; var l=SC_MAP[e.category]||'Other expenses (ln 48)'; var mult=SC_MULT[e.category]||1; map[l]=(map[l]||0)+(parseFloat(e.amount)||0)*mult; });
+  var rows=[['IRS Schedule C — '+BIZ[b]],['Line item','Deductible amount']];
   Object.keys(map).sort(function(a,b){return map[b]-map[a];}).forEach(function(k){total+=map[k];rows.push([k,map[k].toFixed(2)]);});
   rows.push(['Total deductible',total.toFixed(2)]);
   dl(rows,BIZ[b]+'_schedule_c.csv');
 }
+function dl(rows,name){ var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n'); var a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a); toast('↗ Downloaded'); }
 
-function dl(rows,name) {
-  var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-  a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  toast('↗ Downloaded');
+// ── AUTO-LOG REPEATS ──
+function autoLogDueRepeats(){
+  var today=new Date().toISOString().split('T')[0];
+  var due=state.repeats.filter(function(r){return r.nextDate<=today;});
+  if(!due.length) return Promise.resolve();
+  var ops=[];
+  due.forEach(function(r){
+    // Log the expense on its due date
+    var expRow={id:genId(),biz:r.biz,date:r.nextDate,time:'',vendor:r.vendor,amount:r.amount,category:r.category,pay_method:r.payMethod,note:(r.note||'')+(r.note?' (auto)':'auto'),files:''};
+    var nextDate=calcNextDate(r.nextDate,r.freq);
+    ops.push(sbInsert('expenses',expRow));
+    ops.push(sbUpdate('repeat_expenses',r.id,{next_date:nextDate}));
+  });
+  return Promise.all(ops).then(function(){ return loadAll(); }).then(function(){
+    if(due.length) toast('🔁 '+due.length+' repeat expense'+(due.length>1?'s':'')+' auto-logged');
+  }).catch(function(e){ console.error('Auto-log failed',e); });
 }
 
 // ── INIT ──
-loadAll().then(function() {
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  render();
-}).catch(function() {
-  document.getElementById('loading').querySelector('.load-sub').textContent = 'Could not connect. Check your internet.';
-});
+loadAll().then(function(){
+  document.getElementById('loading').style.display='none';
+  document.getElementById('app').style.display='flex';
+  autoLogDueRepeats().then(function(){ render(); });
+}).catch(function(){ document.getElementById('loading').querySelector('.load-sub').textContent='Could not connect. Check your internet.'; });
 </script>
 </body>
 </html>
