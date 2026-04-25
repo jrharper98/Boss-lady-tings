@@ -789,14 +789,14 @@ function viewFile(nameOrEncoded, urlParam){
     if(isPdf){
       h += '<div style="text-align:center;padding:20px 0"><div style="font-size:48px;margin-bottom:12px">📄</div>';
       h += '<p style="font-size:13px;color:var(--text2);margin-bottom:16px">Tap to open your receipt PDF.</p>';
-      h += '<button class="btn-full" onclick="window.open(''+fileUrl+'','_blank')">Open PDF</button></div>';
+      h += '<button class="btn-full" onclick="openReceipt()">Open PDF</button></div>';
     } else if(isImage){
-      h += '<img src="'+fileUrl+'" style="width:100%;border-radius:10px;max-height:62vh;object-fit:contain;background:var(--bg2)" onerror="this.style.display='none';document.getElementById('img-err').style.display='block'">';
+      h += '<img src="'+fileUrl+'" style="width:100%;border-radius:10px;max-height:62vh;object-fit:contain;background:var(--bg2)" onerror="this.style.display=\'none\';document.getElementById(\'img-err\').style.display=\'block\'" >';
       h += '<div id="img-err" style="display:none;text-align:center;padding:16px;font-size:13px;color:var(--red)">Could not load — <a href="'+fileUrl+'" target="_blank" style="color:var(--income)">open directly</a></div>';
-      h += '<button class="btn-full" style="margin-top:10px" onclick="window.open(''+fileUrl+'','_blank')">↗ Open full size</button>';
+      h += '<button class="btn-full" style="margin-top:10px" onclick="openReceipt()">↗ Open full size</button>';
     } else {
       h += '<div style="text-align:center;padding:20px 0"><div style="font-size:48px;margin-bottom:12px">📎</div>';
-      h += '<button class="btn-full" onclick="window.open(''+fileUrl+'','_blank')">Open file</button></div>';
+      h += '<button class="btn-full" onclick="openReceipt()">Open file</button></div>';
     }
   } else {
     h += '<div style="text-align:center;padding:24px 0"><div style="font-size:40px;margin-bottom:12px">📎</div>';
@@ -805,6 +805,7 @@ function viewFile(nameOrEncoded, urlParam){
   }
   h += '<button class="btn-full" style="background:var(--bg2);color:var(--text2);margin-top:8px" onclick="closeModalDirect()">Close</button>';
   h += '</div></div>';
+  window._receiptUrl = fileUrl || null;
   document.getElementById('modal-root').innerHTML = h;
 }
 
@@ -946,6 +947,7 @@ function rmNew(idx){
   editPendingFiles.splice(idx,1); editNewFileObjects.splice(idx,1);
   renderNewChips();
 }
+function openReceipt(){ if(window._receiptUrl) window.open(window._receiptUrl,'_blank'); }
 function closeModal(evt){ if(evt.target.classList.contains('modal-overlay')) closeModalDirect(); }
 function closeModalDirect(){ document.getElementById('modal-root').innerHTML=''; editingId=null; editPendingFiles=[]; editExistingFiles=[]; editNewFileObjects=[]; }
 function saveEdit(){
