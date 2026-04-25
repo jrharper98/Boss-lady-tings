@@ -895,11 +895,25 @@ function autoLogDueRepeats(){
 }
 
 // ── INIT ──
-loadAll().then(function(){
+function showApp() {
   document.getElementById('loading').style.display='none';
   document.getElementById('app').style.display='flex';
-  autoLogDueRepeats().then(function(){ render(); });
-}).catch(function(){ document.getElementById('loading').querySelector('.load-sub').textContent='Could not connect. Check your internet.'; });
+  render();
+}
+
+var initTimeout = setTimeout(function() {
+  console.warn('Load timeout — showing app with available data');
+  showApp();
+}, 8000);
+
+loadAll().then(function(){
+  clearTimeout(initTimeout);
+  showApp();
+  autoLogDueRepeats().catch(function(e){ console.error('Auto-log failed', e); });
+}).catch(function(){
+  clearTimeout(initTimeout);
+  document.getElementById('loading').querySelector('.load-sub').textContent='Could not connect. Check your internet.';
+});
 </script>
 </body>
 </html>
