@@ -220,6 +220,7 @@ var SC_MAP = {
   'Decor':'Supplies (ln 22)',
   'Phone Bill':'Office expense — 15% (ln 18)',
   'iPad':'Depreciation/equipment — 25% (ln 13)',
+  'Internet':'Utilities — 40% deductible (ln 25)',
   'Other':'Other expenses (ln 48)'
 };
 // Special Schedule C multipliers
@@ -372,7 +373,7 @@ function switchBiz(b2){
 }
 function switchView(v){
   curView=v;
-  if(v==='add') addSubView='chooser';
+  if(v==='add'){ addSubView='chooser'; _addFormInitialized=false; pendingFiles=[]; pendingFileObjects=[]; }
   ['earnings','add','overview','docs','export'].forEach(function(x){ var el=document.getElementById('nav-'+x); if(el) el.classList.toggle('active',x===v); });
   if(v==='overview'||v==='earnings'){
     setSyncDot('syncing');
@@ -615,7 +616,7 @@ function buildAdd(){
   return '';
 }
 
-function goBackToChooser(){ addSubView='chooser'; render(); }
+function goBackToChooser(){ addSubView='chooser'; _addFormInitialized=false; pendingFiles=[]; pendingFileObjects=[]; render(); }
 function setAddSubView(v){ addSubView=v; render(); }
 function toggleUnassigned(el){ el.classList.toggle('unassigned', el.value===''); }
 function triggerFileInput(){ var f=document.getElementById('a-file'); if(f) f.click(); }
@@ -697,20 +698,30 @@ function updateEventPreviewEVE(){
   prev.innerHTML='<div class="preview"><div class="preview-row"><span style="color:var(--text3)">Attendance</span><strong>'+qty+' people</strong></div><div class="preview-row"><span style="color:var(--text3)">Revenue</span><strong style="color:var(--income)">'+fmt(rev)+'</strong></div></div>';
 }
 
+var _addFormInitialized = false; // track if form was just freshly opened
+
 function initAddDefaults(){
   var today=new Date().toISOString().split('T')[0];
   var now=new Date();
   var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  var d=document.getElementById('a-date'); if(d) d.value=today;
-  var ti=document.getElementById('a-time'); if(ti) ti.value=t;
-  var ed=document.getElementById('ev-date'); if(ed) ed.value=today;
-  var sd=document.getElementById('sale-date'); if(sd) sd.value=today;
-  pendingFiles=[]; pendingFileObjects=[];
-  var chips=document.getElementById('file-chips'); if(chips) chips.innerHTML='';
-  // Init ITT ticket rows
-  if(biz==='itt' && addSubView==='income'){
-    ittTicketRows=[{ticket:'',qty:0}];
-    setTimeout(function(){ renderITTTicketRows(); }, 50);
+  var d=document.getElementById('a-date'); if(d&&!d.value) d.value=today;
+  var ti=document.getElementById('a-time'); if(ti&&!ti.value) ti.value=t;
+  var ed=document.getElementById('ev-date'); if(ed&&!ed.value) ed.value=today;
+  var sd=document.getElementById('sale-date'); if(sd&&!sd.value) sd.value=today;
+  // Only reset files when freshly opening the expense form (not on re-render)
+  if(_addFormInitialized===false){
+    pendingFiles=[]; pendingFileObjects=[];
+    var chips=document.getElementById('file-chips'); if(chips) chips.innerHTML='';
+    _addFormInitialized=true;
+  } else {
+    // Re-render chips to show currently pending files
+    var chips=document.getElementById('file-chips');
+    if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span data-fn="'+f+'" onclick="removePFByData(this)" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
+  }
+  // Init ITT ticket rows if on event view
+  if(biz==='itt'&&addSubView==='event'&&ittTicketRows.length===0){
+    ittTicketRows=[{type:'',qty:0}];
+    setTimeout(function(){renderTicketRows();},50);
   }
 }
 
@@ -718,9 +729,15 @@ function handleFiles(input){
   var names=Array.prototype.map.call(input.files,function(f){return f.name;});
   pendingFiles=pendingFiles.concat(names).filter(function(v,i,a){return a.indexOf(v)===i;});
   var chips=document.getElementById('file-chips');
-  if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removePF(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join('');
+  if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span data-fn="'+f+'" onclick="removePFByData(this)" style="color:var(--red)">×</span></span>';}).join('');
 }
-function removePF(n){ pendingFiles=pendingFiles.filter(function(f){return f!==n;}); var chips=document.getElementById('file-chips'); if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span onclick="removePF(\''+f+'\')" style="color:var(--red)">×</span></span>';}).join(''); }
+function removePFByData(el){ removePF(el.getAttribute('data-fn')); }
+function removePF(n){
+  var idx=pendingFiles.indexOf(n);
+  if(idx>=0){ pendingFiles.splice(idx,1); if(pendingFileObjects[idx]) pendingFileObjects.splice(idx,1); }
+  var chips=document.getElementById('file-chips');
+  if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span data-fn="'+f+'" onclick="removePFByData(this)" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
+}
 
 function addExp(){
   var vendor=(document.getElementById('a-vendor').value||'').trim();
@@ -1250,7 +1267,7 @@ function renderSchedC(){
   var total=0, h='<div class="card" style="margin:0">';
   Object.keys(map).sort(function(a,b){return map[b]-map[a];}).forEach(function(k){total+=map[k];h+='<div class="schc-row"><span style="color:var(--text2)">'+k+'</span><strong>'+fmt(map[k])+'</strong></div>';});
   h+='<div class="schc-row" style="background:var(--bg2)"><span>Total deductible</span><strong style="color:var(--red)">'+fmt(total)+'</strong></div>';
-  h+='<div style="padding:10px 14px;font-size:11px;color:var(--text3)">* Business Meals at 50%, Phone Bill at 15%, iPad at 25% per IRS rules</div></div>';
+  h+='<div style="padding:10px 14px;font-size:11px;color:var(--text3)">* Business Meals at 50% · Phone Bill at 15% · iPad at 25% · Internet at 40% per IRS rules</div></div>';
   out.innerHTML=h;
 }
 
