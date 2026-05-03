@@ -726,10 +726,14 @@ function initAddDefaults(){
 }
 
 function handleFiles(input){
-  var names=Array.prototype.map.call(input.files,function(f){return f.name;});
-  pendingFiles=pendingFiles.concat(names).filter(function(v,i,a){return a.indexOf(v)===i;});
+  Array.prototype.forEach.call(input.files, function(f){
+    if(pendingFiles.indexOf(f.name)<0){
+      pendingFiles.push(f.name);
+      pendingFileObjects.push(f);
+    }
+  });
   var chips=document.getElementById('file-chips');
-  if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span data-fn="'+f+'" onclick="removePFByData(this)" style="color:var(--red)">×</span></span>';}).join('');
+  if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span data-fn="'+f+'" onclick="removePFByData(this)" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
 }
 function removePFByData(el){ removePF(el.getAttribute('data-fn')); }
 function removePF(n){
@@ -1070,7 +1074,8 @@ function uploadDocs(input){
   var files=Array.prototype.slice.call(input.files);
   var today=new Date().toLocaleDateString();
   var year=(document.getElementById('doc-year').value||new Date().getFullYear())+'';
-  var docBiz=(document.getElementById('doc-biz')||{}).value||BIZ[biz]||'';
+  var docBizEl=document.getElementById('doc-biz');
+  var docBiz=(docBizEl&&docBizEl.value)?docBizEl.value:(BIZ[biz]||'');
   var docType=(document.getElementById('doc-type')||{}).value||'';
   setSyncDot('syncing');
   var uploads=files.map(function(f){
@@ -1081,7 +1086,7 @@ function uploadDocs(input){
       headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':f.type||'application/octet-stream','x-upsert':'true'},
       body:f
     }).then(function(r){
-      var url=r.ok?SB_URL+'/storage/v1/object/public/receipts/'+path:'';
+      var url=r.ok?(SB_URL+'/storage/v1/object/public/receipts/'+path):'';
       return {id:genId(),name:f.name,biz:docBiz,uploaded:today,year:year,form_type:docType,file_url:url};
     }).catch(function(){
       return {id:genId(),name:f.name,biz:docBiz,uploaded:today,year:year,form_type:docType,file_url:''};
