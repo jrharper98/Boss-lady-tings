@@ -1046,8 +1046,8 @@ function buildDocs(){
         h+='<div class="doc-info"><div class="doc-name">'+d.name+'</div>';
         h+='<div class="doc-meta">'+d.biz+(d.formType?' · '+d.formType:'')+(d.uploaded?' · '+d.uploaded:'')+'</div></div>';
         h+='<div style="display:flex;gap:6px;flex-shrink:0">';
-        h+='<button class="btn-view" style="font-size:11px" data-docview="'+d.id+'">View</button>';
-        h+='<button class="btn-del" style="font-size:11px" data-del="'+d.id+'">Del</button>';
+        h+='<button class="btn-view" style="font-size:11px" onclick="showDocById(\''+d.id+'\')">View</button>';
+        h+='<button class="btn-del" style="font-size:11px" onclick="deleteDoc(\''+d.id+'\')">Del</button>';
         h+='</div></div>';
       });
       h+='</div>';
@@ -1167,6 +1167,12 @@ function uploadDocs(input){
   }).then(function(){return loadAll();}).then(function(){toast('✓ '+files.length+' form(s) uploaded');render();}).catch(function(){setSyncDot('error');toast('Upload failed');});
 }
 function deleteDoc(id){ if(!confirm('Remove?')) return; setSyncDot('syncing'); sbDelete('docs',id).then(function(){return loadAll();}).then(function(){toast('Removed');render();}); }
+function showDocById(id){
+  var doc=null;
+  for(var i=0;i<state.docs.length;i++){if(state.docs[i].id===id){doc=state.docs[i];break;}}
+  if(!doc){ toast('Document not found'); return; }
+  showDocPreview(doc);
+}
 function deleteDocById(id){ deleteDoc(id); }
 
 // ── INCOME ──
