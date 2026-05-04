@@ -1041,14 +1041,13 @@ function buildDocs(){
     sortedYears.forEach(function(y){
       h+='<div class="sec-label">'+y+'</div><div class="card">';
       byYear[y].forEach(function(d){
-        var regIdx = _docRegistry.indexOf(d);
         var icon=d.name&&d.name.toLowerCase().indexOf('.pdf')>=0?'📄':'🖼️';
         h+='<div class="doc-row"><span class="doc-icon">'+icon+'</span>';
         h+='<div class="doc-info"><div class="doc-name">'+d.name+'</div>';
         h+='<div class="doc-meta">'+d.biz+(d.formType?' · '+d.formType:'')+(d.uploaded?' · '+d.uploaded:'')+'</div></div>';
         h+='<div style="display:flex;gap:6px;flex-shrink:0">';
-        h+='<button class="btn-view" style="font-size:11px" id="view-'+regIdx+'">View</button>';
-        h+='<button class="btn-del" style="font-size:11px" id="del-'+regIdx+'">Del</button>';
+        h+='<button class="btn-view" style="font-size:11px" data-idx="'+_docRegistry.indexOf(d)+'">View</button>';
+        h+='<button class="btn-del" style="font-size:11px" data-del="'+d.id+'">Del</button>';
         h+='</div></div>';
       });
       h+='</div>';
@@ -1369,6 +1368,27 @@ function exportSchC(){
   dl(rows,BIZ[b]+'_schedule_c.csv');
 }
 function dl(rows,name){ var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n'); var a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a); toast('↗ Downloaded'); }
+
+// ── GLOBAL DOC BUTTON HANDLER ──
+document.addEventListener('click', function(evt){
+  var t = evt.target;
+  // Delete doc button
+  if(t.tagName==='BUTTON' && t.getAttribute('data-del')){
+    var id = t.getAttribute('data-del');
+    if(confirm('Remove this document?')){
+      setSyncDot('syncing');
+      sbDelete('docs', id).then(function(){return loadAll();}).then(function(){toast('Removed');render();});
+    }
+    return;
+  }
+  // View doc button
+  if(t.tagName==='BUTTON' && t.getAttribute('data-idx') && t.classList.contains('btn-view')){
+    var idx = parseInt(t.getAttribute('data-idx'));
+    var doc = _docRegistry[idx];
+    if(doc) showDocPreview(doc);
+    return;
+  }
+});
 
 // ── GLOBAL FILE CHIP HANDLER ──
 document.addEventListener('click', function(evt) {
