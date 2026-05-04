@@ -991,8 +991,12 @@ function viewFile(nameOrEncoded, urlParam){
 }
 
 // ── 1099 DOCS ──
+var _docRegistry = []; // global doc registry for button handlers
+
 function buildDocs(){
   var docs=state.docs||[];
+  _docRegistry = docs.slice(); // store docs globally for button access
+
   var years=[], bizList=[], formTypes=[];
   docs.forEach(function(d){
     if(d.year&&years.indexOf(d.year)<0) years.push(d.year);
@@ -1030,19 +1034,22 @@ function buildDocs(){
   h+='<div class="fg"><select class="period-select" style="width:100%" onchange="window._docFilterType=this.value;render()"><option value="">All types</option>'+formTypes.map(function(t){return'<option value="'+t+'"'+(filterType===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select></div>';
   h+='</div></div>';
 
-  // Doc list
+  // Doc list - use registry index for buttons
   if(!filtered.length){
     h+='<div class="card"><div class="empty">No forms match your filters.</div></div>';
   } else {
     sortedYears.forEach(function(y){
       h+='<div class="sec-label">'+y+'</div><div class="card">';
       byYear[y].forEach(function(d){
+        var regIdx = _docRegistry.indexOf(d);
         var icon=d.name&&d.name.toLowerCase().indexOf('.pdf')>=0?'📄':'🖼️';
         h+='<div class="doc-row"><span class="doc-icon">'+icon+'</span>';
         h+='<div class="doc-info"><div class="doc-name">'+d.name+'</div>';
         h+='<div class="doc-meta">'+d.biz+(d.formType?' · '+d.formType:'')+(d.uploaded?' · '+d.uploaded:'')+'</div></div>';
-        h+='<button class="btn-view" style="margin-right:6px" data-id="'+d.id+'" onclick="window.docAction(this)">View</button>';
-        h+='<button class="btn-del" data-id="'+d.id+'" data-del="1" onclick="window.docAction(this)">Del</button></div>';
+        h+='<div style="display:flex;gap:6px;flex-shrink:0">';
+        h+='<button class="btn-view" style="font-size:11px" id="view-'+regIdx+'">View</button>';
+        h+='<button class="btn-del" style="font-size:11px" id="del-'+regIdx+'">Del</button>';
+        h+='</div></div>';
       });
       h+='</div>';
     });
@@ -1058,6 +1065,63 @@ function buildDocs(){
   h+='</div></div>';
   return h;
 }
+
+// Attach doc button listeners after render
+function attachDocListeners(){
+  for(var i=0;i<_docRegistry.length;i++){
+    (function(idx){
+      var doc = _docRegistry[idx];
+      var vBtn = document.getElementById('view-'+idx);
+      var dBtn = document.getElementById('del-'+idx);
+      if(vBtn) vBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        showDocPreview(doc);
+      });
+      if(dBtn) dBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        if(confirm('Remove this document?')){
+          setSyncDot('syncing');
+          sbDelete('docs', doc.id).then(function(){return loadAll();}).then(function(){toast('Removed');render();});
+        }
+      });
+    })(i);
+  }
+}
+
+function showDocPreview(doc){
+  if(!doc){ toast('Document not found'); return; }
+  var name = doc.name||'';
+  var fileUrl = doc.fileUrl||'';
+  var ext = name.toLowerCase().split('.').pop().trim();
+  var isImage = ['jpg','jpeg','png','gif','webp','heic'].indexOf(ext)>=0;
+  var h='<div class="modal-overlay" onclick="closeModalDirect()"><div class="modal" onclick="event.stopPropagation()">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+  h+='<span class="modal-title" style="font-size:14px;word-break:break-all;max-width:85%">'+name+'</span>';
+  h+='<span onclick="closeModalDirect()" style="font-size:24px;cursor:pointer;color:var(--text3)">✕</span></div>';
+  if(fileUrl){
+    if(ext==='pdf'){
+      h+='<div style="text-align:center;padding:20px 0"><div style="font-size:48px;margin-bottom:12px">📄</div>';
+      h+='<p style="font-size:13px;color:var(--text2);margin-bottom:16px">Tap to open your tax form PDF.</p></div>';
+      window._previewUrl = fileUrl;
+      h+='<button class="btn-full" onclick="openReceipt()">Open PDF</button>';
+    } else if(isImage){
+      h+='<img src="'+fileUrl+'" style="width:100%;border-radius:10px;max-height:62vh;object-fit:contain;background:var(--bg2)">';
+      window._previewUrl = fileUrl;
+      h+='<button class="btn-full" style="margin-top:10px" onclick="openReceipt()">↗ Open full size</button>';
+    } else {
+      window._previewUrl = fileUrl;
+      h+='<div style="text-align:center;padding:20px 0"><button class="btn-full" onclick="openReceipt()">Open file</button></div>';
+    }
+  } else {
+    h+='<div style="text-align:center;padding:24px 0"><div style="font-size:40px;margin-bottom:12px">📎</div>';
+    h+='<p style="font-size:13px;color:var(--text2);margin-bottom:8px">This form was uploaded before cloud storage was enabled.</p>';
+    h+='<p style="font-size:12px;color:var(--text3)">Delete and re-upload to enable preview.</p></div>';
+  }
+  h+='<button class="btn-full" style="background:var(--bg2);color:var(--text2);margin-top:8px" onclick="closeModalDirect()">Close</button>';
+  h+='</div></div>';
+  document.getElementById('modal-root').innerHTML=h;
+}
+
 
 function viewTaxDoc(encoded){
   var info; try { info=JSON.parse(decodeURIComponent(encoded)); } catch(e){ info={name:encoded,url:null}; }
