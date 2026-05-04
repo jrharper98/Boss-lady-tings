@@ -1041,8 +1041,8 @@ function buildDocs(){
         h+='<div class="doc-row"><span class="doc-icon">'+icon+'</span>';
         h+='<div class="doc-info"><div class="doc-name">'+d.name+'</div>';
         h+='<div class="doc-meta">'+d.biz+(d.formType?' · '+d.formType:'')+(d.uploaded?' · '+d.uploaded:'')+'</div></div>';
-        h+='<button class="btn-view view-doc-btn" style="margin-right:6px" data-docid="'+d.id+'">View</button>';
-        h+='<button class="btn-del del-doc-btn" data-docid="'+d.id+'">Del</button></div>';
+        h+='<button class="btn-view" style="margin-right:6px" data-id="'+d.id+'" onclick="window.docAction(this)">View</button>';
+        h+='<button class="btn-del" data-id="'+d.id+'" data-del="1" onclick="window.docAction(this)">Del</button></div>';
       });
       h+='</div>';
     });
