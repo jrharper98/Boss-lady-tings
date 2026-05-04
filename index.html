@@ -314,7 +314,7 @@ function loadAll() {
     safe(sbGet('expenses','order=date.desc')),
     safe(sbGet('events','order=date.desc')),
     safe(sbGet('ticket_prices','')),
-    safe(sbGet('docs','order=uploaded.desc&select=id,name,biz,uploaded,year,form_type,file_url')),
+    safe(sbGet('docs','order=uploaded.desc')),
     safe(sbGet('income_records','')),
     safe(sbGet('repeat_expenses','order=next_date.asc')),
     safe(sbGet('ownit_sales','order=date.desc'))
@@ -1041,11 +1041,8 @@ function buildDocs(){
         h+='<div class="doc-row"><span class="doc-icon">'+icon+'</span>';
         h+='<div class="doc-info"><div class="doc-name">'+d.name+'</div>';
         h+='<div class="doc-meta">'+d.biz+(d.formType?' · '+d.formType:'')+(d.uploaded?' · '+d.uploaded:'')+'</div></div>';
-        // Preview button if URL exists
-        if(d.fileUrl){
-          h+='<button class="btn-view" style="margin-right:6px" data-docid="'+d.id+'" onclick="viewDocById(this.dataset.docid)">View</button>';
-        }
-        h+='<button class="btn-del" data-docid="'+d.id+'" onclick="deleteDocById(this.dataset.docid)">Del</button></div>';
+        h+='<button class="btn-view view-doc-btn" style="margin-right:6px" data-docid="'+d.id+'">View</button>';
+        h+='<button class="btn-del del-doc-btn" data-docid="'+d.id+'">Del</button></div>';
       });
       h+='</div>';
     });
@@ -1372,4 +1369,3 @@ loadAll().then(function(){
 </script>
 </body>
 </html>
-
