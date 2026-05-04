@@ -1100,16 +1100,16 @@ function showDocPreview(doc){
   if(fileUrl){
     if(ext==='pdf'){
       h+='<div style="text-align:center;padding:20px 0"><div style="font-size:48px;margin-bottom:12px">📄</div>';
-      h+='<p style="font-size:13px;color:var(--text2);margin-bottom:16px">Tap to open your tax form PDF.</p></div>';
-      window._previewUrl = fileUrl;
-      h+='<button class="btn-full" onclick="openReceipt()">Open PDF</button>';
+      h+='<p style="font-size:13px;color:var(--text2);margin-bottom:16px">Tap to open your tax form PDF.</p>';
+      h+='<a href="'+fileUrl+'" target="_blank" style="display:block;width:100%;padding:15px;background:var(--olive);color:var(--sage);border-radius:var(--r-sm);font-size:16px;font-weight:700;text-align:center;text-decoration:none">Open PDF</a>';
+      h+='</div>';
     } else if(isImage){
       h+='<img src="'+fileUrl+'" style="width:100%;border-radius:10px;max-height:62vh;object-fit:contain;background:var(--bg2)">';
-      window._previewUrl = fileUrl;
-      h+='<button class="btn-full" style="margin-top:10px" onclick="openReceipt()">↗ Open full size</button>';
+      h+='<a href="'+fileUrl+'" target="_blank" style="display:block;width:100%;padding:15px;background:var(--olive);color:var(--sage);border-radius:var(--r-sm);font-size:16px;font-weight:700;text-align:center;text-decoration:none;margin-top:10px">↗ Open full size</a>';
     } else {
-      window._previewUrl = fileUrl;
-      h+='<div style="text-align:center;padding:20px 0"><button class="btn-full" onclick="openReceipt()">Open file</button></div>';
+      h+='<div style="text-align:center;padding:20px 0">';
+      h+='<a href="'+fileUrl+'" target="_blank" style="display:block;width:100%;padding:15px;background:var(--olive);color:var(--sage);border-radius:var(--r-sm);font-size:16px;font-weight:700;text-align:center;text-decoration:none">Open file</a>';
+      h+='</div>';
     }
   } else {
     h+='<div style="text-align:center;padding:24px 0"><div style="font-size:40px;margin-bottom:12px">📎</div>';
