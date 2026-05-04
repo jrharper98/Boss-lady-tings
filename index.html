@@ -290,11 +290,17 @@ function sbUploadFile(file, path) {
 
 // Upload multiple files, returns array of {name, url}
 function uploadFiles(files, expenseId) {
+  console.log('uploadFiles called with', files.length, 'files for expense', expenseId);
   var uploads = Array.prototype.map.call(files, function(file) {
     var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     var path = expenseId + '/' + safeName;
+    console.log('Uploading file:', file.name, 'to path:', path);
     return sbUploadFile(file, path).then(function(url) {
+      console.log('Upload success, url:', url);
       return { name: file.name, url: url };
+    }).catch(function(e){
+      console.error('Upload failed for', file.name, e);
+      return { name: file.name, url: null };
     });
   });
   return Promise.all(uploads);
@@ -616,7 +622,7 @@ function buildAdd(){
   return '';
 }
 
-function goBackToChooser(){ addSubView='chooser'; _addFormInitialized=false; pendingFiles=[]; pendingFileObjects=[]; render(); }
+function goBackToChooser(){ addSubView='chooser'; _addFormInitialized=false; pendingFiles=[]; pendingFileObjects=[]; window._pendingFileInput=[]; render(); }
 function setAddSubView(v){ addSubView=v; render(); }
 function toggleUnassigned(el){ el.classList.toggle('unassigned', el.value===''); }
 function triggerFileInput(){ var f=document.getElementById('a-file'); if(f) f.click(); }
@@ -710,7 +716,7 @@ function initAddDefaults(){
   var sd=document.getElementById('sale-date'); if(sd&&!sd.value) sd.value=today;
   // Only reset files when freshly opening the expense form (not on re-render)
   if(_addFormInitialized===false){
-    pendingFiles=[]; pendingFileObjects=[];
+    pendingFiles=[]; pendingFileObjects=[]; window._pendingFileInput=[];
     var chips=document.getElementById('file-chips'); if(chips) chips.innerHTML='';
     _addFormInitialized=true;
   } else {
@@ -726,10 +732,12 @@ function initAddDefaults(){
 }
 
 function handleFiles(input){
+  // Store the FileList on the input element itself - survives without re-renders wiping it
+  if(!window._pendingFileInput) window._pendingFileInput = [];
   Array.prototype.forEach.call(input.files, function(f){
     if(pendingFiles.indexOf(f.name)<0){
       pendingFiles.push(f.name);
-      pendingFileObjects.push(f);
+      window._pendingFileInput.push(f);
     }
   });
   var chips=document.getElementById('file-chips');
@@ -738,7 +746,11 @@ function handleFiles(input){
 function removePFByData(el){ removePF(el.getAttribute('data-fn')); }
 function removePF(n){
   var idx=pendingFiles.indexOf(n);
-  if(idx>=0){ pendingFiles.splice(idx,1); if(pendingFileObjects[idx]) pendingFileObjects.splice(idx,1); }
+  if(idx>=0){
+    pendingFiles.splice(idx,1);
+    if(pendingFileObjects && pendingFileObjects[idx]) pendingFileObjects.splice(idx,1);
+    if(window._pendingFileInput && window._pendingFileInput[idx]) window._pendingFileInput.splice(idx,1);
+  }
   var chips=document.getElementById('file-chips');
   if(chips) chips.innerHTML=pendingFiles.map(function(f){return'<span class="file-chip">📎 '+f+' <span data-fn="'+f+'" onclick="removePFByData(this)" style="cursor:pointer;color:var(--red)">×</span></span>';}).join('');
 }
@@ -758,15 +770,13 @@ function addExp(){
   var newId = genId();
   setSyncDot('syncing');
 
-  // Upload files first if any, then save expense
-  var fileUploadPromise;
-  try {
-    fileUploadPromise = (pendingFileObjects && pendingFileObjects.length > 0)
-      ? uploadFiles(pendingFileObjects, newId)
-      : Promise.resolve([]);
-  } catch(e) {
-    fileUploadPromise = Promise.resolve([]);
-  }
+  // Use _pendingFileInput which survives renders
+  var filesToUpload = window._pendingFileInput || [];
+  console.log('addExp: files to upload =', filesToUpload.length, pendingFiles);
+
+  var fileUploadPromise = filesToUpload.length > 0
+    ? uploadFiles(filesToUpload, newId)
+    : Promise.resolve([]);
 
   fileUploadPromise.then(function(uploadedFiles) {
     var filesJson = JSON.stringify(uploadedFiles || []);
@@ -779,8 +789,8 @@ function addExp(){
     return Promise.all(ops);
   }).then(function(){return loadAll();}).then(function(){
     toast(isRepeat?'✓ Expense added & repeat scheduled':'✓ Expense added');
-    pendingFiles=[]; pendingFileObjects=[];
-    addSubView='chooser'; render();
+    pendingFiles=[]; pendingFileObjects=[]; window._pendingFileInput=[];
+    addSubView='chooser'; _addFormInitialized=false; render();
   }).catch(function(e){setSyncDot('error');console.error('addExp error:',e);toast('Error: '+(e.message||'unknown'));});
 }
 
