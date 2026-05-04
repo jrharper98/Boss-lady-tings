@@ -1046,7 +1046,7 @@ function buildDocs(){
         h+='<div class="doc-info"><div class="doc-name">'+d.name+'</div>';
         h+='<div class="doc-meta">'+d.biz+(d.formType?' · '+d.formType:'')+(d.uploaded?' · '+d.uploaded:'')+'</div></div>';
         h+='<div style="display:flex;gap:6px;flex-shrink:0">';
-        h+='<button class="btn-view" style="font-size:11px" data-idx="'+_docRegistry.indexOf(d)+'">View</button>';
+        h+='<button class="btn-view" style="font-size:11px" data-docview="'+d.id+'">View</button>';
         h+='<button class="btn-del" style="font-size:11px" data-del="'+d.id+'">Del</button>';
         h+='</div></div>';
       });
@@ -1382,10 +1382,14 @@ document.addEventListener('click', function(evt){
     return;
   }
   // View doc button
-  if(t.tagName==='BUTTON' && t.getAttribute('data-idx') && t.classList.contains('btn-view')){
-    var idx = parseInt(t.getAttribute('data-idx'));
-    var doc = _docRegistry[idx];
+  if(t.tagName==='BUTTON' && t.getAttribute('data-docview')){
+    var docId = t.getAttribute('data-docview');
+    var doc = null;
+    for(var i=0;i<_docRegistry.length;i++){
+      if(_docRegistry[i].id===docId){ doc=_docRegistry[i]; break; }
+    }
     if(doc) showDocPreview(doc);
+    else toast('Could not find document');
     return;
   }
 });
