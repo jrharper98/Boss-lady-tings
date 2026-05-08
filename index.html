@@ -321,11 +321,12 @@ function loadAll() {
     safe(sbGet('docs','order=uploaded.desc')),
     safe(sbGet('income_records','')),
     safe(sbGet('repeat_expenses','order=next_date.asc')),
-    safe(sbGet('ownit_sales','order=date.desc'))
+    safe(sbGet('ownit_sales','order=date.desc')),
+    safe(sbGet('paychecks','order=date.desc'))
   ]).then(function(r) {
-    var expenses=r[0]||[], events=r[1]||[], prices=r[2]||[], docs=r[3]||[], incomes=r[4]||[], repeats=r[5]||[], sales=r[6]||[];
+    var expenses=r[0]||[], events=r[1]||[], prices=r[2]||[], docs=r[3]||[], incomes=r[4]||[], repeats=r[5]||[], sales=r[6]||[], paychecks=r[7]||[];
     var keys=['rover','wyzant','itt','eve','ownit','pandora','alexfit'];
-    keys.forEach(function(k){ state[k].expenses=[]; if(state[k].events) state[k].events=[]; if(state[k].sales) state[k].sales=[]; });
+    keys.forEach(function(k){ state[k].expenses=[]; if(state[k].events) state[k].events=[]; if(state[k].sales) state[k].sales=[]; if(state[k].paychecks) state[k].paychecks=[]; });
     state.docs=[]; state.repeats=[];
     expenses.forEach(function(e){ if(state[e.biz]) state[e.biz].expenses.push({id:e.id,date:e.date,time:e.time,vendor:e.vendor,amount:e.amount,category:e.category,payMethod:e.pay_method,note:e.note,files:e.files?parseFiles(e.files):[]}); });
     events.forEach(function(e){ if(state[e.biz]) state[e.biz].events.push({id:e.id,name:e.name,date:e.date,ticketType:e.ticket_type,ticketQty:e.ticket_qty,revenue:e.revenue}); });
@@ -398,7 +399,6 @@ function switchBiz(b2){
   var tabs=document.querySelectorAll('.biz-tab');
   var keys=['rover','wyzant','itt','eve','ownit','pandora','alexfit'];
   for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle('active',keys[i]===b2);
-  // Switch to overview when tapping a business tab
   curView='overview';
   ['earnings','add','overview','docs','export'].forEach(function(x){ var el=document.getElementById('nav-'+x); if(el) el.classList.toggle('active',x==='overview'); });
   setSyncDot('syncing');
@@ -590,7 +590,8 @@ function buildPaycheckOverview(){
 
   // Log paycheck button
   h+='<div class="sec-label">Log paycheck</div><div class="card"><div class="card-body" style="padding-top:12px">';
-  h+='<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="pc-date"></div><div class="fg"><label>Amount ($)</label><input type="number" id="pc-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div></div>';
+  var todayPc=new Date().toISOString().split('T')[0];
+  h+='<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="pc-date" value="'+todayPc+'"></div><div class="fg"><label>Amount ($)</label><input type="number" id="pc-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div></div>';
   h+='<button class="btn-full" onclick="addPaycheck()">Log Paycheck</button></div></div>';
 
   // Paycheck history
@@ -619,9 +620,14 @@ function addPaycheck(){
   if(isNaN(amount)||amount<=0){toast('Enter a valid amount');return;}
   setSyncDot('syncing');
   sbInsert('paychecks',{id:genId(),biz:biz,date:date,amount:amount})
-    .then(function(){return loadAll();})
+    .then(function(){
+      // Clear the amount field immediately for quick re-entry
+      var amt=document.getElementById('pc-amount');
+      if(amt) amt.value='';
+      return loadAll();
+    })
     .then(function(){toast('✓ Paycheck logged');render();})
-    .catch(function(){setSyncDot('error');toast('Save failed');});
+    .catch(function(e){setSyncDot('error');console.error(e);toast('Save failed');});
 }
 
 function deletePaycheck(id){
@@ -722,6 +728,17 @@ function addPickBiz(b2){
   var tabs=document.querySelectorAll('.biz-tab');
   var keys=['rover','wyzant','itt','eve','ownit','pandora','alexfit'];
   for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle('active',keys[i]===b2);
+  if(PAYCHECK_BIZ.indexOf(b2)>=0){
+    // Route to overview where the paycheck log form lives
+    curView='overview'; addSubView='chooser';
+    ['earnings','add','overview','docs','export'].forEach(function(x){
+      var el=document.getElementById('nav-'+x);
+      if(el) el.classList.toggle('active',x==='overview');
+    });
+    setSyncDot('syncing');
+    loadAll().then(function(){render();});
+    return;
+  }
   if(b2==='rover'||b2==='wyzant'){ addSubView='expense'; }
   else { addSubView='action'; }
   render();
