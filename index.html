@@ -1323,10 +1323,9 @@ function buildEarnings(){
 },0);
     var inc;
     if(k==='ownit') inc=(state.ownit.sales||[]).reduce(function(s,sa){return s+(parseFloat(sa.quote)||0);},0);
-    else if(TICKET_BIZ.indexOf(k)>=0){
-      var p=state[k].ticketPrices||{single:65,couple:115};
-      inc=(state[k].events||[]).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0);
-    } else inc=parseFloat((state[k].income||{}).amount)||0;
+    else if(TICKET_BIZ.indexOf(k)>=0) inc=(state[k].events||[]).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0);
+    else if(PAYCHECK_BIZ.indexOf(k)>=0) inc=(state[k].paychecks||[]).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
+    else inc=parseFloat((state[k].income||{}).amount)||0;
     var profit=inc-exp;
     totalIncome+=inc; totalExpAll+=exp; totalProfitAll+=profit;
     var emoji={rover:'🐾',wyzant:'📚',itt:'💃',eve:'🌿',ownit:'💻',pandora:'💍',alexfit:'🏋️'}[k]||'💼';
