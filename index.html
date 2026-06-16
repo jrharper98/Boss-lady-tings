@@ -14,7 +14,7 @@
 <link rel="shortcut icon" type="image/png" href="apple-touch-icon.png">
 <title>Boss Lady Tings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Tangerine:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Clicker+Script&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -157,14 +157,14 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 </head>
 <body>
 <div id="loading">
-  <div class="load-title"><span style="font-family:'Playfair Display',Georgia,serif;font-weight:800">BO$$</span> <span style="font-family:'Tangerine',cursive;font-weight:700;font-size:32px;line-height:1;color:var(--lavender)">Lady Tings</span></div>
+  <div class="load-title"><span style="font-family:'Playfair Display',Georgia,serif;font-weight:800">BO$$</span> <span style="font-family:'Clicker Script',cursive;font-size:32px;line-height:1;color:var(--lavender)">Lady Tings</span></div>
   <div class="spinner"></div>
   <div class="load-sub">Syncing your data...</div>
 </div>
 <div id="app" style="display:none">
   <div class="safe-top"></div>
   <div class="header">
-    <div class="header-title"><span style="font-weight:800;color:var(--forest);font-family:'Playfair Display',Georgia,serif">BO$$</span> <span style="color:var(--lavender);font-family:'Tangerine',cursive;font-weight:700;font-size:26px;line-height:1">Lady Tings</span> <span class="sync-dot" id="sync-dot"></span></div>
+    <div class="header-title"><span style="font-weight:800;color:var(--forest);font-family:'Playfair Display',Georgia,serif">BO$$</span> <span style="color:var(--lavender);font-family:'Clicker Script',cursive;font-size:26px;line-height:1;vertical-align:baseline">Lady Tings</span> <span class="sync-dot" id="sync-dot"></span></div>
   </div>
   <div class="biz-tabs" id="biz-tabs">
     <div class="biz-tab active" onclick="switchBiz('rover')">🐾 Rover</div>
@@ -172,8 +172,6 @@ body { display: flex; flex-direction: column; overflow: hidden; }
     <div class="biz-tab" onclick="switchBiz('itt')">💃 It Takes Two</div>
     <div class="biz-tab" onclick="switchBiz('eve')">🌿 EVE</div>
     <div class="biz-tab" onclick="switchBiz('ownit')">💻 OwnIt</div>
-    <div class="biz-tab" onclick="switchBiz('pandora')">💍 Pandora</div>
-    <div class="biz-tab" onclick="switchBiz('alexfit')">🏋️ Alex Fitness</div>
   </div>
   <div class="content" id="content"></div>
   <div class="bottom-nav">
@@ -200,7 +198,7 @@ var CATS = {
   eve:    ['Decor','Food & Bev','Business Meals','Marketing','Utilities','Venue','Supplies','Transportation','Software','Phone Bill','iPad','Internet','Other'],
   ownit:  BASE_CATS.slice()
 };
-var PAY = ['— Select —','BoA CC','Apple Card','Venmo','PayPal','Personal Debit','Personal Checking','EventBrite Portal','Cash','Other'];
+var PAY = ['— Select —','BoA CC','Apple Card','Chase CC','Venmo','PayPal','Personal Debit','Personal Checking','EventBrite Portal','Cash','Other'];
 // ITT ticket options (dropdown)
 var ITT_TICKETS = [
   {label:'Single $65',    qty:1, price:65},
@@ -222,13 +220,13 @@ var SC_MAP = {
   'Decor':'Supplies (ln 22)',
   'Phone Bill':'Office expense — 15% (ln 18)',
   'iPad':'Depreciation/equipment — 25% (ln 13)',
-  'Internet':'Utilities — 40% deductible (ln 25)',
+  'Internet':'Utilities — 20% deductible (ln 25)',
   'Other':'Other expenses (ln 48)'
 };
 // Special Schedule C multipliers
 var SC_MULT = { 'Business Meals': 0.5, 'Phone Bill': 0.15, 'iPad': 0.25, 'Internet': 0.4 };
 
-var BIZ = {rover:'Rover',wyzant:'Wyzant',itt:'It Takes Two',eve:'EVE',ownit:'OwnIt',pandora:'Pandora',alexfit:'Alex Fitness'};
+var BIZ = {rover:'Rover',wyzant:'Wyzant',itt:'It Takes Two',eve:'EVE',ownit:'OwnIt'};
 var TICKET_BIZ = ['itt','eve'];
 var PAYCHECK_BIZ = ['pandora','alexfit'];
 var CAT_CLS = {
@@ -251,7 +249,6 @@ var state = {
   itt:{expenses:[],events:[],ticketPrices:{single:65,couple:115}},
   eve:{expenses:[],events:[],ticketPrices:{single:65,couple:115}},
   ownit:{expenses:[],sales:[]},
-  pandora:{paychecks:[]}, alexfit:{paychecks:[]},
   docs:[], repeats:[]
 };
 var biz='rover', curView='earnings', addSubView='chooser';
@@ -321,12 +318,11 @@ function loadAll() {
     safe(sbGet('docs','order=uploaded.desc')),
     safe(sbGet('income_records','')),
     safe(sbGet('repeat_expenses','order=next_date.asc')),
-    safe(sbGet('ownit_sales','order=date.desc')),
-    safe(sbGet('paychecks','order=date.desc'))
+    safe(sbGet('ownit_sales','order=date.desc'))
   ]).then(function(r) {
-    var expenses=r[0]||[], events=r[1]||[], prices=r[2]||[], docs=r[3]||[], incomes=r[4]||[], repeats=r[5]||[], sales=r[6]||[], paychecks=r[7]||[];
-    var keys=['rover','wyzant','itt','eve','ownit','pandora','alexfit'];
-    keys.forEach(function(k){ state[k].expenses=[]; if(state[k].events) state[k].events=[]; if(state[k].sales) state[k].sales=[]; if(state[k].paychecks) state[k].paychecks=[]; });
+    var expenses=r[0]||[], events=r[1]||[], prices=r[2]||[], docs=r[3]||[], incomes=r[4]||[], repeats=r[5]||[], sales=r[6]||[];
+    var keys=['rover','wyzant','itt','eve','ownit'];
+    keys.forEach(function(k){ state[k].expenses=[]; if(state[k].events) state[k].events=[]; if(state[k].sales) state[k].sales=[]; });
     state.docs=[]; state.repeats=[];
     expenses.forEach(function(e){ if(state[e.biz]) state[e.biz].expenses.push({id:e.id,date:e.date,time:e.time,vendor:e.vendor,amount:e.amount,category:e.category,payMethod:e.pay_method,note:e.note,files:e.files?parseFiles(e.files):[]}); });
     events.forEach(function(e){ if(state[e.biz]) state[e.biz].events.push({id:e.id,name:e.name,date:e.date,ticketType:e.ticket_type,ticketQty:e.ticket_qty,revenue:e.revenue}); });
@@ -335,7 +331,6 @@ function loadAll() {
     incomes.forEach(function(r){ if(state[r.biz]) state[r.biz].income={amount:r.amount||0,date:r.date||'',asOf:r.as_of||''}; });
     repeats.forEach(function(r){ state.repeats.push({id:r.id,biz:r.biz,vendor:r.vendor,amount:r.amount,category:r.category,payMethod:r.pay_method,note:r.note,freq:r.freq,nextDate:r.next_date}); });
     sales.forEach(function(s){ if(state.ownit) state.ownit.sales.push({id:s.id,date:s.date,clientName:s.client_name,appName:s.app_name,quote:s.quote,saleType:s.sale_type}); });
-    paychecks.forEach(function(p){ if(state[p.biz]) state[p.biz].paychecks.push({id:p.id,date:p.date,amount:p.amount}); });
     setSyncDot('synced'); return true;
   }).catch(function(err){ setSyncDot('error'); console.error(err); return false; });
 }
@@ -368,37 +363,15 @@ function totalExp(b){ return filteredExps(b).reduce(function(s,e){
 function filteredEvs(b){ var evs=state[b].events||[]; if(periodMode==='all') return evs; return evs.filter(function(ev){ if(!ev.date) return false; if(periodMode==='year') return ev.date.slice(0,4)===periodYear; if(periodMode==='month') return ev.date.slice(0,7)===periodMonth; return true; }); }
 function totalRev(b){ return filteredEvs(b).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0); }
 function totalAtt(b){ return filteredEvs(b).reduce(function(s,ev){return s+(parseInt(ev.ticketQty)||0);},0); }
-function getAvailableYears(b){
-  var y={};
-  (state[b].expenses||[]).forEach(function(e){if(e.date)y[e.date.slice(0,4)]=1;});
-  if(state[b].paychecks) state[b].paychecks.forEach(function(p){if(p.date)y[p.date.slice(0,4)]=1;});
-  return Object.keys(y).sort().reverse();
-}
-function getAvailableMonths(b){
-  var m={};
-  (state[b].expenses||[]).forEach(function(e){if(e.date)m[e.date.slice(0,7)]=1;});
-  if(state[b].paychecks) state[b].paychecks.forEach(function(p){if(p.date)m[p.date.slice(0,7)]=1;});
-  return Object.keys(m).sort().reverse();
-}
-function filteredPaychecks(b){
-  var all=(state[b]&&state[b].paychecks)||[];
-  if(periodMode==='all') return all;
-  return all.filter(function(p){
-    if(!p.date) return false;
-    if(periodMode==='year') return p.date.slice(0,4)===periodYear;
-    if(periodMode==='month') return p.date.slice(0,7)===periodMonth;
-    return true;
-  });
-}
-function totalPaycheckIncome(b){
-  return filteredPaychecks(b).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
-}
+function getAvailableYears(b){ var y={}; (state[b].expenses||[]).forEach(function(e){if(e.date)y[e.date.slice(0,4)]=1;}); return Object.keys(y).sort().reverse(); }
+function getAvailableMonths(b){ var m={}; (state[b].expenses||[]).forEach(function(e){if(e.date)m[e.date.slice(0,7)]=1;}); return Object.keys(m).sort().reverse(); }
 
 function switchBiz(b2){
   biz=b2; periodMode='all'; periodMonth=''; periodYear='';
   var tabs=document.querySelectorAll('.biz-tab');
-  var keys=['rover','wyzant','itt','eve','ownit','pandora','alexfit'];
+  var keys=['rover','wyzant','itt','eve','ownit'];
   for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle('active',keys[i]===b2);
+  // Switch to overview when tapping a business tab
   curView='overview';
   ['earnings','add','overview','docs','export'].forEach(function(x){ var el=document.getElementById('nav-'+x); if(el) el.classList.toggle('active',x==='overview'); });
   setSyncDot('syncing');
@@ -449,9 +422,6 @@ function buildPeriodBar(){
 
 // ── OVERVIEW ──
 function buildOverview(){
-  // Paycheck-only businesses get their own view
-  if(PAYCHECK_BIZ.indexOf(biz)>=0) return buildPaycheckOverview();
-
   var exps=filteredExps(biz);
   var isT=TICKET_BIZ.indexOf(biz)>=0, isOwnit=biz==='ownit';
   var te=totalExp(biz), tr=isT?totalRev(biz):0, profit=tr-te;
@@ -549,6 +519,9 @@ function buildOverview(){
     h+='</div>';
   }
 
+  // Quick add FAB button
+  h+='<div style="position:sticky;bottom:90px;display:flex;justify-content:flex-end;pointer-events:none;margin-bottom:-10px"><button onclick="quickAddFromOverview()" style="pointer-events:all;width:52px;height:52px;border-radius:50%;background:var(--olive);color:var(--sage);border:none;font-size:28px;font-weight:300;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;line-height:1">+</button></div>';
+
   // Expense log
   var sorted=exps.slice().sort(function(a,b){return new Date(b.date+' '+(b.time||'00:00'))-new Date(a.date+' '+(a.time||'00:00'));});
   h+='<div class="sec-label">Expense log ('+sorted.length+')</div><div class="card">';
@@ -571,78 +544,13 @@ function buildOverview(){
 }
 
 // ── ADD ──
-function buildPaycheckOverview(){
-  var paychecks = filteredPaychecks(biz);
-  var allPaychecks = (state[biz]&&state[biz].paychecks)||[];
-  var ytdTotal = allPaychecks.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
-  var periodTotal = paychecks.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
-
-  var years=getAvailableYears(biz), months=getAvailableMonths(biz);
-  var h=buildPeriodBar();
-
-  // Income YTD metric at top
-  h+='<div class="metrics">';
-  h+='<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Income YTD</div><div class="metric-val" style="color:var(--income)">'+fmt(ytdTotal)+'</div></div>';
-  if(periodMode!=='all'){
-    h+='<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">'+( periodMode==='month'?fmtMonthLabel(periodMonth):periodYear)+' income</div><div class="metric-val" style="color:var(--income)">'+fmt(periodTotal)+'</div></div>';
-  }
-  h+='</div>';
-
-  // Log paycheck button
-  h+='<div class="sec-label">Log paycheck</div><div class="card"><div class="card-body" style="padding-top:12px">';
-  var todayPc=new Date().toISOString().split('T')[0];
-  h+='<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="pc-date" value="'+todayPc+'"></div><div class="fg"><label>Amount ($)</label><input type="number" id="pc-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div></div>';
-  h+='<button class="btn-full" onclick="addPaycheck()">Log Paycheck</button></div></div>';
-
-  // Paycheck history
-  var sorted = allPaychecks.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
-  var display = periodMode==='all' ? sorted : paychecks.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
-
-  h+='<div class="sec-label">Paycheck history ('+display.length+')</div><div class="card">';
-  if(!display.length){
-    h+='<div class="empty">No paychecks logged'+(periodMode!=='all'?' for this period':'')+'. Log one above.</div>';
-  } else {
-    display.forEach(function(p){
-      h+='<div class="exp-row"><div class="exp-main"><div class="exp-vendor">'+fmtDate(p.date)+'</div></div>';
-      h+='<div class="exp-right"><div class="exp-amt" style="color:var(--income)">'+fmt(p.amount)+'</div>';
-      h+='<div class="exp-actions"><button class="btn-del" onclick="deletePaycheck(\''+p.id+'\')">Del</button></div></div></div>';
-    });
-    h+='<div class="total-row"><span>Period total</span><span style="color:var(--income)">'+fmt(periodTotal)+'</span></div>';
-  }
-  h+='</div>';
-  return h;
-}
-
-function addPaycheck(){
-  var date=document.getElementById('pc-date').value;
-  var amount=parseFloat(document.getElementById('pc-amount').value);
-  if(!date){toast('Select a date');return;}
-  if(isNaN(amount)||amount<=0){toast('Enter a valid amount');return;}
-  setSyncDot('syncing');
-  sbInsert('paychecks',{id:genId(),biz:biz,date:date,amount:amount})
-    .then(function(){
-      // Clear the amount field immediately for quick re-entry
-      var amt=document.getElementById('pc-amount');
-      if(amt) amt.value='';
-      return loadAll();
-    })
-    .then(function(){toast('✓ Paycheck logged');render();})
-    .catch(function(e){setSyncDot('error');console.error(e);toast('Save failed');});
-}
-
-function deletePaycheck(id){
-  if(!confirm('Delete this paycheck?')) return;
-  setSyncDot('syncing');
-  sbDelete('paychecks',id).then(function(){return loadAll();}).then(function(){toast('Deleted');render();});
-}
-
 function buildAdd(){
   // Chooser view - pick business
   if(addSubView==='chooser'){
     var h='<div class="sec-label">What are you logging?</div>';
     h+='<p style="font-size:13px;color:var(--text2);margin-bottom:14px">Choose a business to get started.</p>';
     h+='<div class="chooser-grid">';
-    var bizList=[['rover','🐾','Rover','Expense only'],['wyzant','📚','Wyzant','Expense only'],['itt','💃','It Takes Two','Expense or Income'],['eve','🌿','EVE','Expense or Income'],['ownit','💻','OwnIt','Expense or Sale'],['pandora','💍','Pandora','Log paychecks'],['alexfit','🏋️','Alex Fitness','Log paychecks']];
+    var bizList=[['rover','🐾','Rover','Expense only'],['wyzant','📚','Wyzant','Expense only'],['itt','💃','It Takes Two','Expense or Income'],['eve','🌿','EVE','Expense or Income'],['ownit','💻','OwnIt','Expense or Sale']];
     bizList.forEach(function(b){
       h+='<div class="chooser-card" data-biz="'+b[0]+'" onclick="addPickBiz(this.getAttribute(\'data-biz\'))"><span class="cc-icon">'+b[1]+'</span><span class="cc-label">'+b[2]+'</span><span style="font-size:10px;color:var(--text3);display:block;margin-top:3px">'+b[3]+'</span></div>';
     });
@@ -718,6 +626,34 @@ function buildAdd(){
   return '';
 }
 
+function quickAddFromOverview(){
+  // Switch to Add tab, pre-select current business, go straight to action
+  curView='add';
+  ['earnings','add','overview','docs','export'].forEach(function(x){
+    var el=document.getElementById('nav-'+x);
+    if(el) el.classList.toggle('active',x==='add');
+  });
+  if(PAYCHECK_BIZ.indexOf(biz)>=0){
+    // For paycheck biz, scroll to log form on overview instead
+    curView='overview';
+    ['earnings','add','overview','docs','export'].forEach(function(x){
+      var el=document.getElementById('nav-'+x);
+      if(el) el.classList.toggle('active',x==='overview');
+    });
+    render();
+    setTimeout(function(){
+      var pc=document.getElementById('pc-amount');
+      if(pc) pc.focus();
+    },100);
+    return;
+  }
+  _addFormInitialized=false;
+  pendingFiles=[]; pendingFileObjects=[]; window._pendingFileInput=[];
+  if(biz==='rover'||biz==='wyzant') addSubView='expense';
+  else addSubView='action';
+  render();
+}
+
 function goBackToChooser(){ addSubView='chooser'; _addFormInitialized=false; pendingFiles=[]; pendingFileObjects=[]; window._pendingFileInput=[]; render(); }
 function setAddSubView(v){ addSubView=v; render(); }
 function toggleUnassigned(el){ el.classList.toggle('unassigned', el.value===''); }
@@ -726,19 +662,8 @@ function triggerDocInput(){ var f=document.getElementById('doc-file'); if(f) f.c
 function addPickBiz(b2){
   biz=b2;
   var tabs=document.querySelectorAll('.biz-tab');
-  var keys=['rover','wyzant','itt','eve','ownit','pandora','alexfit'];
+  var keys=['rover','wyzant','itt','eve','ownit'];
   for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle('active',keys[i]===b2);
-  if(PAYCHECK_BIZ.indexOf(b2)>=0){
-    // Route to overview where the paycheck log form lives
-    curView='overview'; addSubView='chooser';
-    ['earnings','add','overview','docs','export'].forEach(function(x){
-      var el=document.getElementById('nav-'+x);
-      if(el) el.classList.toggle('active',x==='overview');
-    });
-    setSyncDot('syncing');
-    loadAll().then(function(){render();});
-    return;
-  }
   if(b2==='rover'||b2==='wyzant'){ addSubView='expense'; }
   else { addSubView='action'; }
   render();
@@ -820,7 +745,6 @@ function initAddDefaults(){
   var d=document.getElementById('a-date'); if(d&&!d.value) d.value=today;
   var ti=document.getElementById('a-time'); if(ti&&!ti.value) ti.value=t;
   var ed=document.getElementById('ev-date'); if(ed&&!ed.value) ed.value=today;
-  var pd=document.getElementById('pc-date'); if(pd&&!pd.value) pd.value=today;
   var sd=document.getElementById('sale-date'); if(sd&&!sd.value) sd.value=today;
   // Only reset files when freshly opening the expense form (not on re-render)
   if(_addFormInitialized===false){
@@ -1131,7 +1055,7 @@ function buildDocs(){
   var h='<div class="sec-label">Upload tax form</div><div class="card"><div class="card-body" style="padding-top:14px">';
   h+='<div class="form-row"><div class="fg"><label>Tax year</label><input type="number" id="doc-year" placeholder="'+new Date().getFullYear()+'" inputmode="numeric"></div>';
   h+='<div class="fg"><label>Business</label><select id="doc-biz"><option value="">— Select —</option>'+Object.keys(BIZ).map(function(k){return'<option value="'+BIZ[k]+'">'+BIZ[k]+'</option>';}).join('')+'</select></div></div>';
-  h+='<div class="fg" style="margin-bottom:12px"><label>Form type</label><select id="doc-type"><option value="">— Select —</option><option>1099-NEC</option><option>1099-K</option><option>Schedule C</option><option>W-9</option><option>Other</option></select></div>';
+  h+='<div class="fg" style="margin-bottom:12px"><label>Form type</label><select id="doc-type"><option value="">— Select —</option><option>1099-NEC</option><option>1099-K</option><option>W-2</option><option>Schedule C</option><option>W-9</option><option>Other</option></select></div>';
   h+='<div class="upload-zone" onclick="triggerDocInput()">📋 Tap to upload tax form (PDF or image)<input type="file" id="doc-file" style="display:none" accept=".pdf,image/*" multiple onchange="uploadDocs(this)"></div></div></div>';
 
   // Filters
@@ -1293,7 +1217,7 @@ function saveIncome(){
 
 // ── EARNINGS ──
 function buildEarnings(){
-  var keys=['rover','wyzant','itt','eve','ownit','pandora','alexfit'];
+  var keys=['rover','wyzant','itt','eve','ownit'];
   var totalIncome=0, totalExpAll=0, totalProfitAll=0;
   // Pre-calculate totals for summary box
   keys.forEach(function(k){
@@ -1301,7 +1225,6 @@ function buildEarnings(){
     var inc;
     if(k==='ownit') inc=(state.ownit.sales||[]).reduce(function(s,sa){return s+(parseFloat(sa.quote)||0);},0);
     else if(TICKET_BIZ.indexOf(k)>=0) inc=(state[k].events||[]).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0);
-    else if(PAYCHECK_BIZ.indexOf(k)>=0) inc=(state[k].paychecks||[]).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
     else inc=parseFloat((state[k].income||{}).amount)||0;
     totalIncome+=inc; totalExpAll+=exp; totalProfitAll+=(inc-exp);
   });
@@ -1323,12 +1246,13 @@ function buildEarnings(){
 },0);
     var inc;
     if(k==='ownit') inc=(state.ownit.sales||[]).reduce(function(s,sa){return s+(parseFloat(sa.quote)||0);},0);
-    else if(TICKET_BIZ.indexOf(k)>=0) inc=(state[k].events||[]).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0);
-    else if(PAYCHECK_BIZ.indexOf(k)>=0) inc=(state[k].paychecks||[]).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
-    else inc=parseFloat((state[k].income||{}).amount)||0;
+    else if(TICKET_BIZ.indexOf(k)>=0){
+      var p=state[k].ticketPrices||{single:65,couple:115};
+      inc=(state[k].events||[]).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0);
+    } else inc=parseFloat((state[k].income||{}).amount)||0;
     var profit=inc-exp;
     totalIncome+=inc; totalExpAll+=exp; totalProfitAll+=profit;
-    var emoji={rover:'🐾',wyzant:'📚',itt:'💃',eve:'🌿',ownit:'💻',pandora:'💍',alexfit:'🏋️'}[k]||'💼';
+    var emoji={rover:'🐾',wyzant:'📚',itt:'💃',eve:'🌿',ownit:'💻'}[k];
     h+='<div class="card" style="margin-bottom:10px">';
     h+='<div style="padding:12px 14px 0;font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">'+emoji+' '+BIZ[k]+'</div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--border)">';
@@ -1358,6 +1282,20 @@ function openEdit(id){
   h+='<div id="ed-existing-chips" style="margin-bottom:6px">'+renderExistingChips()+'</div>';
   h+='<div class="upload-zone" onclick="document.getElementById(\'ed-file\').click()">📎 Add new receipt or file<input type="file" id="ed-file" style="display:none" accept="image/*,.pdf" multiple onchange="handleEditFiles(this)"></div>';
   h+='<div id="ed-new-chips"></div></div>';
+  // Check if a matching repeat exists for this vendor+biz
+  var matchingRepeat=null;
+  for(var ri=0;ri<state.repeats.length;ri++){
+    if(state.repeats[ri].biz===biz && state.repeats[ri].vendor===e.vendor){
+      matchingRepeat=state.repeats[ri]; break;
+    }
+  }
+  if(matchingRepeat){
+    h+='<div style="background:var(--orange-light);border:1px solid var(--orange);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:10px">';
+    h+='<div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:6px">🔁 Repeat expense scheduled</div>';
+    h+='<div style="font-size:11px;color:var(--text2);margin-bottom:8px">'+FREQ_LABELS[matchingRepeat.freq]+' · Next: '+fmtDate(matchingRepeat.nextDate)+'</div>';
+    h+='<button class="btn-del" style="width:100%" onclick="cancelRepeat(\''+matchingRepeat.id+'\')">Cancel future repeats</button>';
+    h+='</div>';
+  }
   h+='<button class="btn-full" onclick="saveEdit()">Save Changes</button>';
   h+='<button class="btn-full" style="background:var(--bg2);color:var(--text2);margin-top:8px" onclick="closeModalDirect()">Cancel</button>';
   h+='</div></div>';
@@ -1395,6 +1333,16 @@ function rmNew(idx){
 function openReceipt(){ if(window._receiptUrl) window.open(window._receiptUrl,'_blank'); }
 function closeModal(evt){ if(evt.target.classList.contains('modal-overlay')) closeModalDirect(); }
 function closeModalDirect(){ document.getElementById('modal-root').innerHTML=''; editingId=null; editPendingFiles=[]; editExistingFiles=[]; editNewFileObjects=[]; }
+function cancelRepeat(id){
+  if(!confirm('Cancel all future repeats for this expense? The expense already logged will be kept.')) return;
+  setSyncDot('syncing');
+  sbDelete('repeat_expenses',id).then(function(){return loadAll();}).then(function(){
+    closeModalDirect();
+    toast('✓ Repeat schedule cancelled');
+    render();
+  }).catch(function(){setSyncDot('error');toast('Failed to cancel');});
+}
+
 function saveEdit(){
   var date=document.getElementById('ed-date').value;
   var time=document.getElementById('ed-time').value;
@@ -1456,7 +1404,7 @@ function renderSchedC(){
   var total=0, h='<div class="card" style="margin:0">';
   Object.keys(map).sort(function(a,b){return map[b]-map[a];}).forEach(function(k){total+=map[k];h+='<div class="schc-row"><span style="color:var(--text2)">'+k+'</span><strong>'+fmt(map[k])+'</strong></div>';});
   h+='<div class="schc-row" style="background:var(--bg2)"><span>Total deductible</span><strong style="color:var(--red)">'+fmt(total)+'</strong></div>';
-  h+='<div style="padding:10px 14px;font-size:11px;color:var(--text3)">* Business Meals at 50% · Phone Bill at 15% · iPad at 25% · Internet at 40% per IRS rules</div></div>';
+  h+='<div style="padding:10px 14px;font-size:11px;color:var(--text3)">* Business Meals at 50% · Phone Bill at 15% · iPad at 25% · Internet at 20% per IRS rules</div></div>';
   out.innerHTML=h;
 }
 
