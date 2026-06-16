@@ -368,7 +368,12 @@ function totalExp(b){ return filteredExps(b).reduce(function(s,e){
 function filteredEvs(b){ var evs=state[b].events||[]; if(periodMode==='all') return evs; return evs.filter(function(ev){ if(!ev.date) return false; if(periodMode==='year') return ev.date.slice(0,4)===periodYear; if(periodMode==='month') return ev.date.slice(0,7)===periodMonth; return true; }); }
 function totalRev(b){ return filteredEvs(b).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0); }
 function totalAtt(b){ return filteredEvs(b).reduce(function(s,ev){return s+(parseInt(ev.ticketQty)||0);},0); }
-function getAvailableYears(b){ var y={}; (state[b].expenses||[]).forEach(function(e){if(e.date)y[e.date.slice(0,4)]=1;}); return Object.keys(y).sort().reverse(); }
+function getAvailableYears(b){
+  var y={};
+  (state[b].expenses||[]).forEach(function(e){if(e.date)y[e.date.slice(0,4)]=1;});
+  if(state[b]&&state[b].paychecks) state[b].paychecks.forEach(function(p){if(p.date)y[p.date.slice(0,4)]=1;});
+  return Object.keys(y).sort().reverse();
+}
 function getAvailableMonths(b){ var m={}; (state[b].expenses||[]).forEach(function(e){if(e.date)m[e.date.slice(0,7)]=1;}); return Object.keys(m).sort().reverse(); }
 
 function switchBiz(b2){
@@ -549,6 +554,84 @@ function buildOverview(){
 }
 
 // ── ADD ──
+function filteredPaychecks(b){
+  var all=(state[b]&&state[b].paychecks)||[];
+  if(periodMode==='all') return all;
+  return all.filter(function(p){
+    if(!p.date) return false;
+    if(periodMode==='year') return p.date.slice(0,4)===periodYear;
+    if(periodMode==='month') return p.date.slice(0,7)===periodMonth;
+    return true;
+  });
+}
+
+function totalPaycheckIncome(b){
+  return ((state[b]&&state[b].paychecks)||[]).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
+}
+
+function buildPaycheckOverview(){
+  var allPaychecks=(state[biz]&&state[biz].paychecks)||[];
+  var paychecks=filteredPaychecks(biz);
+  var ytdTotal=allPaychecks.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
+  var periodTotal=paychecks.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
+
+  var h=buildPeriodBar();
+
+  h+='<div class="metrics">';
+  h+='<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Income YTD</div><div class="metric-val" style="color:var(--income)">'+fmt(ytdTotal)+'</div></div>';
+  if(periodMode!=='all'){
+    h+='<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">'+(periodMode==='month'?fmtMonthLabel(periodMonth):periodYear)+' income</div><div class="metric-val" style="color:var(--income)">'+fmt(periodTotal)+'</div></div>';
+  }
+  h+='</div>';
+
+  h+='<div style="position:sticky;bottom:90px;display:flex;justify-content:flex-end;pointer-events:none;margin-bottom:-10px"><button onclick="quickAddFromOverview()" style="pointer-events:all;width:52px;height:52px;border-radius:50%;background:var(--olive);color:var(--sage);border:none;font-size:28px;font-weight:300;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;line-height:1">+</button></div>';
+
+  var todayPc=new Date().toISOString().split('T')[0];
+  h+='<div class="sec-label">Log paycheck</div><div class="card"><div class="card-body" style="padding-top:12px">';
+  h+='<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="pc-date" value="'+todayPc+'"></div><div class="fg"><label>Amount ($)</label><input type="number" id="pc-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div></div>';
+  h+='<button class="btn-full" onclick="addPaycheck()">Log Paycheck</button></div></div>';
+
+  var sorted=allPaychecks.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+  var display=periodMode==='all'?sorted:paychecks.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+
+  h+='<div class="sec-label">Paycheck history ('+display.length+')</div><div class="card">';
+  if(!display.length){
+    h+='<div class="empty">No paychecks logged'+(periodMode!=='all'?' for this period':'')+'. Log one above.</div>';
+  } else {
+    display.forEach(function(p){
+      h+='<div class="exp-row"><div class="exp-main"><div class="exp-vendor">'+fmtDate(p.date)+'</div></div>';
+      h+='<div class="exp-right"><div class="exp-amt" style="color:var(--income)">'+fmt(p.amount)+'</div>';
+      h+='<div class="exp-actions"><button class="btn-del" onclick="deletePaycheck(\''+p.id+'\')">Del</button></div></div></div>';
+    });
+    h+='<div class="total-row"><span>Period total</span><span style="color:var(--income)">'+fmt(periodTotal)+'</span></div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function addPaycheck(){
+  var date=document.getElementById('pc-date').value;
+  var amount=parseFloat(document.getElementById('pc-amount').value);
+  if(!date){toast('Select a date');return;}
+  if(isNaN(amount)||amount<=0){toast('Enter a valid amount');return;}
+  setSyncDot('syncing');
+  sbInsert('paychecks',{id:genId(),biz:biz,date:date,amount:amount})
+    .then(function(){
+      var amt=document.getElementById('pc-amount');
+      if(amt) amt.value='';
+      return loadAll();
+    })
+    .then(function(){toast('\u2713 Paycheck logged');render();})
+    .catch(function(e){setSyncDot('error');console.error(e);toast('Save failed');});
+}
+
+function deletePaycheck(id){
+  if(!confirm('Delete this paycheck?')) return;
+  setSyncDot('syncing');
+  sbDelete('paychecks',id).then(function(){return loadAll();}).then(function(){toast('Deleted');render();});
+}
+
+
 function buildAdd(){
   // Chooser view - pick business
   if(addSubView==='chooser'){
@@ -1257,7 +1340,7 @@ function buildEarnings(){
     } else inc=parseFloat((state[k].income||{}).amount)||0;
     var profit=inc-exp;
     totalIncome+=inc; totalExpAll+=exp; totalProfitAll+=profit;
-    var emoji={rover:'🐾',wyzant:'📚',itt:'💃',eve:'🌿',ownit:'💻'}[k];
+    var emoji={rover:'🐾',wyzant:'📚',itt:'💃',eve:'🌿',ownit:'💻',pandora:'💍',alexfit:'🏋️'}[k]||'💼';
     h+='<div class="card" style="margin-bottom:10px">';
     h+='<div style="padding:12px 14px 0;font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">'+emoji+' '+BIZ[k]+'</div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--border)">';
