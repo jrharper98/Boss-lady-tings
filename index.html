@@ -325,7 +325,7 @@ function loadAll() {
     safe(sbGet('paychecks','order=date.desc'))
   ]).then(function(r) {
     var expenses=r[0]||[], events=r[1]||[], prices=r[2]||[], docs=r[3]||[], incomes=r[4]||[], repeats=r[5]||[], sales=r[6]||[], paychecks=r[7]||[];
-    var keys=['rover','wyzant','itt','eve','ownit'];
+    var keys=['rover','wyzant','itt','eve','ownit','pandora','alexfit'];
     keys.forEach(function(k){ state[k].expenses=[]; if(state[k].events) state[k].events=[]; if(state[k].sales) state[k].sales=[]; if(state[k].paychecks) state[k].paychecks=[]; });
     state.docs=[]; state.repeats=[];
     expenses.forEach(function(e){ if(state[e.biz]) state[e.biz].expenses.push({id:e.id,date:e.date,time:e.time,vendor:e.vendor,amount:e.amount,category:e.category,payMethod:e.pay_method,note:e.note,files:e.files?parseFiles(e.files):[]}); });
@@ -371,17 +371,34 @@ function totalAtt(b){ return filteredEvs(b).reduce(function(s,ev){return s+(pars
 function getAvailableYears(b){
   var y={};
   (state[b].expenses||[]).forEach(function(e){if(e.date)y[e.date.slice(0,4)]=1;});
-  if(state[b]&&state[b].paychecks) state[b].paychecks.forEach(function(p){if(p.date)y[p.date.slice(0,4)]=1;});
+  if(state[b].paychecks) state[b].paychecks.forEach(function(p){if(p.date)y[p.date.slice(0,4)]=1;});
   return Object.keys(y).sort().reverse();
 }
-function getAvailableMonths(b){ var m={}; (state[b].expenses||[]).forEach(function(e){if(e.date)m[e.date.slice(0,7)]=1;}); return Object.keys(m).sort().reverse(); }
+function getAvailableMonths(b){
+  var m={};
+  (state[b].expenses||[]).forEach(function(e){if(e.date)m[e.date.slice(0,7)]=1;});
+  if(state[b].paychecks) state[b].paychecks.forEach(function(p){if(p.date)m[p.date.slice(0,7)]=1;});
+  return Object.keys(m).sort().reverse();
+}
+function filteredPaychecks(b){
+  var all=(state[b]&&state[b].paychecks)||[];
+  if(periodMode==='all') return all;
+  return all.filter(function(p){
+    if(!p.date) return false;
+    if(periodMode==='year') return p.date.slice(0,4)===periodYear;
+    if(periodMode==='month') return p.date.slice(0,7)===periodMonth;
+    return true;
+  });
+}
+function totalPaycheckIncome(b){
+  return filteredPaychecks(b).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
+}
 
 function switchBiz(b2){
   biz=b2; periodMode='all'; periodMonth=''; periodYear='';
   var tabs=document.querySelectorAll('.biz-tab');
-  var keys=['rover','wyzant','itt','eve','ownit'];
+  var keys=['rover','wyzant','itt','eve','ownit','pandora','alexfit'];
   for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle('active',keys[i]===b2);
-  // Switch to overview when tapping a business tab
   curView='overview';
   ['earnings','add','overview','docs','export'].forEach(function(x){ var el=document.getElementById('nav-'+x); if(el) el.classList.toggle('active',x==='overview'); });
   setSyncDot('syncing');
@@ -432,6 +449,9 @@ function buildPeriodBar(){
 
 // ── OVERVIEW ──
 function buildOverview(){
+  // Paycheck-only businesses get their own view
+  if(PAYCHECK_BIZ.indexOf(biz)>=0) return buildPaycheckOverview();
+
   var exps=filteredExps(biz);
   var isT=TICKET_BIZ.indexOf(biz)>=0, isOwnit=biz==='ownit';
   var te=totalExp(biz), tr=isT?totalRev(biz):0, profit=tr-te;
@@ -529,7 +549,7 @@ function buildOverview(){
     h+='</div>';
   }
 
-  // Quick add FAB button
+  // FAB plus button
   h+='<div style="position:sticky;bottom:90px;display:flex;justify-content:flex-end;pointer-events:none;margin-bottom:-10px"><button onclick="quickAddFromOverview()" style="pointer-events:all;width:52px;height:52px;border-radius:50%;background:var(--olive);color:var(--sage);border:none;font-size:28px;font-weight:300;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;line-height:1">+</button></div>';
 
   // Expense log
@@ -554,45 +574,32 @@ function buildOverview(){
 }
 
 // ── ADD ──
-function filteredPaychecks(b){
-  var all=(state[b]&&state[b].paychecks)||[];
-  if(periodMode==='all') return all;
-  return all.filter(function(p){
-    if(!p.date) return false;
-    if(periodMode==='year') return p.date.slice(0,4)===periodYear;
-    if(periodMode==='month') return p.date.slice(0,7)===periodMonth;
-    return true;
-  });
-}
-
-function totalPaycheckIncome(b){
-  return ((state[b]&&state[b].paychecks)||[]).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
-}
-
 function buildPaycheckOverview(){
-  var allPaychecks=(state[biz]&&state[biz].paychecks)||[];
-  var paychecks=filteredPaychecks(biz);
-  var ytdTotal=allPaychecks.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
-  var periodTotal=paychecks.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
+  var paychecks = filteredPaychecks(biz);
+  var allPaychecks = (state[biz]&&state[biz].paychecks)||[];
+  var ytdTotal = allPaychecks.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
+  var periodTotal = paychecks.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
 
+  var years=getAvailableYears(biz), months=getAvailableMonths(biz);
   var h=buildPeriodBar();
 
+  // Income YTD metric at top
   h+='<div class="metrics">';
   h+='<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">Income YTD</div><div class="metric-val" style="color:var(--income)">'+fmt(ytdTotal)+'</div></div>';
   if(periodMode!=='all'){
-    h+='<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">'+(periodMode==='month'?fmtMonthLabel(periodMonth):periodYear)+' income</div><div class="metric-val" style="color:var(--income)">'+fmt(periodTotal)+'</div></div>';
+    h+='<div class="metric" style="grid-column:1/-1"><div class="metric-lbl">'+( periodMode==='month'?fmtMonthLabel(periodMonth):periodYear)+' income</div><div class="metric-val" style="color:var(--income)">'+fmt(periodTotal)+'</div></div>';
   }
   h+='</div>';
 
-  h+='<div style="position:sticky;bottom:90px;display:flex;justify-content:flex-end;pointer-events:none;margin-bottom:-10px"><button onclick="quickAddFromOverview()" style="pointer-events:all;width:52px;height:52px;border-radius:50%;background:var(--olive);color:var(--sage);border:none;font-size:28px;font-weight:300;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;line-height:1">+</button></div>';
-
-  var todayPc=new Date().toISOString().split('T')[0];
+  // Log paycheck button
   h+='<div class="sec-label">Log paycheck</div><div class="card"><div class="card-body" style="padding-top:12px">';
+  var todayPc=new Date().toISOString().split('T')[0];
   h+='<div class="form-row"><div class="fg"><label>Date</label><input type="date" id="pc-date" value="'+todayPc+'"></div><div class="fg"><label>Amount ($)</label><input type="number" id="pc-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div></div>';
   h+='<button class="btn-full" onclick="addPaycheck()">Log Paycheck</button></div></div>';
 
-  var sorted=allPaychecks.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
-  var display=periodMode==='all'?sorted:paychecks.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+  // Paycheck history
+  var sorted = allPaychecks.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+  var display = periodMode==='all' ? sorted : paychecks.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
 
   h+='<div class="sec-label">Paycheck history ('+display.length+')</div><div class="card">';
   if(!display.length){
@@ -617,11 +624,12 @@ function addPaycheck(){
   setSyncDot('syncing');
   sbInsert('paychecks',{id:genId(),biz:biz,date:date,amount:amount})
     .then(function(){
+      // Clear the amount field immediately for quick re-entry
       var amt=document.getElementById('pc-amount');
       if(amt) amt.value='';
       return loadAll();
     })
-    .then(function(){toast('\u2713 Paycheck logged');render();})
+    .then(function(){toast('✓ Paycheck logged');render();})
     .catch(function(e){setSyncDot('error');console.error(e);toast('Save failed');});
 }
 
@@ -631,14 +639,13 @@ function deletePaycheck(id){
   sbDelete('paychecks',id).then(function(){return loadAll();}).then(function(){toast('Deleted');render();});
 }
 
-
 function buildAdd(){
   // Chooser view - pick business
   if(addSubView==='chooser'){
     var h='<div class="sec-label">What are you logging?</div>';
     h+='<p style="font-size:13px;color:var(--text2);margin-bottom:14px">Choose a business to get started.</p>';
     h+='<div class="chooser-grid">';
-    var bizList=[['rover','🐾','Rover','Expense only'],['wyzant','📚','Wyzant','Expense only'],['itt','💃','It Takes Two','Expense or Income'],['eve','🌿','EVE','Expense or Income'],['ownit','💻','OwnIt','Expense or Sale']];
+    var bizList=[['rover','🐾','Rover','Expense only'],['wyzant','📚','Wyzant','Expense only'],['itt','💃','It Takes Two','Expense or Income'],['eve','🌿','EVE','Expense or Income'],['ownit','💻','OwnIt','Expense or Sale'],['pandora','💍','Pandora','Log paychecks'],['alexfit','🏋️','Alex Fitness','Log paychecks']];
     bizList.forEach(function(b){
       h+='<div class="chooser-card" data-biz="'+b[0]+'" onclick="addPickBiz(this.getAttribute(\'data-biz\'))"><span class="cc-icon">'+b[1]+'</span><span class="cc-label">'+b[2]+'</span><span style="font-size:10px;color:var(--text3);display:block;margin-top:3px">'+b[3]+'</span></div>';
     });
@@ -715,26 +722,18 @@ function buildAdd(){
 }
 
 function quickAddFromOverview(){
-  // Switch to Add tab, pre-select current business, go straight to action
+  if(PAYCHECK_BIZ.indexOf(biz)>=0){
+    var pc=document.getElementById('pc-amount');
+    if(pc){ pc.focus(); return; }
+    render();
+    setTimeout(function(){ var a=document.getElementById('pc-amount'); if(a) a.focus(); },100);
+    return;
+  }
   curView='add';
   ['earnings','add','overview','docs','export'].forEach(function(x){
     var el=document.getElementById('nav-'+x);
     if(el) el.classList.toggle('active',x==='add');
   });
-  if(PAYCHECK_BIZ.indexOf(biz)>=0){
-    // For paycheck biz, scroll to log form on overview instead
-    curView='overview';
-    ['earnings','add','overview','docs','export'].forEach(function(x){
-      var el=document.getElementById('nav-'+x);
-      if(el) el.classList.toggle('active',x==='overview');
-    });
-    render();
-    setTimeout(function(){
-      var pc=document.getElementById('pc-amount');
-      if(pc) pc.focus();
-    },100);
-    return;
-  }
   _addFormInitialized=false;
   pendingFiles=[]; pendingFileObjects=[]; window._pendingFileInput=[];
   if(biz==='rover'||biz==='wyzant') addSubView='expense';
@@ -750,8 +749,19 @@ function triggerDocInput(){ var f=document.getElementById('doc-file'); if(f) f.c
 function addPickBiz(b2){
   biz=b2;
   var tabs=document.querySelectorAll('.biz-tab');
-  var keys=['rover','wyzant','itt','eve','ownit'];
+  var keys=['rover','wyzant','itt','eve','ownit','pandora','alexfit'];
   for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle('active',keys[i]===b2);
+  if(PAYCHECK_BIZ.indexOf(b2)>=0){
+    // Route to overview where the paycheck log form lives
+    curView='overview'; addSubView='chooser';
+    ['earnings','add','overview','docs','export'].forEach(function(x){
+      var el=document.getElementById('nav-'+x);
+      if(el) el.classList.toggle('active',x==='overview');
+    });
+    setSyncDot('syncing');
+    loadAll().then(function(){render();});
+    return;
+  }
   if(b2==='rover'||b2==='wyzant'){ addSubView='expense'; }
   else { addSubView='action'; }
   render();
@@ -833,6 +843,7 @@ function initAddDefaults(){
   var d=document.getElementById('a-date'); if(d&&!d.value) d.value=today;
   var ti=document.getElementById('a-time'); if(ti&&!ti.value) ti.value=t;
   var ed=document.getElementById('ev-date'); if(ed&&!ed.value) ed.value=today;
+  var pd=document.getElementById('pc-date'); if(pd&&!pd.value) pd.value=today;
   var sd=document.getElementById('sale-date'); if(sd&&!sd.value) sd.value=today;
   // Only reset files when freshly opening the expense form (not on re-render)
   if(_addFormInitialized===false){
@@ -1305,7 +1316,7 @@ function saveIncome(){
 
 // ── EARNINGS ──
 function buildEarnings(){
-  var keys=['rover','wyzant','itt','eve','ownit'];
+  var keys=['rover','wyzant','itt','eve','ownit','pandora','alexfit'];
   var totalIncome=0, totalExpAll=0, totalProfitAll=0;
   // Pre-calculate totals for summary box
   keys.forEach(function(k){
@@ -1313,6 +1324,7 @@ function buildEarnings(){
     var inc;
     if(k==='ownit') inc=(state.ownit.sales||[]).reduce(function(s,sa){return s+(parseFloat(sa.quote)||0);},0);
     else if(TICKET_BIZ.indexOf(k)>=0) inc=(state[k].events||[]).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0);
+    else if(PAYCHECK_BIZ.indexOf(k)>=0) inc=(state[k].paychecks||[]).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
     else inc=parseFloat((state[k].income||{}).amount)||0;
     totalIncome+=inc; totalExpAll+=exp; totalProfitAll+=(inc-exp);
   });
@@ -1334,10 +1346,9 @@ function buildEarnings(){
 },0);
     var inc;
     if(k==='ownit') inc=(state.ownit.sales||[]).reduce(function(s,sa){return s+(parseFloat(sa.quote)||0);},0);
-    else if(TICKET_BIZ.indexOf(k)>=0){
-      var p=state[k].ticketPrices||{single:65,couple:115};
-      inc=(state[k].events||[]).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0);
-    } else inc=parseFloat((state[k].income||{}).amount)||0;
+    else if(TICKET_BIZ.indexOf(k)>=0) inc=(state[k].events||[]).reduce(function(s,ev){return s+(parseFloat(ev.revenue)||0);},0);
+    else if(PAYCHECK_BIZ.indexOf(k)>=0) inc=(state[k].paychecks||[]).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
+    else inc=parseFloat((state[k].income||{}).amount)||0;
     var profit=inc-exp;
     totalIncome+=inc; totalExpAll+=exp; totalProfitAll+=profit;
     var emoji={rover:'🐾',wyzant:'📚',itt:'💃',eve:'🌿',ownit:'💻',pandora:'💍',alexfit:'🏋️'}[k]||'💼';
@@ -1370,16 +1381,16 @@ function openEdit(id){
   h+='<div id="ed-existing-chips" style="margin-bottom:6px">'+renderExistingChips()+'</div>';
   h+='<div class="upload-zone" onclick="document.getElementById(\'ed-file\').click()">📎 Add new receipt or file<input type="file" id="ed-file" style="display:none" accept="image/*,.pdf" multiple onchange="handleEditFiles(this)"></div>';
   h+='<div id="ed-new-chips"></div></div>';
-  // Check if a matching repeat exists for this vendor+biz
+  // Show cancel repeat option if a matching repeat exists
   var matchingRepeat=null;
   for(var ri=0;ri<state.repeats.length;ri++){
-    if(state.repeats[ri].biz===biz && state.repeats[ri].vendor===e.vendor){
+    if(state.repeats[ri].biz===biz&&state.repeats[ri].vendor===e.vendor){
       matchingRepeat=state.repeats[ri]; break;
     }
   }
   if(matchingRepeat){
     h+='<div style="background:var(--orange-light);border:1px solid var(--orange);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:10px">';
-    h+='<div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:6px">🔁 Repeat expense scheduled</div>';
+    h+='<div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:4px">🔁 Repeat scheduled</div>';
     h+='<div style="font-size:11px;color:var(--text2);margin-bottom:8px">'+FREQ_LABELS[matchingRepeat.freq]+' · Next: '+fmtDate(matchingRepeat.nextDate)+'</div>';
     h+='<button class="btn-del" style="width:100%" onclick="cancelRepeat(\''+matchingRepeat.id+'\')">Cancel future repeats</button>';
     h+='</div>';
@@ -1422,13 +1433,11 @@ function openReceipt(){ if(window._receiptUrl) window.open(window._receiptUrl,'_
 function closeModal(evt){ if(evt.target.classList.contains('modal-overlay')) closeModalDirect(); }
 function closeModalDirect(){ document.getElementById('modal-root').innerHTML=''; editingId=null; editPendingFiles=[]; editExistingFiles=[]; editNewFileObjects=[]; }
 function cancelRepeat(id){
-  if(!confirm('Cancel all future repeats for this expense? The expense already logged will be kept.')) return;
+  if(!confirm('Cancel all future repeats for this expense? The already-logged expense will be kept.')) return;
   setSyncDot('syncing');
   sbDelete('repeat_expenses',id).then(function(){return loadAll();}).then(function(){
-    closeModalDirect();
-    toast('✓ Repeat schedule cancelled');
-    render();
-  }).catch(function(){setSyncDot('error');toast('Failed to cancel');});
+    closeModalDirect(); toast('✓ Repeat cancelled'); render();
+  }).catch(function(){setSyncDot('error');toast('Failed');});
 }
 
 function saveEdit(){
