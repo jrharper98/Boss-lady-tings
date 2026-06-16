@@ -172,6 +172,8 @@ body { display: flex; flex-direction: column; overflow: hidden; }
     <div class="biz-tab" onclick="switchBiz('itt')">💃 It Takes Two</div>
     <div class="biz-tab" onclick="switchBiz('eve')">🌿 EVE</div>
     <div class="biz-tab" onclick="switchBiz('ownit')">💻 OwnIt</div>
+    <div class="biz-tab" onclick="switchBiz('pandora')">💍 Pandora</div>
+    <div class="biz-tab" onclick="switchBiz('alexfit')">🏋️ Alex Fitness</div>
   </div>
   <div class="content" id="content"></div>
   <div class="bottom-nav">
@@ -224,9 +226,9 @@ var SC_MAP = {
   'Other':'Other expenses (ln 48)'
 };
 // Special Schedule C multipliers
-var SC_MULT = { 'Business Meals': 0.5, 'Phone Bill': 0.15, 'iPad': 0.25, 'Internet': 0.4 };
+var SC_MULT = { 'Business Meals': 0.5, 'Phone Bill': 0.15, 'iPad': 0.25, 'Internet': 0.20 };
 
-var BIZ = {rover:'Rover',wyzant:'Wyzant',itt:'It Takes Two',eve:'EVE',ownit:'OwnIt'};
+var BIZ = {rover:'Rover',wyzant:'Wyzant',itt:'It Takes Two',eve:'EVE',ownit:'OwnIt',pandora:'Pandora',alexfit:'Alex Fitness'};
 var TICKET_BIZ = ['itt','eve'];
 var PAYCHECK_BIZ = ['pandora','alexfit'];
 var CAT_CLS = {
@@ -249,6 +251,7 @@ var state = {
   itt:{expenses:[],events:[],ticketPrices:{single:65,couple:115}},
   eve:{expenses:[],events:[],ticketPrices:{single:65,couple:115}},
   ownit:{expenses:[],sales:[]},
+  pandora:{paychecks:[]}, alexfit:{paychecks:[]},
   docs:[], repeats:[]
 };
 var biz='rover', curView='earnings', addSubView='chooser';
@@ -318,11 +321,12 @@ function loadAll() {
     safe(sbGet('docs','order=uploaded.desc')),
     safe(sbGet('income_records','')),
     safe(sbGet('repeat_expenses','order=next_date.asc')),
-    safe(sbGet('ownit_sales','order=date.desc'))
+    safe(sbGet('ownit_sales','order=date.desc')),
+    safe(sbGet('paychecks','order=date.desc'))
   ]).then(function(r) {
-    var expenses=r[0]||[], events=r[1]||[], prices=r[2]||[], docs=r[3]||[], incomes=r[4]||[], repeats=r[5]||[], sales=r[6]||[];
+    var expenses=r[0]||[], events=r[1]||[], prices=r[2]||[], docs=r[3]||[], incomes=r[4]||[], repeats=r[5]||[], sales=r[6]||[], paychecks=r[7]||[];
     var keys=['rover','wyzant','itt','eve','ownit'];
-    keys.forEach(function(k){ state[k].expenses=[]; if(state[k].events) state[k].events=[]; if(state[k].sales) state[k].sales=[]; });
+    keys.forEach(function(k){ state[k].expenses=[]; if(state[k].events) state[k].events=[]; if(state[k].sales) state[k].sales=[]; if(state[k].paychecks) state[k].paychecks=[]; });
     state.docs=[]; state.repeats=[];
     expenses.forEach(function(e){ if(state[e.biz]) state[e.biz].expenses.push({id:e.id,date:e.date,time:e.time,vendor:e.vendor,amount:e.amount,category:e.category,payMethod:e.pay_method,note:e.note,files:e.files?parseFiles(e.files):[]}); });
     events.forEach(function(e){ if(state[e.biz]) state[e.biz].events.push({id:e.id,name:e.name,date:e.date,ticketType:e.ticket_type,ticketQty:e.ticket_qty,revenue:e.revenue}); });
@@ -331,6 +335,7 @@ function loadAll() {
     incomes.forEach(function(r){ if(state[r.biz]) state[r.biz].income={amount:r.amount||0,date:r.date||'',asOf:r.as_of||''}; });
     repeats.forEach(function(r){ state.repeats.push({id:r.id,biz:r.biz,vendor:r.vendor,amount:r.amount,category:r.category,payMethod:r.pay_method,note:r.note,freq:r.freq,nextDate:r.next_date}); });
     sales.forEach(function(s){ if(state.ownit) state.ownit.sales.push({id:s.id,date:s.date,clientName:s.client_name,appName:s.app_name,quote:s.quote,saleType:s.sale_type}); });
+    paychecks.forEach(function(p){ if(state[p.biz]) state[p.biz].paychecks.push({id:p.id,date:p.date,amount:p.amount}); });
     setSyncDot('synced'); return true;
   }).catch(function(err){ setSyncDot('error'); console.error(err); return false; });
 }
